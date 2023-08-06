@@ -56,4 +56,15 @@ public class ViewController {
     public ResponseDto joinFormHandler(MemberRequestDto memberRequestDto){
         return memberController.insertMember(memberRequestDto);
     }
+
+    @GetMapping("/dev/loginSuccess")
+    public String loginSuccess(){
+        return "loginSuccess";
+    }
+
+    @PostMapping("/login")
+    @ResponseBody
+    public String login(){
+        return "login";
+    }
 }

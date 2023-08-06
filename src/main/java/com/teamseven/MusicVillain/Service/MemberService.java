@@ -5,6 +5,7 @@ import com.teamseven.MusicVillain.DTO.MemberRequestDto;
 import com.teamseven.MusicVillain.Repository.MemberRepository;
 import com.teamseven.MusicVillain.Status;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.UUID;
 import java.time.LocalDateTime;
@@ -14,11 +15,14 @@ import static java.util.UUID.*;
 
 @Service
 public class MemberService {
+
     private final MemberRepository memberRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
-    public MemberService(MemberRepository memberRepository){
+    public MemberService(MemberRepository memberRepository, BCryptPasswordEncoder bCryptPasswordEncoder){
         this.memberRepository = memberRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
     public List<Member> getAllMembers(){
@@ -45,11 +49,12 @@ public class MemberService {
             return Status.BAD_REQUEST;
         }
 
+
         // 새로운 멤버 생성
         Member member = Member.builder()
                 .memberId(UUID.randomUUID().toString().replace("-", ""))
                 .userId(memberRequestDto.getUserId())
-                .userInfo(memberRequestDto.getUserInfo())
+                .userInfo(bCryptPasswordEncoder.encode(memberRequestDto.getUserInfo()))
                 .name(memberRequestDto.getName())
                 .email(memberRequestDto.getEmail())
                 .role("USER")
