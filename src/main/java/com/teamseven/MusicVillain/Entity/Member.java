@@ -1,5 +1,6 @@
 package com.teamseven.MusicVillain.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -53,6 +54,7 @@ public class Member {
         this.lastLoginAt = lastLoginAt;
     }
 
+    @JsonIgnore
     public List<String> getRoleList(){
 
         if(this.role.length() > 0){
