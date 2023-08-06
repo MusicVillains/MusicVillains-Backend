@@ -39,6 +39,12 @@ public class MemberService {
             return Status.BAD_REQUEST;
         }
 
+        // 사용자 아이디에 특수문자가 들어가거나 숫자로 시작하는지 검사
+        if (!isValidUserId(memberRequestDto.getUserId())) {
+            System.out.println("유효하지 않은 사용자 아이디입니다.");
+            return Status.BAD_REQUEST;
+        }
+
         // 새로운 멤버 생성
         Member member = Member.builder()
                 .memberId(UUID.randomUUID().toString().replace("-", ""))
@@ -55,5 +61,13 @@ public class MemberService {
 
         memberRepository.save(member);
         return Status.OK;
+
+    }
+
+    // 사용자 아이디 유효성 검사 메서드
+    private boolean isValidUserId(String userId) {
+        // 특수문자 또는 숫자로 시작하는지 검사하는 정규표현식
+        String pattern = "^[a-zA-Z][a-zA-Z0-9]*$";
+        return userId.matches(pattern);
     }
 }

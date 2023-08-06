@@ -38,4 +38,6 @@ public class MemberController {
         return ResponseDto.builder().statusCode(s.getStatusCode()).message(s.getMessage()).build();
     }
 
+
+
 }
