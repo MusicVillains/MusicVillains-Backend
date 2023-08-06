@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login Form</title>
+</head>
+<body>
+<h1>Login</h1>
+<form id="loginForm">
+  <label for="username">Username:</label>
+  <input type="text" id="username" name="username" required>
+  <br>
+  <label for="password">Password:</label>
+  <input type="password" id="password" name="password" required>
+  <br>
+  <button type="submit">Login</button>
+</form>
+
+<div id="result"></div>
+
+<script>
+        document.getElementById("loginForm").addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            const formData = new FormData(event.target);
+            const username = formData.get("username");
+            const password = formData.get("password");
+
+            // Replace 'http://localhost:8080/login' with your server's login endpoint
+            const url = "http://localhost:8080/login";
+            const requestBody = JSON.stringify({ username, password });
+
+            try {
+                const response = await fetch(url, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: requestBody
+                });
+
+                const responseBody = await response.text();
+                document.getElementById("result").innerText = responseBody;
+            } catch (error) {
+                document.getElementById("result").innerText = "Error: " + error.message;
+            }
+        });
+    </script>
+</body>
+</html>

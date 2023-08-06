@@ -2,11 +2,13 @@ package com.teamseven.MusicVillain.Entity;
 
 
 import com.teamseven.MusicVillain.Entity.Member;
+import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import java.util.ArrayList;
 import java.util.Collection;
 
+@Data
 public class UserDetailsImpl implements UserDetails {
     // 현재 프로젝트에 정의한 유저에 대응되는 엔티티인 Member 객체를 가져옴
     private Member member;
@@ -17,9 +19,12 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        Collection<GrantedAuthority> collect = new ArrayList<>();
-        collect.add((GrantedAuthority) () -> "ROLE_"+ member.getRole());
-        return collect;
+        Collection<GrantedAuthority> authorityList = new ArrayList<>();
+        member.getRoleList().forEach(r -> {
+            authorityList.add(()->"ROLE_" + r);
+        });
+
+        return authorityList;
     }
 
     @Override

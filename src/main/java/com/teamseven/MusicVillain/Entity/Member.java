@@ -10,6 +10,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 @Getter
 @Entity
 @NoArgsConstructor
@@ -47,5 +51,15 @@ public class Member {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.lastLoginAt = lastLoginAt;
+    }
+
+    public List<String> getRoleList(){
+
+        if(this.role.length() > 0){
+            // role이 null이 아니면 콤마를 기준으로 분리하여 리스트에 담아 리턴
+            return Arrays.asList(this.role.split(","));
+        }
+        // role이 null이면 빈 리스트를 리턴
+        return new ArrayList<>();
     }
 }

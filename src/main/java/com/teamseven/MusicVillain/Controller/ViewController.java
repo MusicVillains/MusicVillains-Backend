@@ -67,4 +67,10 @@ public class ViewController {
     public String login(){
         return "login";
     }
+
+    @GetMapping("/testLoginPage")
+    public String testLoginPage(){
+        return "restAPI_loginTestPage";
+    }
+
 }

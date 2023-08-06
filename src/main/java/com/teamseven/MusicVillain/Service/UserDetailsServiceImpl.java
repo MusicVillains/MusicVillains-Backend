@@ -9,7 +9,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+// http://localhost:8080/login 요청이 들어오면, 스프링 시큐리티에서 자동으로 UserDetailsService 타입으로 IoC에 등록되어 있는 되어 있는 UserDetailsService의 loadUserByUsername 함수가 실행된다.
 @Service
+
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final MemberRepository memberRepository;
