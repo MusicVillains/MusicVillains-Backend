@@ -174,3 +174,4 @@ gradle-app.setting
 
 ### for Secure ###
 application.properties
+application.yml
