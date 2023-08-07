@@ -39,10 +39,11 @@ public class Member {
     public LocalDateTime updatedAt;
     @Column(name = "last_login_at")
     public LocalDateTime lastLoginAt;
-
+    @Column(name = "provider_type")
+    public String providerType;
     @Builder
     public Member(String memberId, String userId, String userInfo, String name, String email,
-                  String role, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime lastLoginAt) {
+                  String role, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime lastLoginAt, String providerType) {
         this.memberId = memberId;
         this.userId = userId;
         this.userInfo = userInfo;
@@ -52,6 +53,7 @@ public class Member {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.lastLoginAt = lastLoginAt;
+        this.providerType = providerType;
     }
 
     @JsonIgnore

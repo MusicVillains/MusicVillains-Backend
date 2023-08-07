@@ -2,19 +2,34 @@ package com.teamseven.MusicVillain.Entity;
 
 
 import com.teamseven.MusicVillain.Entity.Member;
+import com.teamseven.MusicVillain.OAuth2UserInfo;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
+
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
 @Data
-public class UserDetailsImpl implements UserDetails {
+public class UserDetailsImpl implements UserDetails, OAuth2User {
     // 현재 프로젝트에 정의한 유저에 대응되는 엔티티인 Member 객체를 가져옴
     private Member member;
+    private Map<String, Object> attributes;
 
     public UserDetailsImpl(Member member) {
+        super();
         this.member = member;
+    }
+    public UserDetailsImpl(Member member, Map<String, Object> attributes) {
+        this.member = member;
+        this.attributes = attributes;
+    }
+
+    @Override
+    public Map<String, Object> getAttributes() {
+        return this.attributes;
     }
 
     @Override
@@ -61,5 +76,10 @@ public class UserDetailsImpl implements UserDetails {
     public boolean isEnabled() {
         // 계정 사용 가능 여부
         return true; // 사용 가능
+    }
+
+    @Override
+    public String getName() {
+        return null;
     }
 }
