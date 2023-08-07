@@ -42,26 +42,30 @@
   <tr>
     <th>member_id</th>
     <th>user_id</th>
-    <th>user_info</th>
+<!--    <th>user_info</th>-->
     <th>name</th>
     <th>email</th>
     <th>role</th>
     <th>created_at</th>
     <th>updated_at</th>
     <th>last_login_at</th>
+    <th>provider_type</th>
+
   </tr>
   </thead>
   <tbody>
   <tr th:each="member : ${memberList}">
     <td th:text="${member.memberId}"></td>
     <td th:text="${member.userId}"></td>
-    <td th:text="${member.userInfo}"></td>
+<!--    <td th:text="${member.userInfo}"></td>-->
     <td th:text="${member.name}"></td>
     <td th:text="${member.email}"></td>
     <td th:text="${member.role}"></td>
     <td th:text="${member.createdAt}"></td>
     <td th:text="${member.updatedAt}"></td>
     <td th:text="${member.lastLoginAt}"></td>
+    <td th:text="${member.providerType}"></td>
+
   </tr>
   </tbody>
 </table>
