@@ -48,14 +48,15 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
     private OAuth2User process(OAuth2UserRequest userRequest, OAuth2User user) {
         System.out.println("[DEBUG] OAuth2UserServiceImpl.process(..) Entered");
 
-        // userReqest에서 providerType 가져오기
-
+        // userRequest에서 providerType 가져오기
         String providerType = (userRequest.getClientRegistration().getRegistrationId().toUpperCase());
         System.out.println("providerType: " + providerType);
         //provider타입에 따라서 각각 다르게 userInfo가져온다. (가져온 필요한 정보는 OAuth2UserInfo로 동일하다)
         OAuth2UserInfo userInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(providerType, user.getAttributes());
 
-        Member member = memberRepository.findByEmail(userInfo.getEmail());
+        // Member member = memberRepository.findByEmail(userInfo.getEmail());
+        String expectedUserId = providerType +"_"+ userInfo.getId();
+        Member member = memberRepository.findByUserId(expectedUserId);
 
         if (member != null) {
             System.out.println(">>> 이미 존재하는 회원이므로 별도로 가입하지 않음");
@@ -74,17 +75,17 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
 
     }
 
-        // 인증을 요청하는 사용자가 없는 회원이면 회원가입 시키고, 이미 존재하는 회원이면 회원정보를 변경사항 확인 후 회원정보를 업데이트한다.
-
+    // 인증을 요청하는 사용자가 없는 회원이면 회원가입 시키고, 이미 존재하는 회원이면 회원정보를 변경사항 확인 후 회원정보를 업데이트한다.
     private Member createUser(OAuth2UserInfo oAuth2UserInfo, String providerType) {
         System.out.println("[DEBUG] OAuth2UserServiceImpl.createUser(..) Entered");
 
-
-        String generatedName= oAuth2UserInfo.getEmail().split("@")[0];
-        String generatedUserId = generatedName +"_" +providerType;
-
+        String generatedUserId = providerType +"_"+ oAuth2UserInfo.getId();
+        String generatedName = "-"; // 랜덤한 단어 조합으로 생성할 예정
+//        if(oAuth2UserInfo.getEmail() != null) {
+//            String generatedName = oAuth2UserInfo.getEmail().split("@")[0];
+//            String generatedUserId = generatedName + "_" + providerType;
+//        }
         Member member = Member.builder()
-
                 // 사용자 이메일 정보만 가지고 가입
                 .memberId(UUID.randomUUID().toString().replace("-", ""))
                 .createdAt(LocalDateTime.now())
@@ -95,9 +96,7 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
                 .name(generatedName) // 랜덤 닉네임으로 교체할 예정
                 .email(oAuth2UserInfo.getEmail())
                 .role("USER")
-
                 .build();
-
         return memberRepository.save(member);
     }
 

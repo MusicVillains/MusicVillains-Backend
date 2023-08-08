@@ -66,13 +66,23 @@ public class SecurityConfig {
 
                 // 요청에 따른 권한 설정
                 http.authorizeHttpRequests((authorize) -> authorize
-                                .anyRequest().permitAll()
-//                        .requestMatchers("/", "/welcome","/view/**","/dev/**").permitAll() // 모든 사용자 접근 가능
-//                        .requestMatchers("/user").hasAnyRole("USER", "MANAGER", "ADMIN") // USER, MANAGER, ADMIN 접근 가능
-//                        .requestMatchers("/manager").hasAnyRole("MANAGER", "ADMIN") // MANAGER, ADMIN 접근 가능
+                                //.anyRequest().permitAll()
+                        // .requestMatchers("/", "/welcome","/view/**","/dev/**").permitAll() // 모든 사용자 접근 가능
+                          .requestMatchers("/user").hasAnyRole("USER", "MANAGER", "ADMIN") // USER, MANAGER, ADMIN 접근 가능
+                          .requestMatchers("/manager").hasAnyRole("MANAGER", "ADMIN") // MANAGER, ADMIN 접근 가능
+                          .anyRequest().permitAll()
 //                        .requestMatchers("/admin").hasRole("ADMIN") // ADMIN 접근 가능
                 );
 
+
+                http.exceptionHandling((exceptionHandling) -> exceptionHandling
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            response.sendRedirect("/access-denied");
+                        })
+                        .authenticationEntryPoint((request, response, authenticationException) -> {
+                            response.sendRedirect("/login");
+                        })
+                );
         return http.build();
     }
 

@@ -6,9 +6,6 @@ public class OAuth2UserInfoFactory {
         switch (providerType) {
             case ProviderType.GOOGLE: return new GoogleOAuth2UserInfo(attributes);
             case ProviderType.KAKAO: return new KakaoOAuth2UserInfo(attributes);
-        //  case FACEBOOK: return new FacebookOAuth2UserInfo(attributes);
-//          case NAVER: return new NaverOAuth2UserInfo(attributes);
-
             default: throw new IllegalArgumentException("Invalid Provider Type.");
         }
     }
