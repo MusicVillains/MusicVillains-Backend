@@ -2,6 +2,7 @@ package com.teamseven.MusicVillain;
 
 import com.teamseven.MusicVillain.Feed.Feed;
 import com.teamseven.MusicVillain.Feed.FeedService;
+import com.teamseven.MusicVillain.Interaction.Interaction;
 import com.teamseven.MusicVillain.Interaction.InteractionService;
 import com.teamseven.MusicVillain.Member.Member;
 import com.teamseven.MusicVillain.Member.MemberService;
@@ -45,7 +46,7 @@ public class DatabaseViewContorller {
 
     @GetMapping("/view/interactions")
     public String interactionView(Model model){
-        List<com.teamseven.MusicVillain.Interaction.Interaction> interactionList = interactionService.getAllInteractions();
+        List<Interaction> interactionList = interactionService.getAllInteractions();
         model.addAttribute("interactionList", interactionList);
         return "interaction_view";
     }

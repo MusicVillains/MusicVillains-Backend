@@ -4,12 +4,13 @@ import com.teamseven.MusicVillain.Record.Record;
 import com.teamseven.MusicVillain.Member.Member;
 import jakarta.persistence.*;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-@Getter
+@Data
 @Entity
 @NoArgsConstructor
 @Table(name = "feed_table")
@@ -51,4 +52,6 @@ public class Feed {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
+
+
 }

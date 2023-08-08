@@ -42,4 +42,12 @@ public class FeedController {
                 .data(resultMap.get("feedId").toString())
                 .build();
     }
+
+    @GetMapping("/feeds/record")
+    // feedId로 record 가져오기
+    // http://localhost:8080/feeds/record?feedId=6a9a17e91a334c3498213b6c89ac22c3
+    public RecordResponseDto getFeedRecord(@RequestParam("feedId") String feedId){
+        // base 64로 인코딩된 record를 가져옴 -> 프론트로 보낼때 Decode 해야하나?
+        return feedService.getRecordByFeedId(feedId);
+    }
 }

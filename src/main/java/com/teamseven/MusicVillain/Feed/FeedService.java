@@ -3,6 +3,7 @@ package com.teamseven.MusicVillain.Feed;
 import com.teamseven.MusicVillain.Member.Member;
 import com.teamseven.MusicVillain.Member.MemberRepository;
 import com.teamseven.MusicVillain.Record.RecordRepository;
+import com.teamseven.MusicVillain.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +29,24 @@ public class FeedService {
         return feedRepository.findAll();
     }
 
+    public RecordResponseDto getRecordByFeedId(String feedId){
+        RecordResponseDto recordResponseDto = new RecordResponseDto();
+
+        Feed feed = feedRepository.findByFeedId(feedId);
+        if (feed == null){
+            recordResponseDto.setStatusCode(Status.BAD_REQUEST.getStatusCode());
+            recordResponseDto.setMessage("Feed not found");
+            recordResponseDto.setRecordId("");
+            recordResponseDto.setRecordRawData(new byte[]{});
+            return recordResponseDto;
+        }
+
+        recordResponseDto.setStatusCode(Status.OK.getStatusCode());
+        recordResponseDto.setMessage("OK");
+        recordResponseDto.setRecordId(feed.getRecord().getRecordId());
+        recordResponseDto.setRecordRawData(feed.getRecord().getRecordRawData());
+        return recordResponseDto;
+    }
     public Map<Object, Object> insertFeed(String ownerId, String feedName, String recordName, String recordFileType, int recordDuration, byte[] recordRawData){
         Member feedOwner = memberRepository.findByMemberId(ownerId);
 
