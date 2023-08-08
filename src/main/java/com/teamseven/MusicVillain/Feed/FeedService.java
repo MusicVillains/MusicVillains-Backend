@@ -32,24 +32,25 @@ public class FeedService {
         return feedRepository.findAllByOrderByCreatedAtDesc();
     }
 
-    public byte[] getRecordByFeedId(String feedId){
-        // RecordResponseDto recordResponseDto = new RecordResponseDto();
+    public RecordResponseDto getRecordByFeedId(String feedId){
 
         Feed feed = feedRepository.findByFeedId(feedId);
-        if (feed == null){
-//            recordResponseDto.setStatusCode(Status.BAD_REQUEST.getStatusCode());
-//            recordResponseDto.setMessage("Feed not found");
-//            recordResponseDto.setRecordId("");
-//            recordResponseDto.setRecordRawData(new byte[]{});
-            return new byte[]{};
-        }
+        if (feedRepository.findByFeedId(feedId) == null) return RecordResponseDto.builder()
+                    .statusCode(Status.NOT_FOUND.getStatusCode())
+                    .message("Feed not found")
+                    .build();
 
-//        recordResponseDto.setStatusCode(Status.OK.getStatusCode());
-//        recordResponseDto.setMessage("OK");
-//        recordResponseDto.setRecordId(feed.getRecord().getRecordId());
-//        recordResponseDto.setRecordRawData(feed.getRecord().getRecordRawData());
-//        return recordResponseDto;
-        return feed.getRecord().getRecordRawData();
+        return RecordResponseDto.builder()
+                .statusCode(Status.OK.getStatusCode())
+                .message("Record found")
+                .recordId(feed.getRecord().getRecordId())
+                .recordFileSize(feed.getRecord().getRecordFileSize())
+                .recordDuration(feed.getRecord().getRecordDuration())
+                .recordFileType(feed.getRecord().getRecordFileType())
+                .recordRawData(feed.getRecord().getRecordRawData())
+                .build();
+
+
 
     }
     public Map<Object, Object> insertFeed(String ownerId, String feedName, int recordDuration, byte[] recordRawData){
@@ -94,17 +95,10 @@ public class FeedService {
         Map<Object, Object> resultMap = new HashMap();
 
         if (feedOwner == null){
-            System.out.println("[DEBUG] feedOwner is null");
             resultMap.put("result", "fail");
             return resultMap;
         }
-        System.out.println("[DEBUG] feedName: " + feedName);
-        System.out.println("[DEBUG] feedDescription: " + feedDescription);
-        System.out.println("[DEBUG] ownerId: " + ownerId);
-        System.out.println("[DEBUG] recordFileName: " + recordFile.getOriginalFilename());
-        System.out.println("[DEBUG] recordFileSize: " + recordFile.getBytes().length);
-        System.out.println("[DEBUG] recordFileType: " + recordFile.getContentType());
-        System.out.println("[DEBUG] recordDuration: " + recordDuration);
+
 
         Record generatedRecord = Record.builder()
                 .recordId(UUID.randomUUID().toString().replace("-", ""))

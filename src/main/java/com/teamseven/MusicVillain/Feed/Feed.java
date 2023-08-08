@@ -1,5 +1,6 @@
 package com.teamseven.MusicVillain.Feed;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.teamseven.MusicVillain.Record.Record;
 import com.teamseven.MusicVillain.Member.Member;
 import jakarta.persistence.*;
@@ -34,10 +35,10 @@ public class Feed {
 
     @Column(name = "interaction_count")
     public int interactionCount;
-
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "created_at")
     LocalDateTime createdAt;
-
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "updated_at")
     LocalDateTime updatedAt;
 

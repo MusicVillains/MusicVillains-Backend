@@ -15,6 +15,7 @@ public class Record {
     @Column(name = "record_id")
     public String recordId;
 
+
     @Column(name = "record_filetype", nullable =true)
     public String recordFileType;
 

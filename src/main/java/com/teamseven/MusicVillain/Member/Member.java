@@ -1,5 +1,6 @@
 package com.teamseven.MusicVillain.Member;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -33,10 +34,13 @@ public class Member {
     public String email;
     @Column(name = "role")
     public String role;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss") // LocalDateTime을 JSON으로 변환할 때 포맷 지정, 안해주면 이상하게 변환될 때가 있음
     @Column(name = "created_at")
     public LocalDateTime createdAt;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "updated_at")
     public LocalDateTime updatedAt;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "last_login_at")
     public LocalDateTime lastLoginAt;
     @Column(name = "provider_type")
