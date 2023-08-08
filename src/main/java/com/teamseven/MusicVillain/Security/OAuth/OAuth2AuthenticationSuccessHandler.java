@@ -18,7 +18,7 @@ import java.util.Date;
 
 @Component
 @RequiredArgsConstructor
-public class OAuth2SuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
+public class OAuth2AuthenticationSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws ServletException, IOException {
         System.out.println("[DEBUG] OAuth2SuccessHandler.onAuthenticationSuccess() Entered");

@@ -3,8 +3,8 @@ package com.teamseven.MusicVillain.Security.config;
 import com.teamseven.MusicVillain.Member.MemberRepository;
 import com.teamseven.MusicVillain.Security.Filter.JwtAuthenticationFilter;
 import com.teamseven.MusicVillain.Security.Filter.JwtAuthorizationFilter;
+import com.teamseven.MusicVillain.Security.OAuth.OAuth2AuthenticationFailureHandler;
 import com.teamseven.MusicVillain.Security.OAuth.OAuth2UserServiceImpl;
-import org.apache.catalina.filters.CorsFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,8 +14,8 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import com.teamseven.MusicVillain.Security.OAuth.OAuth2SuccessHandler;
-import com.teamseven.MusicVillain.Security.config.CorsConfig;
+import com.teamseven.MusicVillain.Security.OAuth.OAuth2AuthenticationSuccessHandler;
+
 @Configuration
 public class SecurityConfig {
     private final MemberRepository memberRepository;
@@ -26,8 +26,14 @@ public class SecurityConfig {
 
     @Bean
     @Autowired
-    public OAuth2SuccessHandler oAuth2SuccessHandler(){
-        return new OAuth2SuccessHandler();
+    public OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler(){
+        return new OAuth2AuthenticationSuccessHandler();
+    }
+
+    @Bean
+    @Autowired
+    public OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler(){
+        return new OAuth2AuthenticationFailureHandler();
     }
     @Autowired
     public SecurityConfig(MemberRepository memberRepository) {
@@ -57,7 +63,8 @@ public class SecurityConfig {
                         .userInfoEndpoint((userInfoEndpoint) -> userInfoEndpoint
                                 //oauth2Login을 진행하게 되면 loadUser라는 함수를 호출하게 되는데 이것을 OAuth2UserServiceImpl에서 호출하겠다는 설정.
                                 .userService(oAuth2UserServiceImpl())) // 로그인 성공 시 후속 조치를 진행할 OAuth2UserService 인터페이스의 구현체 등록
-                        .successHandler(oAuth2SuccessHandler()))
+                        .successHandler(oAuth2AuthenticationSuccessHandler())
+                        .failureHandler(oAuth2AuthenticationFailureHandler()))
                         //.defaultSuccessUrl("/OAuth/loginSuccess")
                         //.failureUrl("/OAuth/loginFailure")) //  실패 시 /OAuth/loginFailure 호출
 
