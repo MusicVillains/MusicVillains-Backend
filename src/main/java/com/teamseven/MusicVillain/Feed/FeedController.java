@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.*;
 import com.teamseven.MusicVillain.ResponseDto;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 public class FeedController {
     private final FeedService feedService;
@@ -19,6 +19,11 @@ public class FeedController {
         this.feedService = feedService;
     }
 
+    @GetMapping("/feeds")
+    // 모든 feed 가져오기
+    public List<Feed> getAllFeeds(){
+        return this.feedService.getAllFeeds();
+    }
     @PostMapping("/feeds")
     // feed 생성
     public ResponseDto createFeed(@RequestBody FeedCreationRequestBody reqBody){
@@ -50,4 +55,15 @@ public class FeedController {
         // base 64로 인코딩된 record를 가져옴 -> 프론트로 보낼때 Decode 해야하나?
         return feedService.getRecordByFeedId(feedId);
     }
+
+    @GetMapping("/feeds/member")
+    // memberId로 feed 가져오기
+    // 주소 예시: http://localhost:8080/feeds/member?id=1
+    // 특정 멤버에 대한 피드 가져오기
+    // [!] Implement Later
+    public String getFeedByMemberId(@RequestParam("id") String memberId){
+        //return feedService.getFeedByMemberId(memberId);
+        return "";
+    }
+
 }

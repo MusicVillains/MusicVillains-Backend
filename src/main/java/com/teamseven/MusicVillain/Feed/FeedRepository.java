@@ -8,5 +8,7 @@ import java.util.List;
 @Repository
 public interface FeedRepository extends JpaRepository<Feed, String> {
     List<Feed> findAll();
+    List<Feed> findAllByOrderByCreatedAtDesc();
     Feed findByFeedId(String feedId);
+
 }

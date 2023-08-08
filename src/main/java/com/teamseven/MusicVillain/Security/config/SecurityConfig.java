@@ -4,6 +4,7 @@ import com.teamseven.MusicVillain.Member.MemberRepository;
 import com.teamseven.MusicVillain.Security.Filter.JwtAuthenticationFilter;
 import com.teamseven.MusicVillain.Security.Filter.JwtAuthorizationFilter;
 import com.teamseven.MusicVillain.Security.OAuth.OAuth2UserServiceImpl;
+import org.apache.catalina.filters.CorsFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +15,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import com.teamseven.MusicVillain.Security.OAuth.OAuth2SuccessHandler;
+import com.teamseven.MusicVillain.Security.config.CorsConfig;
 @Configuration
 public class SecurityConfig {
     private final MemberRepository memberRepository;
@@ -38,6 +40,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain (HttpSecurity http) throws Exception {
+        http.addFilter(new CorsConfig().corsFilter());
         // csrf 해제
         http.csrf(csrf -> csrf.disable())
 

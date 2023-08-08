@@ -26,7 +26,7 @@ public class FeedService {
         this.memberRepository = memberRepository;
     }
     public List<Feed> getAllFeeds(){
-        return feedRepository.findAll();
+        return feedRepository.findAllByOrderByCreatedAtDesc();
     }
 
     public RecordResponseDto getRecordByFeedId(String feedId){
@@ -86,5 +86,16 @@ public class FeedService {
         return map;
     }
 
+    // [!] Implement Later
+    public List<String> getFeedByMemberId(String memberId) {
+        if(this.checkIsValidMemberId(memberId)==false){
+            return null;
+        }
+        return null;
+    }
 
+
+    public boolean checkIsValidMemberId(String memberId){
+        return memberRepository.findByMemberId(memberId) != null;
+    }
 }

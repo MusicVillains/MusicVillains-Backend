@@ -87,7 +87,7 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
                 .userId(generatedUserId)
                 .userInfo("-")
                 .name(generatedName) // 랜덤 닉네임으로 교체할 예정
-                .email(oAuth2UserInfo.getEmail())
+                .email("-")
                 .role("USER")
                 .build();
         return memberRepository.save(member);

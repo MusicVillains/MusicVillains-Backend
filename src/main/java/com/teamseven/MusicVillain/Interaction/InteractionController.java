@@ -4,13 +4,10 @@ import com.teamseven.MusicVillain.Interaction.RequestBodyForm.InteractionCreatio
 import com.teamseven.MusicVillain.ResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.Map;
-@CrossOrigin(origins = "*", allowedHeaders = "*")
-@Controller
+@RestController
 public class InteractionController {
 
     private final InteractionService interactionService;
@@ -21,7 +18,6 @@ public class InteractionController {
     }
 
     @PostMapping("/interaction")
-    @ResponseBody
     public ResponseDto doInteraction(@RequestBody InteractionCreationRequestBody requestBody){
         System.out.println("[DEBUG] InteractionController.createInteraction");
         System.out.println("[DEBUG] feedId: " + requestBody.feedId);
@@ -30,7 +26,6 @@ public class InteractionController {
         if (resultMap.get("result").equals("fail")){
             return new ResponseDto(400, "fail",null);
         }
-
         return new ResponseDto(200, "success", resultMap.get("interactionId"));
     }
 }
