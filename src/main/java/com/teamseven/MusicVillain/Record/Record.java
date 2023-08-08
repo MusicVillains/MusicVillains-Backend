@@ -1,9 +1,6 @@
 package com.teamseven.MusicVillain.Record;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
@@ -18,9 +15,6 @@ public class Record {
     @Column(name = "record_id")
     public String recordId;
 
-    @Column(name = "record_name")
-    public String recordName;
-
     @Column(name = "record_filetype", nullable =true)
     public String recordFileType;
 
@@ -30,13 +24,13 @@ public class Record {
     @Column(name = "record_duration", nullable =true)
     public int recordDuration;
 
+    @Lob
     @Column(name = "record_rawdata", nullable =true)
     public byte[] recordRawData;
 
     @Builder
-    public Record(String recordId, String recordName, String recordFileType, int recordFileSize, int recordDuration, byte[] recordRawData){
+    public Record(String recordId, String recordFileType, int recordFileSize, int recordDuration, byte[] recordRawData){
         this.recordId = recordId;
-        this.recordName = recordName;
         this.recordFileType = recordFileType;
         this.recordFileSize = recordFileSize;
         this.recordDuration = recordDuration;

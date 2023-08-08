@@ -41,9 +41,11 @@ public class Feed {
     @Column(name = "updated_at")
     LocalDateTime updatedAt;
 
+    @Column(name ="description")
+    public String description;
 
     @Builder
-    public Feed(String feedId, String feedName, Member owner, Record record, int interactionCount, LocalDateTime createdAt, LocalDateTime updatedAt){
+    public Feed(String feedId, String feedName, Member owner, Record record, int interactionCount, LocalDateTime createdAt, LocalDateTime updatedAt, String description){
         this.feedId = feedId;
         this.feedName = feedName;
         this.owner = owner;
@@ -51,7 +53,7 @@ public class Feed {
         this.interactionCount = interactionCount;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.description = description;
     }
-
 
 }

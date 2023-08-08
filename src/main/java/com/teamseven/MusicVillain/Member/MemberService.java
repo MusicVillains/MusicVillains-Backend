@@ -64,10 +64,16 @@ public class MemberService {
 
     }
 
+    public Member getMemberById(String memberId) {
+        return memberRepository.findByMemberId(memberId);
+    }
+
     // 사용자 아이디 유효성 검사 메서드
     private boolean isValidUserId(String userId) {
         // 특수문자 또는 숫자로 시작하는지 검사하는 정규표현식
         String pattern = "^[a-zA-Z][a-zA-Z0-9]*$";
         return userId.matches(pattern);
     }
+
+
 }

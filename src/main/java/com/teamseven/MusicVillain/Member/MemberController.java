@@ -21,6 +21,10 @@ public class MemberController {
         List<Member> memberList = memberService.getAllMembers();
         return memberList;
     }
+    @GetMapping("/members/{memberId}")
+    public Member getMemberById(@PathVariable("memberId") String memberId){
+        return memberService.getMemberById(memberId);
+    }
 
     @PostMapping("/members")
     public ResponseDto insertMember(@RequestBody MemberCreationRequestBody memberCreationRequestBody){

@@ -41,9 +41,8 @@
   <thead>
   <tr>
     <th>record_id</th>
-    <th>record_name</th>
     <th>record_filetype</th>
-    <th>record_filesize</th>
+    <th>record_filesize(bytes)</th>
     <th>record_duration</th>
     <th>record_rawdata</th>
   </tr>
@@ -51,7 +50,6 @@
   <tbody>
   <tr th:each="record : ${recordList}">
     <td th:text="${record.recordId}"></td>
-    <td th:text="${record.recordName}"></td>
     <td th:text="${record.recordFileType}"></td>
     <td th:text="${record.recordFileSize}"></td>
     <td th:text="${record.recordDuration}"></td>
