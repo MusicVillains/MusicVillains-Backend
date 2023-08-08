@@ -1,9 +1,6 @@
 package com.teamseven.MusicVillain.Entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -16,9 +13,12 @@ public class Interaction {
     @Column(name = "interaction_id")
     public String interactionId;
 
-    @Column(name = "feed_id")
-    public String feedId;
+    @ManyToOne // N(Interaction):1(Feed) 관계, reference = feed_table.feed_id
+    @JoinColumn(name = "feed_id", referencedColumnName = "feed_id", nullable = false)
+    public Feed feed;
 
-    @Column(name = "member_id")
-    public String memberId;
+    @OneToOne // N(Interaction):1(Member) 관계,
+    // interaction_table.member_id 필드의 reference는 member_table.member_id
+    @JoinColumn(name = "member_id", referencedColumnName = "member_id", nullable = false)
+    public Member member;
 }

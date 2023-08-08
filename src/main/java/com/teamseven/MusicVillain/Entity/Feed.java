@@ -1,9 +1,6 @@
 package com.teamseven.MusicVillain.Entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -23,11 +20,13 @@ public class Feed {
     @Column(name = "feed_name")
     public String feedName;
 
-    @Column(name = "owner_id")
-    public String ownerId;
+    @ManyToOne // N(Feed):1(Member) 관계
+    @JoinColumn(name = "owner_id", referencedColumnName = "member_id", nullable = false)
+    public Member owner;
 
-    @Column(name = "record_id")
-    public String recordId;
+    @OneToOne // 1(Feed):1(Record) 관계
+    @JoinColumn(name = "record_id", referencedColumnName = "record_id", nullable = false)
+    public Record record;
 
     @Column(name = "interaction_count")
     public int interactionCount;
