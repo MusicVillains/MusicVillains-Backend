@@ -12,8 +12,8 @@ public enum Status {
     UNAUTHORIZED(401, "UNAUTHORIZED"),
     FORBIDDEN(403, "FORBIDDEN"),
     NOT_FOUND(404, "NOT FOUND"),
-    CONFLICT(409, "CONFLICT");
-
+    CONFLICT(409, "CONFLICT"),
+    CREATION_FAIL (400, "CREATION FAIL");
     private final int statusCode;
     private final String message;
 

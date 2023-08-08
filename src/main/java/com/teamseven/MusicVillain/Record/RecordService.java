@@ -2,7 +2,7 @@ package com.teamseven.MusicVillain.Record;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import java.util.List;
 @Service
 public class RecordService {
     private final RecordRepository recordRepository;
@@ -10,6 +10,10 @@ public class RecordService {
     @Autowired
     public RecordService(RecordRepository recordRepository){
         this.recordRepository = recordRepository;
+    }
+
+    public List<Record> getAllRecords(){
+        return recordRepository.findAll();
     }
 
 }

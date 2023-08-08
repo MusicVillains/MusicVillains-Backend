@@ -8,6 +8,7 @@ import com.teamseven.MusicVillain.Member.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -22,6 +23,10 @@ public class InteractionService {
         this.interactionRepository = interactionRepository;
         this.memberRepository = memberRepository;
         this.feedRepository = feedRepository;
+    }
+
+    public List<Interaction> getAllInteractions(){
+        return interactionRepository.findAll();
     }
 
     public void insertInteraction(InteractionCreationRequestBody interactionCreationRequestBody){

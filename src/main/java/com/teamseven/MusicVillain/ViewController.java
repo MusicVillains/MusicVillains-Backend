@@ -32,12 +32,6 @@ public class ViewController {
     }
 
 
-    @GetMapping("/view/members")
-    public String memberView(Model model) {
-        List<Member> memberList = memberService.getAllMembers();
-        model.addAttribute("memberList", memberList);
-        return "member_view";
-    }
 
     @GetMapping("/dev/loginForm")
     public String loginForm(){

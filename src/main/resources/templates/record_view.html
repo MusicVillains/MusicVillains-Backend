@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="kr" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <title>Records in DB</title>
+  <style>
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        h1 {
+          text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #ffffff;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            border: 1px solid #bcbcbc;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 12px;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+<h1> RECORD TABLE VIEW </h1>
+<table>
+  <thead>
+  <tr>
+    <th>record_id</th>
+    <th>record_name</th>
+    <th>record_filetype</th>
+    <th>record_filesize</th>
+    <th>record_duration</th>
+    <th>record_rawdata</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="record : ${recordList}">
+    <td th:text="${record.recordId}"></td>
+    <td th:text="${record.recordName}"></td>
+    <td th:text="${record.recordFileType}"></td>
+    <td th:text="${record.recordFileSize}"></td>
+    <td th:text="${record.recordDuration}"></td>
+    <td th:text="${record.recordRawData}"></td>
+  </tr>
+  </tbody>
+</table>
+</body>
+</html>
