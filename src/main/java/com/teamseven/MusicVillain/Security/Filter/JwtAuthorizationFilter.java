@@ -37,22 +37,22 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
-        System.out.println("[DEBUG] Enter JwtAuthorizationFilter.doFilterInternal()");
-        System.out.println(">>> 인증이나 권한 요청이 필요한 주소요청이 있을 때 해당 필터를 타게 된다.");
+//        System.out.println("[DEBUG] Enter JwtAuthorizationFilter.doFilterInternal()");
+//        System.out.println(">>> 인증이나 권한 요청이 필요한 주소요청이 있을 때 해당 필터를 타게 된다.");
         String jwtHeader = request.getHeader("Authorization");
-        System.out.println("jwtHeader: "+jwtHeader);
+//        System.out.println("jwtHeader: "+jwtHeader);
 
         // jwt Header 양식이 맞는지 확인
-        System.out.println(">>> jwt Header 양식이 맞는지 확인");
+//        System.out.println(">>> jwt Header 양식이 맞는지 확인");
         if(jwtHeader == null || !jwtHeader.startsWith("Bearer")){ // 토큰이 없거나 Bearer로 시작하지 않으면 검증하지 않고 다음 필터로 넘어감
             chain.doFilter(request, response); // 다음 필터로 넘어감
-            System.out.println(">>>>>> jwt Header 양식이 맞지 않음");
+//            System.out.println(">>>>>> jwt Header 양식이 맞지 않음");
             return;
         }
-        System.out.println(">>>>>> jwt Header 양식 정상");
+//        System.out.println(">>>>>> jwt Header 양식 정상");
         // jwt Header 양식이 맞으면 검증해서 정상적인 사용자인지 확인
 
-        System.out.println(">>> 검증해서 정상적인 사용자인지 확인");
+//        System.out.println(">>> 검증해서 정상적인 사용자인지 확인");
 
         String jwtToken = request.getHeader("Authorization").replace("Bearer ", ""); // Bearer 없애고, 뒤에 있는 토큰값만 가져옴
         String username = "";
@@ -62,21 +62,21 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                     .getClaim("username").asString(); // username claim을 가져옴
         }
         catch(TokenExpiredException e) {
-            System.out.println(">>>>>> 토큰 만료 Exception 발생");
+//            System.out.println(">>>>>> 토큰 만료 Exception 발생");
             e.printStackTrace();
             chain.doFilter(request, response);
             return;
         }
 
 
-        System.out.println(">>>> **** username: "+username);
+//        System.out.println(">>>> **** username: "+username);
 
         if(username != null){
-            System.out.println(">>>>>> 사용자 존재, 검증 성공");
+//            System.out.println(">>>>>> 사용자 존재, 검증 성공");
 
             Member member = memberRepository.findByUserId(username);
 
-            System.out.println(">>>> Token is valid. username: "+ member.getUserId());
+//            System.out.println(">>>> Token is valid. username: "+ member.getUserId());
 
             UserDetailsImpl userDetails = new UserDetailsImpl(member);
 
@@ -92,7 +92,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
         }
         else {
-            System.out.println(">>>>>> 존재하지 않는 사용자, 검증 실패");
+//            System.out.println(">>>>>> 존재하지 않는 사용자, 검증 실패");
         }
         //super.doFilterInternal(request, response, chain);
         chain.doFilter(request, response);

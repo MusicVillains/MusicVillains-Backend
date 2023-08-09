@@ -11,7 +11,13 @@ import java.util.List;
 public interface InteractionRepository extends JpaRepository<Interaction, String> {
     List<Interaction> findAll();
     Interaction findByInteractionMemberAndInteractionFeed(Member member, Feed feed);
+
+    Interaction findByInteractionId(String interactionId);
+
+    int countByInteractionFeedFeedId(String feedId);
+
     void deleteByInteractionFeed(Feed interactionFeed);
     void deleteByInteractionFeedFeedId(String feedId);
-
+    void deleteByInteractionMemberMemberId(String memberId);
+    void deleteByInteractionId(String interactionId);
 }

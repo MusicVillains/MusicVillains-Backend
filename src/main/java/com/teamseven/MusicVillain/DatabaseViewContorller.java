@@ -1,6 +1,7 @@
 package com.teamseven.MusicVillain;
 
 import com.teamseven.MusicVillain.Feed.Feed;
+import com.teamseven.MusicVillain.Feed.FeedRepository;
 import com.teamseven.MusicVillain.Feed.FeedService;
 import com.teamseven.MusicVillain.Interaction.Interaction;
 import com.teamseven.MusicVillain.Interaction.InteractionService;
@@ -19,15 +20,19 @@ import java.util.List;
 public class DatabaseViewContorller {
     private final MemberService memberService;
     private final FeedService feedService;
+    private final FeedRepository feedRepository;
     private final RecordService recordService;
     private final InteractionService interactionService;
 
     @Autowired
-    public DatabaseViewContorller(MemberService memberService, FeedService feedService, RecordService recordService, InteractionService interactionService) {
+    public DatabaseViewContorller(MemberService memberService, FeedService feedService,
+                                  RecordService recordService, InteractionService interactionService,
+                                  FeedRepository feedRepository) {
         this.memberService = memberService;
         this.feedService = feedService;
         this.recordService = recordService;
         this.interactionService = interactionService;
+        this.feedRepository = feedRepository;
     }
 
     @GetMapping("/view/members")
@@ -39,7 +44,7 @@ public class DatabaseViewContorller {
 
     @GetMapping("/view/feeds")
     public String feedView(Model model){
-        List<Feed> feedList = feedService.getAllFeeds();
+        List<Feed> feedList = feedRepository.findAll();
         model.addAttribute("feedList", feedList);
         return "feed_view";
     }

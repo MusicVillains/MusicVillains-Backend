@@ -1,17 +1,15 @@
 package com.teamseven.MusicVillain.Feed;
 
 import com.teamseven.MusicVillain.ResponseDto;
+import com.teamseven.MusicVillain.ResponseObject;
+import com.teamseven.MusicVillain.ServiceResult;
 import com.teamseven.MusicVillain.Status;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.Base64Utils;
 import org.springframework.web.bind.annotation.*;
-import com.teamseven.MusicVillain.ResponseDto;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Base64;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,32 +24,18 @@ public class FeedController {
 
     @GetMapping("/feeds")
     // 모든 feed 가져오기
-    public List<Feed> getAllFeeds(){
-        return this.feedService.getAllFeeds();
+    public ResponseObject getAllFeeds(){
+        ServiceResult result = feedService.getAllFeeds();
+        return ResponseObject.of(Status.OK,result.getData());
     }
-    @PostMapping("/feeds2")
-    // feed 생성
-    public ResponseDto createFeed(@RequestBody FeedCreationRequestBody reqBody){
-        Map resultMap=
-        feedService.insertFeed(reqBody.getOwnerId(),
-               reqBody.getFeedName(),
-               reqBody.getRecordDuration(), reqBody.getRecordRawData());
-
-        if (resultMap.get("result").equals("fail")) return ResponseDto.builder()
-                .statusCode(Status.CREATION_FAIL.getStatusCode())
-                .message("Feed creation failed")
-                .data(null)
-                .build();
-
-        return ResponseDto.
-                builder()
-                .statusCode(Status.OK.getStatusCode())
-                .message("Feed created successfully")
-                .data(resultMap.get("feedId").toString())
-                .build();
+    @GetMapping("/feeds/{feedId}")
+    // FeedDto
+    public ResponseObject getFeedById(@RequestParam("feedId") String feedId){
+        return ResponseObject.of(Status.OK,feedService.getFeedByFeedId(feedId));
     }
+
     @PostMapping("/feeds")
-    public ResponseDto createFeed2(
+    public ResponseObject createFeed(
             // MultipartFile 받으려면 @RequestParam 사용해야하므로 다음과 같이 form-data로 받도록 함.
             @RequestParam("feedName") String feedName,
             @RequestParam("feedType") String feedType,
@@ -60,28 +44,16 @@ public class FeedController {
             @RequestParam("recordDuration") int recordDuration,
             @RequestParam("recordFile") MultipartFile recordFile) throws IOException {
 
-        Map resultMap= feedService.insertFeed2(feedName, ownerId, feedType,feedDescription, recordDuration, recordFile);
+        ServiceResult result = feedService.insertFeed(feedName, ownerId, feedType,feedDescription, recordDuration, recordFile);
+        if (result.isFailed()) return ResponseObject.of(Status.CREATION_FAIL, null);
 
-        if (resultMap.get("result").equals("fail")) return ResponseDto.builder()
-                .statusCode(Status.CREATION_FAIL.getStatusCode())
-                .message("Feed creation failed")
-                .data(null)
-                .build();
-
-        return ResponseDto.
-                builder()
-                .statusCode(Status.OK.getStatusCode())
-                .message("Feed created successfully")
-                .data(resultMap.get("feedId").toString())
-                .build();
-
+        return ResponseObject.of(Status.OK, result.getData());
     }
     @GetMapping("/feeds/record")
     // feedId로 record 가져오기
     // http://localhost:8080/feeds/record?feedId=6a9a17e91a334c3498213b6c89ac22c3
-    public RecordResponseDto  getFeedRecord(@RequestParam("feedId") String feedId){
-        RecordResponseDto recordResponseDto = feedService.getRecordByFeedId(feedId);
-//        String encodedByteArrayAsString = Base64.getEncoder().encodeToString(recordResponseDto.getRecordRawData());
+    public RecordResponseBody getFeedRecord(@RequestParam("feedId") String feedId){
+        //        String encodedByteArrayAsString = Base64.getEncoder().encodeToString(recordResponseDto.getRecordRawData());
 //        System.out.println("encodedByteArrayAsString: " + encodedByteArrayAsString);
 //
 //        byte[] decodedByteArray = Base64.getDecoder().decode(encodedByteArrayAsString);
@@ -90,7 +62,7 @@ public class FeedController {
 //        String resourcePath = "/Users/gunmo/Desktop/Team7-Backend/src/main/resources/static/output." + recordResponseDto.getRecordFileType().split("/")[1];
 //        writeBytesToFile(decodedByteArray, resourcePath);
 
-        return recordResponseDto;
+        return feedService.getRecordByFeedId(feedId);
     }
 
     //for test
@@ -114,22 +86,12 @@ public class FeedController {
         return "";
     }
 
-
     @DeleteMapping("/feeds/{feedId}")
     // feedId로 feed 삭제하기
-    public ResponseDto deleteFeed(@PathVariable("feedId") String feedId){
-        Map map = feedService.deleteFeedByFeedId(feedId);
-        if(map.get("result").equals("fail")) return ResponseDto.builder()
-                .statusCode(Status.BAD_REQUEST.getStatusCode())
-                .message("Feed deletion failed")
-                .data(null)
-                .build();
-
-        return ResponseDto.builder()
-                .statusCode(Status.OK.getStatusCode())
-                .message("Feed deleted successfully")
-                .data(map.get("feedId").toString())
-                .build();
+    public ResponseObject deleteFeed(@PathVariable("feedId") String feedId){
+        ServiceResult result = feedService.deleteFeedByFeedId(feedId);
+        if(result.isFailed()) return ResponseObject.of(Status.BAD_REQUEST);
+        return ResponseObject.of(Status.OK,feedId);
     }
 
 

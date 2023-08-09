@@ -4,6 +4,7 @@ import com.teamseven.MusicVillain.Interaction.InteractionRepository;
 import com.teamseven.MusicVillain.Member.Member;
 import com.teamseven.MusicVillain.Member.MemberRepository;
 import com.teamseven.MusicVillain.Record.RecordRepository;
+import com.teamseven.MusicVillain.ServiceResult;
 import com.teamseven.MusicVillain.Status;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,19 +33,22 @@ public class FeedService {
         this.memberRepository = memberRepository;
         this.interactionRepository = interactionRepository;
     }
-    public List<Feed> getAllFeeds(){
-        return feedRepository.findAllByOrderByCreatedAtDesc();
+    public ServiceResult getAllFeeds(){
+
+        List<FeedDto> feedDtoList = FeedDto.toFeedDtoList(
+                feedRepository.findAllByOrderByCreatedAtDesc());
+        return ServiceResult.success(feedDtoList);
     }
 
-    public RecordResponseDto getRecordByFeedId(String feedId){
+    public RecordResponseBody getRecordByFeedId(String feedId){
 
         Feed feed = feedRepository.findByFeedId(feedId);
-        if (feedRepository.findByFeedId(feedId) == null) return RecordResponseDto.builder()
+        if (feedRepository.findByFeedId(feedId) == null) return RecordResponseBody.builder()
                     .statusCode(Status.NOT_FOUND.getStatusCode())
                     .message("Feed not found")
                     .build();
 
-        return RecordResponseDto.builder()
+        return RecordResponseBody.builder()
                 .statusCode(Status.OK.getStatusCode())
                 .message("Record found")
                 .recordId(feed.getRecord().getRecordId())
@@ -53,55 +57,13 @@ public class FeedService {
                 .recordFileType(feed.getRecord().getRecordFileType())
                 .recordRawData(feed.getRecord().getRecordRawData())
                 .build();
-
-
-
     }
-    @Deprecated
-    public Map<Object, Object> insertFeed(String ownerId, String feedName, int recordDuration, byte[] recordRawData){
+
+    public ServiceResult insertFeed(String feedName, String ownerId, String feedType, String feedDescription, int recordDuration, MultipartFile recordFile) throws IOException {
         Member feedOwner = memberRepository.findByMemberId(ownerId);
 
-        Map<Object, Object> map = new HashMap();
-
         if (feedOwner == null){
-            map.put("result", "fail");
-            return map;
-        }
-
-        Record generatedRecord = Record.builder()
-                .recordId(UUID.randomUUID().toString().replace("-", ""))
-                .recordFileSize(recordRawData.length)
-                .recordDuration(recordDuration)
-                .recordFileType("")
-                .recordRawData(recordRawData)
-                .build();
-
-        recordRepository.save(generatedRecord);
-
-        String generatedFeedId = UUID.randomUUID().toString().replace("-", "");
-        feedRepository.save(
-                Feed.builder()
-                        .feedId(generatedFeedId)
-                        .feedName(feedName)
-                        .owner(feedOwner)
-                        .record(generatedRecord)
-                        .interactionCount(0)
-                        .createdAt(LocalDateTime.now())
-                        .updatedAt(LocalDateTime.now())
-                        .build()
-        );
-        map.put("result", "success");
-        map.put("feedId", generatedFeedId);
-        return map;
-    }
-    public Map<Object, Object> insertFeed2(String feedName, String ownerId, String feedType, String feedDescription, int recordDuration, MultipartFile recordFile) throws IOException {
-        Member feedOwner = memberRepository.findByMemberId(ownerId);
-
-        Map<Object, Object> resultMap = new HashMap();
-
-        if (feedOwner == null){
-            resultMap.put("result", "fail");
-            return resultMap;
+            return ServiceResult.fail("Member Not Found");
         }
 
         Record generatedRecord = Record.builder()
@@ -122,15 +84,12 @@ public class FeedService {
                         .feedType(feedType)
                         .owner(feedOwner)
                         .record(generatedRecord)
-                        .interactionCount(0)
                         .description(feedDescription)
                         .createdAt(LocalDateTime.now())
                         .updatedAt(LocalDateTime.now())
                         .build()
         );
-        resultMap.put("result", "success");
-        resultMap.put("feedId", generatedFeedId);
-        return resultMap;
+        return ServiceResult.of(ServiceResult.SUCCESS, "Feed created", generatedFeedId);
     }
     // [!] Implement Later
     public List<String> getFeedByMemberId(String memberId) {
@@ -141,31 +100,25 @@ public class FeedService {
     }
 
     @Transactional
-    public Map<String, String> deleteFeedByFeedId(String feedId){
-        Map<String, String> resultMap = new HashMap<>();
-
+    public ServiceResult deleteFeedByFeedId(String feedId){
         Feed feedToDelete = feedRepository.findByFeedId(feedId);
-        System.out.println("[HOT DEBUG]" + this.getClass().getName() + ".deleteFeedByFeedId("+feedId+")");
         // 존재하는 피드인지 확인
         if(feedToDelete == null){
-            resultMap.put("result", "fail");
-            resultMap.put("message", "Feed Not Found");
-            return resultMap;
-        }
+            return ServiceResult.of(ServiceResult.FAIL, "Feed Not Found");}
 
+        // 피드에 대한 Interaciton 삭제
         interactionRepository.deleteByInteractionFeedFeedId(feedToDelete.feedId);
-
-        /* Feed 삭제, Record는 Feed쪽에서 CASCADE로 자동 삭제됨 */
+        // Feed 삭제, Record는 Feed쪽에서 CASCADE로 자동 삭제됨
         feedRepository.deleteByFeedId(feedId);
-
-        resultMap.put("result", "success");
-        resultMap.put("message", "Feed Deleted");
-        resultMap.put("feedId", feedId);
-        return resultMap;
+        return ServiceResult.of(ServiceResult.SUCCESS, "Feed Deleted", feedId);
 
     }
 
     public boolean checkIsValidMemberId(String memberId){
         return memberRepository.findByMemberId(memberId) != null;
+    }
+
+    public FeedDto getFeedByFeedId(String feedId) {
+        return FeedDto.toFeedDto(feedRepository.findByFeedId(feedId));
     }
 }

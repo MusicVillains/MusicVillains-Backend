@@ -31,8 +31,6 @@ public class ViewController {
         return "index"; // returns index.html
     }
 
-
-
     @GetMapping("/dev/loginForm")
     public String loginForm(){
         return "loginForm";
@@ -42,11 +40,11 @@ public class ViewController {
         return "joinForm";
     }
 
-    @PostMapping("/dev/joinFormHandler")
-    @ResponseBody
-    public ResponseDto joinFormHandler(MemberCreationRequestBody memberCreationRequestBody){
-        return memberController.insertMember(memberCreationRequestBody);
-    }
+//    @PostMapping("/dev/joinFormHandler")
+//    @ResponseBody
+//    public ResponseDto joinFormHandler(MemberCreationRequestBody memberCreationRequestBody){
+//        return memberController.insertMember(memberCreationRequestBody);
+//    }
 
     @GetMapping("/dev/loginSuccess")
     public String loginSuccess(){

@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 
 @Data
-public class RecordResponseDto {
+public class RecordResponseBody {
     public int statusCode;
     public String message;
     public String recordId;
@@ -14,7 +14,7 @@ public class RecordResponseDto {
     public byte[] recordRawData;
 
     @Builder
-    public RecordResponseDto(int statusCode, String message, String recordId, String recordFileType, int recordFileSize, int recordDuration, byte[] recordRawData){
+    public RecordResponseBody(int statusCode, String message, String recordId, String recordFileType, int recordFileSize, int recordDuration, byte[] recordRawData){
         this.statusCode = statusCode;
         this.message = message;
         this.recordId = recordId;

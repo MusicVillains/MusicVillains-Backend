@@ -1,6 +1,8 @@
 package com.teamseven.MusicVillain.Member;
 
 import com.teamseven.MusicVillain.ResponseDto;
+import com.teamseven.MusicVillain.ResponseObject;
+import com.teamseven.MusicVillain.ServiceResult;
 import com.teamseven.MusicVillain.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -18,20 +20,23 @@ public class MemberController {
 
 
     @GetMapping("/members")
-    public List<Member> members(){
+    public ResponseObject members(){
         List<Member> memberList = memberService.getAllMembers();
-        return memberList;
+        return ResponseObject.of(Status.OK, memberList);
     }
     @GetMapping("/members/{memberId}")
-    public Member getMemberById(@PathVariable("memberId") String memberId){
-        return memberService.getMemberById(memberId);
+    public ResponseObject getMemberById(@PathVariable("memberId") String memberId){
+        ServiceResult serviceResult = memberService.getMemberById(memberId);
+        return serviceResult.isFailed() ? ResponseObject.of(Status.BAD_REQUEST, null)
+                : ResponseObject.of(Status.OK, serviceResult.getData());
     }
 
     @PostMapping("/members")
-    public ResponseDto insertMember(@RequestBody MemberCreationRequestBody memberCreationRequestBody){
-        Status s = memberService.insertMember(memberCreationRequestBody);
+    public ResponseObject insertMember(@RequestBody MemberCreationRequestBody memberCreationRequestBody){
+        ServiceResult result = memberService.insertMember(memberCreationRequestBody);
 
-        return ResponseDto.builder().statusCode(s.getStatusCode()).message(s.getMessage()).build();
+        return result.isFailed() ? ResponseObject.of(Status.CREATION_FAIL, result.getData())
+                : ResponseObject.of(Status.CREATED, result.getData());
     }
 
     /**
@@ -46,13 +51,12 @@ public class MemberController {
      * @Todo: [!] 데이터베이스 서버가 한글을 지원하는지 확인
      */
     @PostMapping("/members/{memberId}")
-    public ResponseDto modifyMemberNickname(@PathVariable("memberId") String memberId, @RequestParam("name") String nickname){
+    public ResponseObject modifyMemberNickname(@PathVariable("memberId") String memberId, @RequestParam("name") String nickname) {
 
-        Map<String,String> resultMap  = memberService.modifyMemberNickname(memberId, nickname);
-        if (resultMap.get("result").equals("fail"))
-            return new ResponseDto(Status.BAD_REQUEST.getStatusCode(), resultMap.get("message") ,null);
+        ServiceResult result = memberService.modifyMemberNickname(memberId, nickname);
 
-        return new ResponseDto(Status.OK.getStatusCode(), resultMap.get("message") ,memberId);
+        return result.isFailed() ? ResponseObject.of(Status.BAD_REQUEST, result.getData())
+                : ResponseObject.of(Status.OK, result.getData());
     }
 
     /**
@@ -65,11 +69,10 @@ public class MemberController {
      * @Return 실패시, 실패 메시지 반환
      */
     @DeleteMapping("/members/{memberId}")
-    public ResponseDto deleteMemberByMemberId(@PathVariable("memberId") String memberId){
-        Map<String,String> resultMap = memberService.deleteMemberByMemberId(memberId);
-        if(resultMap.get("result").equals("fail"))
-            return new ResponseDto(Status.BAD_REQUEST.getStatusCode(), resultMap.get("message"), null);
-        return new ResponseDto(Status.OK.getStatusCode(), resultMap.get("message"), memberId);
+    public ResponseObject deleteMemberByMemberId(@PathVariable("memberId") String memberId){
+        ServiceResult result = memberService.deleteMemberByMemberId(memberId);
+        return result.isFailed() ? ResponseObject.of(Status.BAD_REQUEST, result.getData())
+                : ResponseObject.of(Status.OK, result.getData());
     }
 
 }

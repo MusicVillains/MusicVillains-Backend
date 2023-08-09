@@ -1,6 +1,7 @@
 package com.teamseven.MusicVillain.Feed;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.teamseven.MusicVillain.Record.Record;
 import com.teamseven.MusicVillain.Member.Member;
 import jakarta.persistence.*;
@@ -36,8 +37,6 @@ public class Feed {
     @JoinColumn(name = "record_id", referencedColumnName = "record_id")
     public Record record;
 
-    @Column(name = "interaction_count")
-    public int interactionCount;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "created_at")
     LocalDateTime createdAt;
@@ -49,13 +48,12 @@ public class Feed {
     public String description;
 
     @Builder
-    public Feed(String feedId, String feedName, String feedType, Member owner, Record record, int interactionCount, LocalDateTime createdAt, LocalDateTime updatedAt, String description) {
+    public Feed(String feedId, String feedName, String feedType, Member owner, Record record, LocalDateTime createdAt, LocalDateTime updatedAt, String description) {
         this.feedId = feedId;
         this.feedName = feedName;
         this.feedType = feedType;
         this.owner = owner;
         this.record = record;
-        this.interactionCount = interactionCount;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.description = description;
