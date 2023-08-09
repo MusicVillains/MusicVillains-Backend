@@ -9,5 +9,5 @@ import java.util.List;
 public interface RecordRepository extends JpaRepository<Record, String> {
     List<Record> findAll();
     Record findByRecordId(String recordId);
-
+    void deleteByRecordId(String recordId);
 }

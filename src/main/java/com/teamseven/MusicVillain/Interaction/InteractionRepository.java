@@ -11,4 +11,7 @@ import java.util.List;
 public interface InteractionRepository extends JpaRepository<Interaction, String> {
     List<Interaction> findAll();
     Interaction findByInteractionMemberAndInteractionFeed(Member member, Feed feed);
+    void deleteByInteractionFeed(Feed interactionFeed);
+    void deleteByInteractionFeedFeedId(String feedId);
+
 }

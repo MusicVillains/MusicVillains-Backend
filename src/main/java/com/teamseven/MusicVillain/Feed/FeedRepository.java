@@ -11,4 +11,5 @@ public interface FeedRepository extends JpaRepository<Feed, String> {
     List<Feed> findAllByOrderByCreatedAtDesc();
     Feed findByFeedId(String feedId);
 
+    void deleteByFeedId(String feedId);
 }

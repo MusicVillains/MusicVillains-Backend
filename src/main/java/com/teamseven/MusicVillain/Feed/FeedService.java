@@ -1,9 +1,11 @@
 package com.teamseven.MusicVillain.Feed;
 
+import com.teamseven.MusicVillain.Interaction.InteractionRepository;
 import com.teamseven.MusicVillain.Member.Member;
 import com.teamseven.MusicVillain.Member.MemberRepository;
 import com.teamseven.MusicVillain.Record.RecordRepository;
 import com.teamseven.MusicVillain.Status;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,13 +22,15 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class FeedService {
     private final FeedRepository feedRepository;
+    private final InteractionRepository interactionRepository;
     private final RecordRepository recordRepository;
     private final MemberRepository memberRepository;
     @Autowired
-    public FeedService(FeedRepository feedRepository, RecordRepository recordRepository, MemberRepository memberRepository ){
+    public FeedService(FeedRepository feedRepository, RecordRepository recordRepository, MemberRepository memberRepository, InteractionRepository interactionRepository) {
         this.feedRepository = feedRepository;
         this.recordRepository = recordRepository;
         this.memberRepository = memberRepository;
+        this.interactionRepository = interactionRepository;
     }
     public List<Feed> getAllFeeds(){
         return feedRepository.findAllByOrderByCreatedAtDesc();
@@ -53,6 +57,7 @@ public class FeedService {
 
 
     }
+    @Deprecated
     public Map<Object, Object> insertFeed(String ownerId, String feedName, int recordDuration, byte[] recordRawData){
         Member feedOwner = memberRepository.findByMemberId(ownerId);
 
@@ -135,6 +140,30 @@ public class FeedService {
         return null;
     }
 
+    @Transactional
+    public Map<String, String> deleteFeedByFeedId(String feedId){
+        Map<String, String> resultMap = new HashMap<>();
+
+        Feed feedToDelete = feedRepository.findByFeedId(feedId);
+        System.out.println("[HOT DEBUG]" + this.getClass().getName() + ".deleteFeedByFeedId("+feedId+")");
+        // 존재하는 피드인지 확인
+        if(feedToDelete == null){
+            resultMap.put("result", "fail");
+            resultMap.put("message", "Feed Not Found");
+            return resultMap;
+        }
+
+        interactionRepository.deleteByInteractionFeedFeedId(feedToDelete.feedId);
+
+        /* Feed 삭제, Record는 Feed쪽에서 CASCADE로 자동 삭제됨 */
+        feedRepository.deleteByFeedId(feedId);
+
+        resultMap.put("result", "success");
+        resultMap.put("message", "Feed Deleted");
+        resultMap.put("feedId", feedId);
+        return resultMap;
+
+    }
 
     public boolean checkIsValidMemberId(String memberId){
         return memberRepository.findByMemberId(memberId) != null;

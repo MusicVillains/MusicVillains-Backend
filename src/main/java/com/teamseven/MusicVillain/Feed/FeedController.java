@@ -114,4 +114,23 @@ public class FeedController {
         return "";
     }
 
+
+    @DeleteMapping("/feeds/{feedId}")
+    // feedId로 feed 삭제하기
+    public ResponseDto deleteFeed(@PathVariable("feedId") String feedId){
+        Map map = feedService.deleteFeedByFeedId(feedId);
+        if(map.get("result").equals("fail")) return ResponseDto.builder()
+                .statusCode(Status.BAD_REQUEST.getStatusCode())
+                .message("Feed deletion failed")
+                .data(null)
+                .build();
+
+        return ResponseDto.builder()
+                .statusCode(Status.OK.getStatusCode())
+                .message("Feed deleted successfully")
+                .data(map.get("feedId").toString())
+                .build();
+    }
+
+
 }

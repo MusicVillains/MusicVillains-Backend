@@ -28,12 +28,12 @@ public class Feed {
     @Column(name = "feed_type")
     public String feedType;
 
-    @ManyToOne // N(Feed):1(Member) 관계
-    @JoinColumn(name = "owner_id", referencedColumnName = "member_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)  // N(Feed):1(Member) 관계
+    @JoinColumn(name = "owner_id", referencedColumnName = "member_id")
     public Member owner;
 
-    @OneToOne // 1(Feed):1(Record) 관계
-    @JoinColumn(name = "record_id", referencedColumnName = "record_id", nullable = false)
+    @OneToOne(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY) // 1(Feed):1(Record) 관계
+    @JoinColumn(name = "record_id", referencedColumnName = "record_id")
     public Record record;
 
     @Column(name = "interaction_count")

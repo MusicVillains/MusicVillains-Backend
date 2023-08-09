@@ -1,6 +1,7 @@
 package com.teamseven.MusicVillain.Member;
 
 import com.teamseven.MusicVillain.Status;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,10 +24,14 @@ public class MemberService {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
+
+    /* ──────────────────────── MEMBER CRUD ──────────────────────── */
     public List<Member> getAllMembers(){
         return memberRepository.findAll();
     }
-
+    public Member getMemberById(String memberId) {
+        return memberRepository.findByMemberId(memberId);
+    }
     public Status insertMember(MemberCreationRequestBody memberCreationRequestBody){
         // 이미 존재하는 멤버인지 확인
         if(memberRepository.findByUserId(memberCreationRequestBody.getUserId()) != null){
@@ -42,12 +47,10 @@ public class MemberService {
         }
 
         // 사용자 아이디에 특수문자가 들어가거나 숫자로 시작하는지 검사
-        if (!isValidUserId(memberCreationRequestBody.getUserId())) {
+        if (!isValidUserIdPattern(memberCreationRequestBody.getUserId())) {
             System.out.println("유효하지 않은 사용자 아이디입니다.");
             return Status.BAD_REQUEST;
         }
-
-
         // 새로운 멤버 생성
         Member member = Member.builder()
                 .memberId(UUID.randomUUID().toString().replace("-", ""))
@@ -66,19 +69,6 @@ public class MemberService {
         return Status.OK;
 
     }
-
-    public Member getMemberById(String memberId) {
-        return memberRepository.findByMemberId(memberId);
-    }
-
-    // 사용자 아이디 유효성 검사 메서드
-    private boolean isValidUserId(String userId) {
-        // 특수문자 또는 숫자로 시작하는지 검사하는 정규표현식
-        String pattern = "^[a-zA-Z][a-zA-Z0-9]*$";
-        return userId.matches(pattern);
-    }
-
-
     public Map<String, String> modifyMemberNickname(String memberId, String nickname) {
         Map <String, String> resultMap = new HashMap<>();
         Member member = memberRepository.findByMemberId(memberId);
@@ -94,4 +84,36 @@ public class MemberService {
         resultMap.put("message","nickname changed");
         return resultMap;
     }
+
+    @Transactional
+    public Map<String, String> deleteMemberByMemberId(String memberId){
+        Map <String, String> resultMap = new HashMap<>();
+
+        if(isExistMember(memberId) == false){
+            resultMap.put("result", "fail");
+            resultMap.put("message", "member does not exist");
+            return resultMap;
+        }
+
+        memberRepository.deleteByMemberId(memberId);
+        resultMap.put("result", "success");
+        resultMap.put("message", "member deleted");
+        resultMap.put("data", memberId);
+        return resultMap;
+    }
+
+    /* ──────────────────────── UTILS ──────────────────────── */
+
+    private boolean isExistMember(String userId) {
+        return memberRepository.findByMemberId(userId) != null;
+    }
+
+    // 사용자 아이디 유효성 검사 메서드
+    private boolean isValidUserIdPattern(String userId) {
+        // 특수문자 또는 숫자로 시작하는지 검사하는 정규표현식
+        String pattern = "^[a-zA-Z][a-zA-Z0-9]*$";
+        return userId.matches(pattern);
+    }
+
+
 }

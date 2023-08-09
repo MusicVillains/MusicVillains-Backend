@@ -16,13 +16,13 @@ public class Interaction {
     @Column(name = "interaction_id")
     public String interactionId;
 
-    @ManyToOne // N(Interaction):1(Feed) 관계, reference = feed_table.feed_id
-    @JoinColumn(name = "feed_id", referencedColumnName = "feed_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY) // N(Interaction):1(Feed) 관계, reference = feed_table.feed_id
+    @JoinColumn(name = "feed_id", referencedColumnName = "feed_id")
     public Feed interactionFeed;
 
-    @OneToOne // N(Interaction):1(Member) 관계,
+    @OneToOne(fetch = FetchType.LAZY) // N(Interaction):1(Member) 관계,
     // interaction_table.member_id 필드의 reference는 member_table.member_id
-    @JoinColumn(name = "member_id", referencedColumnName = "member_id", nullable = false)
+    @JoinColumn(name = "member_id", referencedColumnName = "member_id")
     public Member interactionMember;
 
     @Builder

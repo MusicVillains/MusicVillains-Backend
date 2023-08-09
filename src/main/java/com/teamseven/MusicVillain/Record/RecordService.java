@@ -16,4 +16,7 @@ public class RecordService {
         return recordRepository.findAll();
     }
 
+    public void DeleteRecordByRecordId(String recordId){
+        recordRepository.deleteByRecordId(recordId);
+    }
 }

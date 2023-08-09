@@ -34,12 +34,10 @@ public class MemberController {
         return ResponseDto.builder().statusCode(s.getStatusCode()).message(s.getMessage()).build();
     }
 
-
-
     /**
      * @Title: modifyMemberNickname
      * @Author: Woody K
-     * @Date: 2021/10/10
+     * @Date: 2023/08/09
      * @Description: 회원 정보 수정
      *
      * @Param memberId : 수정할 회원의 멤버 아이디
@@ -57,5 +55,21 @@ public class MemberController {
         return new ResponseDto(Status.OK.getStatusCode(), resultMap.get("message") ,memberId);
     }
 
+    /**
+     * @Title: deleteMemberByMemberId
+     * @Author: Woody K
+     * @Date: 2023/08/09
+     * @Param memberId : 삭제할 회원의 멤버 아이디
+     * @Required Authorization (Valid JWT Token)
+     * @Return 성공시, 삭제된 멤버의 memberId 반환
+     * @Return 실패시, 실패 메시지 반환
+     */
+    @DeleteMapping("/members/{memberId}")
+    public ResponseDto deleteMemberByMemberId(@PathVariable("memberId") String memberId){
+        Map<String,String> resultMap = memberService.deleteMemberByMemberId(memberId);
+        if(resultMap.get("result").equals("fail"))
+            return new ResponseDto(Status.BAD_REQUEST.getStatusCode(), resultMap.get("message"), null);
+        return new ResponseDto(Status.OK.getStatusCode(), resultMap.get("message"), memberId);
+    }
 
 }

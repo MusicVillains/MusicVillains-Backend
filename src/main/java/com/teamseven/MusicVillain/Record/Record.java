@@ -15,18 +15,17 @@ public class Record {
     @Column(name = "record_id")
     public String recordId;
 
-
-    @Column(name = "record_filetype", nullable =true)
+    @Column(name = "record_filetype")
     public String recordFileType;
 
-    @Column(name = "record_filesize", nullable =true)
+    @Column(name = "record_filesize")
     public int recordFileSize;
 
-    @Column(name = "record_duration", nullable =true)
+    @Column(name = "record_duration")
     public int recordDuration;
 
     @Lob
-    @Column(name = "record_rawdata", nullable =true)
+    @Column(name = "record_rawdata")
     public byte[] recordRawData;
 
     @Builder
