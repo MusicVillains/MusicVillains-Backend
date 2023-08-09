@@ -4,6 +4,9 @@ import com.teamseven.MusicVillain.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -76,4 +79,19 @@ public class MemberService {
     }
 
 
+    public Map<String, String> modifyMemberNickname(String memberId, String nickname) {
+        Map <String, String> resultMap = new HashMap<>();
+        Member member = memberRepository.findByMemberId(memberId);
+        if (member == null) {
+            resultMap.put("result", "fail");
+            resultMap.put("message", "membe does not exist");
+            return resultMap;
+        }
+
+        member.setName(nickname);
+        memberRepository.save(member);
+        resultMap.put("result", "success");
+        resultMap.put("message","nickname changed");
+        return resultMap;
+    }
 }

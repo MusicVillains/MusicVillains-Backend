@@ -89,7 +89,7 @@ public class FeedService {
         map.put("feedId", generatedFeedId);
         return map;
     }
-    public Map<Object, Object> insertFeed2(String feedName, String ownerId, String feedDescription, int recordDuration, MultipartFile recordFile) throws IOException {
+    public Map<Object, Object> insertFeed2(String feedName, String ownerId, String feedType, String feedDescription, int recordDuration, MultipartFile recordFile) throws IOException {
         Member feedOwner = memberRepository.findByMemberId(ownerId);
 
         Map<Object, Object> resultMap = new HashMap();
@@ -98,7 +98,6 @@ public class FeedService {
             resultMap.put("result", "fail");
             return resultMap;
         }
-
 
         Record generatedRecord = Record.builder()
                 .recordId(UUID.randomUUID().toString().replace("-", ""))
@@ -115,6 +114,7 @@ public class FeedService {
                 Feed.builder()
                         .feedId(generatedFeedId)
                         .feedName(feedName)
+                        .feedType(feedType)
                         .owner(feedOwner)
                         .record(generatedRecord)
                         .interactionCount(0)

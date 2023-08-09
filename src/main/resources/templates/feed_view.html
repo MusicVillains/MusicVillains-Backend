@@ -42,6 +42,7 @@
   <tr>
     <th>feed_id</th>
     <th>feed_name</th>
+    <th>feed_type</th>
     <th>owner_id</th>
     <th>record_id</th>
     <th>interaction_count</th>
@@ -53,6 +54,7 @@
   <tr th:each="feed : ${feedList}">
     <td th:text="${feed.feedId}"></td>
     <td th:text="${feed.feedName}"></td>
+    <td th:text="${feed.feedType}"></td>
     <td th:text="${feed.owner.memberId}"></td>
     <td th:text="${feed.record.recordId}"></td>
     <td th:text="${feed.interactionCount}"></td>

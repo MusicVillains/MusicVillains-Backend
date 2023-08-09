@@ -25,6 +25,9 @@ public class Feed {
     @Column(name = "feed_name")
     public String feedName;
 
+    @Column(name = "feed_type")
+    public String feedType;
+
     @ManyToOne // N(Feed):1(Member) 관계
     @JoinColumn(name = "owner_id", referencedColumnName = "member_id", nullable = false)
     public Member owner;
@@ -46,9 +49,10 @@ public class Feed {
     public String description;
 
     @Builder
-    public Feed(String feedId, String feedName, Member owner, Record record, int interactionCount, LocalDateTime createdAt, LocalDateTime updatedAt, String description){
+    public Feed(String feedId, String feedName, String feedType, Member owner, Record record, int interactionCount, LocalDateTime createdAt, LocalDateTime updatedAt, String description) {
         this.feedId = feedId;
         this.feedName = feedName;
+        this.feedType = feedType;
         this.owner = owner;
         this.record = record;
         this.interactionCount = interactionCount;
@@ -56,5 +60,4 @@ public class Feed {
         this.updatedAt = updatedAt;
         this.description = description;
     }
-
 }

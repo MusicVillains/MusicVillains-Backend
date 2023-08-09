@@ -54,12 +54,13 @@ public class FeedController {
     public ResponseDto createFeed2(
             // MultipartFile 받으려면 @RequestParam 사용해야하므로 다음과 같이 form-data로 받도록 함.
             @RequestParam("feedName") String feedName,
+            @RequestParam("feedType") String feedType,
             @RequestParam("ownerId") String ownerId,
             @RequestParam("description") String feedDescription,
             @RequestParam("recordDuration") int recordDuration,
             @RequestParam("recordFile") MultipartFile recordFile) throws IOException {
 
-        Map resultMap= feedService.insertFeed2(feedName, ownerId, feedDescription, recordDuration, recordFile);
+        Map resultMap= feedService.insertFeed2(feedName, ownerId, feedType,feedDescription, recordDuration, recordFile);
 
         if (resultMap.get("result").equals("fail")) return ResponseDto.builder()
                 .statusCode(Status.CREATION_FAIL.getStatusCode())
@@ -80,10 +81,12 @@ public class FeedController {
     // http://localhost:8080/feeds/record?feedId=6a9a17e91a334c3498213b6c89ac22c3
     public RecordResponseDto  getFeedRecord(@RequestParam("feedId") String feedId){
         RecordResponseDto recordResponseDto = feedService.getRecordByFeedId(feedId);
-//        encodedByteArrayAsString = Base64.getEncoder().encodeToString(recordResponseDto.getRecordRawData());
+//        String encodedByteArrayAsString = Base64.getEncoder().encodeToString(recordResponseDto.getRecordRawData());
 //        System.out.println("encodedByteArrayAsString: " + encodedByteArrayAsString);
+//
 //        byte[] decodedByteArray = Base64.getDecoder().decode(encodedByteArrayAsString);
 //        System.out.println("decodedByteArray: " + decodedByteArray);
+//
 //        String resourcePath = "/Users/gunmo/Desktop/Team7-Backend/src/main/resources/static/output." + recordResponseDto.getRecordFileType().split("/")[1];
 //        writeBytesToFile(decodedByteArray, resourcePath);
 

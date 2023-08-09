@@ -90,6 +90,7 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
                 .email("-")
                 .role("USER")
                 .build();
+
         return memberRepository.save(member);
     }
 
