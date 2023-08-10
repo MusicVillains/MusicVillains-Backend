@@ -1,18 +1,12 @@
 package com.teamseven.MusicVillain;
 
-
-import com.teamseven.MusicVillain.Member.MemberCreationRequestBody;
-import com.teamseven.MusicVillain.Member.Member;
 import com.teamseven.MusicVillain.Member.MemberController;
 import com.teamseven.MusicVillain.Member.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
-@CrossOrigin(origins = "*")
 
 @Controller
 public class ViewController {

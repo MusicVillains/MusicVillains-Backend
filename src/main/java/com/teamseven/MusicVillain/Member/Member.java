@@ -24,6 +24,7 @@ public class Member {
     public String memberId; // PK, uuid.toString()
     @Column(name = "user_id")
     public String userId;
+    @JsonIgnore
     @Column(name = "user_info")
     public String userInfo;
     @Column(name = "name")

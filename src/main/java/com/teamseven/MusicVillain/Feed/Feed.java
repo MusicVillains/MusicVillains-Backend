@@ -47,8 +47,17 @@ public class Feed {
     @Column(name ="description")
     public String description;
 
+    @Column(name="view_count")
+    public int viewCount;
+
+    @Column(name="music_name")
+    public String musicName;
+
+    @Column(name="musician_name")
+    public String musicianName;
+
     @Builder
-    public Feed(String feedId, String feedName, String feedType, Member owner, Record record, LocalDateTime createdAt, LocalDateTime updatedAt, String description) {
+    public Feed(String feedId, String feedName, String feedType, Member owner, Record record, LocalDateTime createdAt, LocalDateTime updatedAt, String description, int viewCount, String musicName, String musicianName) {
         this.feedId = feedId;
         this.feedName = feedName;
         this.feedType = feedType;
@@ -57,5 +66,8 @@ public class Feed {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.description = description;
+        this.viewCount = viewCount;
+        this.musicName = musicName;
+        this.musicianName = musicianName;
     }
 }

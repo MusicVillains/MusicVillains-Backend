@@ -20,7 +20,7 @@ public class InteractionController {
         this.interactionService = interactionService;
     }
 
-    @PostMapping("/interaction")
+    @PostMapping("/interactions")
     public ResponseObject doInteraction(@RequestBody InteractionCreationRequestBody requestBody){
 
         ServiceResult result =  interactionService.insertInteraction(requestBody);
@@ -28,7 +28,7 @@ public class InteractionController {
                 : ResponseObject.of(Status.OK, result.getData());
     }
 
-    @GetMapping("/interaction/count")
+    @GetMapping("/interactions/count")
     // url: /interaction/count?feedId={feedId}
     public ResponseObject getInteractionCountByFeedId(@RequestParam("feedId") String feedId){
         ServiceResult result = interactionService.getInteractionCountByFeedId(feedId);

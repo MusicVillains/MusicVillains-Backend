@@ -23,6 +23,9 @@ public class FeedDto {
     public String ownerId;
     public String ownerName;
     public String recordId;
+    public String musicName;
+    public String musicianName;
+    public int viewCount;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     LocalDateTime createdAt;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -39,6 +42,9 @@ public class FeedDto {
         this.setCreatedAt(feed.getCreatedAt());
         this.setUpdatedAt(feed.getUpdatedAt());
         this.setDescription(feed.getDescription());
+        this.setMusicName(feed.getMusicName());
+        this.setMusicianName(feed.getMusicianName());
+        this.setViewCount(feed.getViewCount());
     }
     public static FeedDto toFeedDto(Feed feed){
         return new FeedDto(feed);

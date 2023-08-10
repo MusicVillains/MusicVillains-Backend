@@ -43,10 +43,13 @@
     <th>feed_id</th>
     <th>feed_name</th>
     <th>feed_type</th>
+    <th>music_name</th>
+    <th>musician_name</th>
     <th>owner_id</th>
     <th>record_id</th>
     <th>created_at</th>
     <th>updated_at</th>
+    <th>view_count</th>
   </tr>
   </thead>
   <tbody>
@@ -54,10 +57,14 @@
     <td th:text="${feed.feedId}"></td>
     <td th:text="${feed.feedName}"></td>
     <td th:text="${feed.feedType}"></td>
+    <td th:text="${feed.musicName}"></td>
+    <td th:text="${feed.musicianName}"></td>
     <td th:text="${feed.owner.memberId}"></td>
     <td th:text="${feed.record.recordId}"></td>
     <td th:text="${feed.createdAt}"></td>
     <td th:text="${feed.updatedAt}"></td>
+    <td th:text="${feed.viewCount}"></td>
+
   </tr>
   </tbody>
 </table>

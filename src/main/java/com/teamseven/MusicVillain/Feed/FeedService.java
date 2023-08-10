@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.sql.SQLOutput;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -59,11 +60,33 @@ public class FeedService {
                 .build();
     }
 
-    public ServiceResult insertFeed(String feedName, String ownerId, String feedType, String feedDescription, int recordDuration, MultipartFile recordFile) throws IOException {
+    public ServiceResult insertFeed(String feedName, String ownerId, String feedType, String feedDescription, int recordDuration, MultipartFile recordFile,
+                                    String musicName, String musicianName
+    ) throws IOException {
+
+        System.out.println("─> [FeedService] insertFeed() called");
+        System.out.println("- Parameters:");
+        System.out.println("  - feedName: " + feedName);
+        System.out.println("  - ownerId: " + ownerId);
+        System.out.println("  - feedType: " + feedType);
+        System.out.println("  - feedDescription: " + feedDescription);
+        System.out.println("  - recordDuration: " + recordDuration);
+        System.out.println("  - recordFile: " + recordFile);
+        System.out.println("  - musicName: " + musicName);
+        System.out.println("  - musicianName: " + musicianName);
+
         Member feedOwner = memberRepository.findByMemberId(ownerId);
 
         if (feedOwner == null){
+            System.out.println("[!] insertFeed() failed: Member Not Found");
+            System.out.println("─> [FeedService] Exit insertFeed() with exception");
             return ServiceResult.fail("Member Not Found");
+        }
+
+        if(feedName == null || ownerId == null || feedType == null){
+            System.out.println("[!] insertFeed() failed: missing parameter");
+            System.out.println("─> [FeedService] Exit insertFeed() with exception");
+            return ServiceResult.fail("missing parameter");
         }
 
         Record generatedRecord = Record.builder()
@@ -74,6 +97,7 @@ public class FeedService {
                 .recordRawData(recordFile.getBytes())
                 .build();
         recordRepository.save(generatedRecord);
+        System.out.println("[>] Record created and saved to database");
 
         String generatedFeedId = UUID.randomUUID().toString().replace("-", "");
 
@@ -85,18 +109,35 @@ public class FeedService {
                         .owner(feedOwner)
                         .record(generatedRecord)
                         .description(feedDescription)
+                        .viewCount(0)
+                        .musicName(musicName)
+                        .musicianName(musicianName)
                         .createdAt(LocalDateTime.now())
                         .updatedAt(LocalDateTime.now())
                         .build()
         );
+        System.out.println("[>] Feed created and saved to database");
+        System.out.println("─> [FeedService] insertFeed() successfully finished");
         return ServiceResult.of(ServiceResult.SUCCESS, "Feed created", generatedFeedId);
     }
-    // [!] Implement Later
-    public List<String> getFeedByMemberId(String memberId) {
-        if(this.checkIsValidMemberId(memberId)==false){
-            return null;
+
+    public ServiceResult getAllFeedsByMemberId(String memberId) {
+        Member member = memberRepository.findByMemberId(memberId);
+
+        List<FeedDto> resultFeedEntityList = FeedDto.toFeedDtoList(feedRepository.findAllByOwnerMemberId(memberId));
+
+        return ServiceResult.success(resultFeedEntityList);
+
+    }
+
+    public ServiceResult feedViewCountUp(String feedId){
+        Feed feed = feedRepository.findByFeedId(feedId);
+        if(feed == null){
+            return ServiceResult.of(ServiceResult.FAIL, "Feed Not Found");
         }
-        return null;
+        feed.viewCount++;
+        feedRepository.save(feed);
+        return ServiceResult.of(ServiceResult.SUCCESS, "Feed View Count Up", feed.viewCount);
     }
 
     @Transactional
@@ -121,4 +162,6 @@ public class FeedService {
     public FeedDto getFeedByFeedId(String feedId) {
         return FeedDto.toFeedDto(feedRepository.findByFeedId(feedId));
     }
+
+
 }
