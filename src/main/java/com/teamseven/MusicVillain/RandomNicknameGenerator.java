@@ -36,7 +36,7 @@ public class RandomNicknameGenerator {
 
         /* 생성된 닉네임이 이미 존재하는지 여부는 호출하는 method 에서 확인해야함 */
 
-        return randomFirstWord + randomSecondWord + randomNumber;
+        return randomFirstWord + " " + randomSecondWord + randomNumber;
     }
 
 }

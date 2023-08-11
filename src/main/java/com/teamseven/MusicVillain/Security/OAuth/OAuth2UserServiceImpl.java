@@ -73,7 +73,14 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
         System.out.println("[DEBUG] OAuth2UserServiceImpl.createUser(..) Entered");
 
         String generatedUserId = providerType +"_"+ oAuth2UserInfo.getId();
-        String generatedName = RandomNicknameGenerator.generate() ; // 랜덤한 단어 조합으로 생성할 예정
+
+        String generatedName = RandomNicknameGenerator.generate();
+
+        // 닉네임 중복 검사
+        while(memberRepository.findByName(generatedName) != null){
+            generatedName = RandomNicknameGenerator.generate();
+        }
+
 //        if(oAuth2UserInfo.getEmail() != null) {
 //            String generatedName = oAuth2UserInfo.getEmail().split("@")[0];
 //            String generatedUserId = generatedName + "_" + providerType;

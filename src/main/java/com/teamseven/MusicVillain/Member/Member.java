@@ -30,6 +30,7 @@ public class Member {
     public String userInfo;
     @Column(name = "name")
     public String name;
+    @JsonIgnore
     @Column(name ="email")
     public String email;
     @Column(name = "role")
