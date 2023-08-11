@@ -1,10 +1,9 @@
 package com.teamseven.MusicVillain.Security.Filter;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.teamseven.MusicVillain.Member.Member;
+import com.teamseven.MusicVillain.Security.JwtManager;
 import com.teamseven.MusicVillain.Security.UserDetailsImpl;
-import com.teamseven.MusicVillain.JwtVariables;
 import com.teamseven.MusicVillain.Member.MemberRepository;
 import com.teamseven.MusicVillain.Security.LoginAttemptMember;
 import jakarta.servlet.FilterChain;
@@ -19,7 +18,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
-import java.util.Date;
 
 // JWT를 이용한 인증을 위한 필터
 // UsernamePasswordAuthenticationFilter는 [POST] /login 요청이 들어오면 동작하는 필터로 username과 password를 받아서 인증을 진행한다.
@@ -88,16 +86,14 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authResult.getPrincipal();
+        Member memberInUserDetails = userDetails.getMember();
+
         // JWT Token 발행
-        String jwtToken = JWT.create().withSubject("wdyToken") // 토큰 발행자
-                .withExpiresAt(new Date(System.currentTimeMillis()+ (60000*10))) // 토큰 만료 시간, 10분으로 설정
-                // 토큰에 담을 정보는 withClaim으로 담는다. 정해져있는 것은 아니고 넣고싶은거 설정해주면 됨
-                        .withClaim("id",userDetails.getMember().memberId) // 토큰에 담을 정보
-                                .withClaim("username",userDetails.getMember().getUserId()) // 토큰에 담을 정보
-                                        .sign(Algorithm.HMAC512(JwtVariables.JWT_SECRETE)); // 토큰 암호화 알고리즘, secret key 넣어줘야 함
+        String generateJwtToken = JwtManager.generateToken(
+                memberInUserDetails.getMemberId(),
+                memberInUserDetails.getUserId());
 
-        response.addHeader("Authorization", "Bearer "+jwtToken);
-
+        response.addHeader("Authorization", "Bearer "+generateJwtToken);
 
         // 로그인 성공시  response body에 아래 json 형식으로 응답
         response.setCharacterEncoding("UTF-8");
