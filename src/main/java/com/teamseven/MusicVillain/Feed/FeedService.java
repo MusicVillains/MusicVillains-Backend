@@ -178,4 +178,12 @@ public class FeedService {
         return ServiceResult.success(FeedDto.toFeedDtoList(interactionFeedList));
 
     }
+
+    public ServiceResult getFeedOwnerMemberIdByFeedId(String feedId) {
+
+        Feed tmpFeed = feedRepository.findByFeedId(feedId);
+        if(tmpFeed == null) return ServiceResult.fail("Feed Not Found");
+        return ServiceResult.success(tmpFeed.getOwner().getMemberId());
+
+    }
 }

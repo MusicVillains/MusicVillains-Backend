@@ -91,7 +91,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         // JWT Token 발행
         String generateJwtToken = JwtManager.generateToken(
                 memberInUserDetails.getMemberId(),
-                memberInUserDetails.getUserId());
+                memberInUserDetails.getUserId(),
+                memberInUserDetails.getRole());
 
         response.addHeader("Authorization", "Bearer "+generateJwtToken);
 

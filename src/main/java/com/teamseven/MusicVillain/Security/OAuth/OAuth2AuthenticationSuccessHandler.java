@@ -28,7 +28,8 @@ public class OAuth2AuthenticationSuccessHandler extends SavedRequestAwareAuthent
         Member memberInUserDetails = ((UserDetailsImpl)authentication.getPrincipal()).getMember();
         String generatedJwtToken = JwtManager.generateToken(
                 memberInUserDetails.getMemberId(),
-                memberInUserDetails.getUserId());
+                memberInUserDetails.getUserId(),
+                memberInUserDetails.getRole());
 
         response.addHeader("Authorization", "Bearer "+generatedJwtToken);
         // JWT token 발행 완료

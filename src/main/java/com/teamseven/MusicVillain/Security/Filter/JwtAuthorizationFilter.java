@@ -1,8 +1,5 @@
 package com.teamseven.MusicVillain.Security.Filter;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.teamseven.MusicVillain.ENV;
 import com.teamseven.MusicVillain.Member.Member;
 import com.teamseven.MusicVillain.Security.JwtManager;
@@ -49,7 +46,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         }
 
         String jwtToken = request.getHeader("Authorization").replace("Bearer ", ""); // Bearer 없애고, 뒤에 있는 토큰값만 가져옴
-        ServiceResult result = JwtManager.verify_token(jwtToken);
+        ServiceResult result = JwtManager.verifyToken(jwtToken);
 
         if(result.isFailed()){
             chain.doFilter(request, response);

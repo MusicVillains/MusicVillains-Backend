@@ -1,5 +1,7 @@
 package com.teamseven.MusicVillain;
 
+import org.apache.coyote.Response;
+
 public class ResponseObject {
     public int statusCode;
     public String message;
@@ -16,7 +18,9 @@ public class ResponseObject {
         this.message = status.getMessage();
         this.data = data;
     }
-
+    public static ResponseObject of(Status status, String message, Object data){
+        return new ResponseObject(status.getStatusCode(), message, data);
+    }
     public static ResponseObject of(Status status, Object data){
         return new ResponseObject(status, data);
     }
@@ -24,4 +28,13 @@ public class ResponseObject {
         return new ResponseObject(status, null);
     }
 
+    public static ResponseObject authenticationFail(){
+        return new ResponseObject(Status.AUTHENTICATION_FAIL.getStatusCode(),
+                Status.AUTHENTICATION_FAIL.getMessage(), null);
+    }
+
+    public static ResponseObject unauthorized(){
+        return new ResponseObject(Status.UNAUTHORIZED.getStatusCode(),
+                Status.UNAUTHORIZED.getMessage(), null);
+    }
 }

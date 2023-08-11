@@ -1,23 +1,26 @@
 package com.teamseven.MusicVillain.Member;
 
-import com.teamseven.MusicVillain.ResponseDto;
 import com.teamseven.MusicVillain.ResponseObject;
+import com.teamseven.MusicVillain.Security.MemberAuthorizationManager;
+import com.teamseven.MusicVillain.Security.OAuth.AuthorizationResult;
 import com.teamseven.MusicVillain.ServiceResult;
 import com.teamseven.MusicVillain.Status;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
-import java.util.Map;
 
 @RestController
 public class MemberController {
     private final MemberService memberService;
+    private final MemberAuthorizationManager authManager;
 
     @Autowired
-    public MemberController(MemberService memberService){
+    public MemberController(MemberService memberService, MemberAuthorizationManager authManager){
         this.memberService = memberService;
+        this.authManager = authManager;
     }
-
 
     @GetMapping("/members")
     public ResponseObject members(){
@@ -48,10 +51,16 @@ public class MemberController {
      * @Param memberId : 수정할 회원의 멤버 아이디
      * @Param nickname : 수정할 닉네임
      * @Required: Authorization (Valid JWT Token)
-     * @Todo: [!] 데이터베이스 서버가 한글을 지원하는지 확인
+     * @Todo: [!] 데이터베이스 필드들이 UTF-8 인코딩으로 설정되어 있는지 확인
      */
     @PostMapping("/members/{memberId}")
-    public ResponseObject modifyMemberNickname(@PathVariable("memberId") String memberId, @RequestParam("name") String nickname) {
+    public ResponseObject modifyMemberNickname(@PathVariable("memberId") String memberId, @RequestParam("name") String nickname,
+                                               @RequestHeader HttpHeaders requestHeader) {
+
+        AuthorizationResult authResult =
+                authManager.authorize(requestHeader, memberId);
+
+        if (authResult.isFailed()) return ResponseObject.of(Status.UNAUTHORIZED, authResult.getMessage());
 
         ServiceResult result = memberService.modifyMemberNickname(memberId, nickname);
 
@@ -69,9 +78,15 @@ public class MemberController {
      * @Return 실패시, 실패 메시지 반환
      */
     @DeleteMapping("/members/{memberId}")
-    public ResponseObject deleteMemberByMemberId(@PathVariable("memberId") String memberId){
+    public ResponseObject deleteMemberByMemberId(
+            @PathVariable("memberId") String memberId,
+            @RequestHeader HttpHeaders requestHeader){
+
+        authManager.authorize(requestHeader, memberId);
+
         ServiceResult result = memberService.deleteMemberByMemberId(memberId);
-        return result.isFailed() ? ResponseObject.of(Status.BAD_REQUEST, result.getData())
+
+        return result.isFailed() ? ResponseObject.of(Status.BAD_REQUEST, result.getMessage())
                 : ResponseObject.of(Status.OK, result.getData());
     }
 

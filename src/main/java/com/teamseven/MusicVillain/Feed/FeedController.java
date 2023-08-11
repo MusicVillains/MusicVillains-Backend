@@ -1,26 +1,30 @@
 package com.teamseven.MusicVillain.Feed;
 
-import com.teamseven.MusicVillain.ResponseDto;
 import com.teamseven.MusicVillain.ResponseObject;
+import com.teamseven.MusicVillain.Security.MemberAuthorizationManager;
+import com.teamseven.MusicVillain.Security.OAuth.AuthorizationResult;
+import com.teamseven.MusicVillain.Security.OAuth.FeedAuthorizationManager;
 import com.teamseven.MusicVillain.ServiceResult;
 import com.teamseven.MusicVillain.Status;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Base64;
-import java.util.List;
-import java.util.Map;
 
 @RestController
 public class FeedController {
     private final FeedService feedService;
-
+    private FeedAuthorizationManager feedAuthManager;
+    private MemberAuthorizationManager memberAuthManager;
     @Autowired
-    public FeedController(FeedService feedService){
+    public FeedController(FeedService feedService, FeedAuthorizationManager authManager,
+                          MemberAuthorizationManager memberAuthManager){
         this.feedService = feedService;
+        this.feedAuthManager = authManager;
+        this.memberAuthManager = memberAuthManager;
     }
 
     @GetMapping("/feeds")
@@ -66,16 +70,16 @@ public class FeedController {
     // feedId로 record 가져오기
     // http://localhost:8080/feeds/record?feedId=6a9a17e91a334c3498213b6c89ac22c3
     public RecordResponseBody getFeedRecord(@RequestParam("feedId") String feedId){
-        RecordResponseBody recordResponseDto = feedService.getRecordByFeedId(feedId);
-
-        String encodedByteArrayAsString = Base64.getEncoder().encodeToString(recordResponseDto.getRecordRawData());
-        System.out.println("encodedByteArrayAsString: " + encodedByteArrayAsString);
-
-        byte[] decodedByteArray = Base64.getDecoder().decode(encodedByteArrayAsString);
-        System.out.println("decodedByteArray: " + decodedByteArray);
-
-        String resourcePath = "/Users/gunmo/Desktop/Team7-Backend/src/main/resources/static/output." + recordResponseDto.getRecordFileType().split("/")[1];
-        writeBytesToFile(decodedByteArray, resourcePath);
+//        RecordResponseBody recordResponseDto = feedService.getRecordByFeedId(feedId);
+//
+//        String encodedByteArrayAsString = Base64.getEncoder().encodeToString(recordResponseDto.getRecordRawData());
+//        System.out.println("encodedByteArrayAsString: " + encodedByteArrayAsString);
+//
+//        byte[] decodedByteArray = Base64.getDecoder().decode(encodedByteArrayAsString);
+//        System.out.println("decodedByteArray: " + decodedByteArray);
+//
+//        String resourcePath = "/Users/gunmo/Desktop/Team7-Backend/src/main/resources/static/output." + recordResponseDto.getRecordFileType().split("/")[1];
+//        writeBytesToFile(decodedByteArray, resourcePath);
 
         return feedService.getRecordByFeedId(feedId);
     }
@@ -99,7 +103,13 @@ public class FeedController {
 
     @DeleteMapping("/feeds/{feedId}")
     // feedId로 feed 삭제하기
-    public ResponseObject deleteFeed(@PathVariable("feedId") String feedId){
+    public ResponseObject deleteFeed(@PathVariable("feedId") String feedId,
+    HttpHeaders headers){
+
+        AuthorizationResult authResult = feedAuthManager.authorize(headers,feedId);
+        if(authResult.isFailed())
+            return ResponseObject.of(Status.UNAUTHORIZED,authResult.getMessage());
+
         ServiceResult result = feedService.deleteFeedByFeedId(feedId);
         if(result.isFailed()) return ResponseObject.of(Status.BAD_REQUEST);
         return ResponseObject.of(Status.OK,feedId);
@@ -115,7 +125,13 @@ public class FeedController {
 
     // [!] Check Needed!
     @GetMapping("/feeds/interactionFeeds")
-    public ResponseObject getInteractionFeedsByMemberId(@RequestParam("memberId") String memberId){
+    public ResponseObject getInteractionFeedsByMemberId(@RequestParam("memberId") String memberId,
+                                                        @RequestHeader HttpHeaders headers){
+
+        AuthorizationResult authResult = memberAuthManager.authorize(headers, memberId);
+        if(authResult.isFailed())
+            return ResponseObject.of(Status.UNAUTHORIZED,authResult.getMessage());
+
         ServiceResult result = feedService.getInteractionFeedsByMemberId(memberId);
         return result.isFailed() ? ResponseObject.of(Status.BAD_REQUEST,result.getData())
                 : ResponseObject.of(Status.OK,result.getData());

@@ -11,7 +11,9 @@ public class ENV{
     public final static String FRONT_SERVER_FAILURE_REDIRECT_URL = BASE_URL + "https://team7-frontend-git-main-beside-team7.vercel.app/"; // temporary
 
 
-    /* For JWT */
+    /* For JWT and Secure */
+
+    public final static Boolean AUTHORIZE_MODE = false;
     public final static String JWT_SECRET_KEY = "1a690b8c7ed346f8b2b49e7660f02232";
     public final static int JWT_TOKEN_EXPIRE_TIME = 30; // minutes
     public final static String JWT_TOKEN_SUBJECT = "BesideTeam7"; // 토큰 발행자
