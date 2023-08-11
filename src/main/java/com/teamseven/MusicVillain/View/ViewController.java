@@ -1,4 +1,4 @@
-package com.teamseven.MusicVillain;
+package com.teamseven.MusicVillain.View;
 
 import com.teamseven.MusicVillain.Member.MemberController;
 import com.teamseven.MusicVillain.Member.MemberService;

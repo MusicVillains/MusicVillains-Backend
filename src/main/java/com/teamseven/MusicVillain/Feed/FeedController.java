@@ -1,10 +1,10 @@
 package com.teamseven.MusicVillain.Feed;
 
-import com.teamseven.MusicVillain.ResponseObject;
-import com.teamseven.MusicVillain.Security.MemberAuthorizationManager;
-import com.teamseven.MusicVillain.Security.OAuth.AuthorizationResult;
-import com.teamseven.MusicVillain.Security.OAuth.FeedAuthorizationManager;
-import com.teamseven.MusicVillain.ServiceResult;
+import com.teamseven.MusicVillain.Dto.ResponseObject;
+import com.teamseven.MusicVillain.Security.JWT.MemberJwtAuthorizationManager;
+import com.teamseven.MusicVillain.Security.JWT.AuthorizationResult;
+import com.teamseven.MusicVillain.Security.JWT.FeedJwtAuthorizationManager;
+import com.teamseven.MusicVillain.Dto.ServiceResult;
 import com.teamseven.MusicVillain.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -17,11 +17,11 @@ import java.io.IOException;
 @RestController
 public class FeedController {
     private final FeedService feedService;
-    private FeedAuthorizationManager feedAuthManager;
-    private MemberAuthorizationManager memberAuthManager;
+    private FeedJwtAuthorizationManager feedAuthManager;
+    private MemberJwtAuthorizationManager memberAuthManager;
     @Autowired
-    public FeedController(FeedService feedService, FeedAuthorizationManager authManager,
-                          MemberAuthorizationManager memberAuthManager){
+    public FeedController(FeedService feedService, FeedJwtAuthorizationManager authManager,
+                          MemberJwtAuthorizationManager memberAuthManager){
         this.feedService = feedService;
         this.feedAuthManager = authManager;
         this.memberAuthManager = memberAuthManager;

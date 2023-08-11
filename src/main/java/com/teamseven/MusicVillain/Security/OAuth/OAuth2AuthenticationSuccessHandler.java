@@ -2,7 +2,7 @@ package com.teamseven.MusicVillain.Security.OAuth;
 
 import com.teamseven.MusicVillain.ENV;
 import com.teamseven.MusicVillain.Member.Member;
-import com.teamseven.MusicVillain.Security.JwtManager;
+import com.teamseven.MusicVillain.Security.JWT.JwtManager;
 import com.teamseven.MusicVillain.Security.UserDetailsImpl;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

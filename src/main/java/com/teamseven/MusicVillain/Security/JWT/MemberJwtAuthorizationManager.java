@@ -1,23 +1,19 @@
-package com.teamseven.MusicVillain.Security;
+package com.teamseven.MusicVillain.Security.JWT;
 
-import com.teamseven.MusicVillain.ENV;
 import com.teamseven.MusicVillain.Feed.FeedRepository;
 import com.teamseven.MusicVillain.Member.Member;
 import com.teamseven.MusicVillain.Member.MemberRepository;
-import com.teamseven.MusicVillain.Security.OAuth.AuthorizationManager;
-import com.teamseven.MusicVillain.Security.OAuth.AuthorizationResult;
-import com.teamseven.MusicVillain.ServiceResult;
+import com.teamseven.MusicVillain.Dto.ServiceResult;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
 @NoArgsConstructor
 @Component
-public class MemberAuthorizationManager extends AuthorizationManager {
+public class MemberJwtAuthorizationManager extends JwtAuthorizationManager {
     private MemberRepository memberRepository;
     @Autowired
-    public MemberAuthorizationManager(MemberRepository memberRepository, FeedRepository feedRepository) {
+    public MemberJwtAuthorizationManager(MemberRepository memberRepository, FeedRepository feedRepository) {
         this.memberRepository = memberRepository;
     }
 

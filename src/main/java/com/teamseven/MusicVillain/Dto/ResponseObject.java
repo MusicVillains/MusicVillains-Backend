@@ -1,6 +1,6 @@
-package com.teamseven.MusicVillain;
+package com.teamseven.MusicVillain.Dto;
 
-import org.apache.coyote.Response;
+import com.teamseven.MusicVillain.Status;
 
 public class ResponseObject {
     public int statusCode;

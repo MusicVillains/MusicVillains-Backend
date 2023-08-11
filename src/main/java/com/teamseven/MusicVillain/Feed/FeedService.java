@@ -5,14 +5,14 @@ import com.teamseven.MusicVillain.Interaction.InteractionRepository;
 import com.teamseven.MusicVillain.Member.Member;
 import com.teamseven.MusicVillain.Member.MemberRepository;
 import com.teamseven.MusicVillain.Record.RecordRepository;
-import com.teamseven.MusicVillain.ServiceResult;
+import com.teamseven.MusicVillain.Dto.ServiceResult;
 import com.teamseven.MusicVillain.Status;
+import com.teamseven.MusicVillain.Util.RandomUUIDGenerator;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.sql.SQLOutput;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -88,7 +88,7 @@ public class FeedService {
         }
 
         Record generatedRecord = Record.builder()
-                .recordId(UUID.randomUUID().toString().replace("-", ""))
+                .recordId(RandomUUIDGenerator.generate())
                 .recordFileSize(recordFile.getBytes().length)
                 .recordDuration(recordDuration)
                 .recordFileType(recordFile.getContentType())
@@ -97,7 +97,7 @@ public class FeedService {
         recordRepository.save(generatedRecord);
         System.out.println("[>] Record created and saved to database");
 
-        String generatedFeedId = UUID.randomUUID().toString().replace("-", "");
+        String generatedFeedId = RandomUUIDGenerator.generate();
 
         feedRepository.save(
                 Feed.builder()

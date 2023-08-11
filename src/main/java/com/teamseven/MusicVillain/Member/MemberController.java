@@ -1,9 +1,9 @@
 package com.teamseven.MusicVillain.Member;
 
-import com.teamseven.MusicVillain.ResponseObject;
-import com.teamseven.MusicVillain.Security.MemberAuthorizationManager;
-import com.teamseven.MusicVillain.Security.OAuth.AuthorizationResult;
-import com.teamseven.MusicVillain.ServiceResult;
+import com.teamseven.MusicVillain.Dto.ResponseObject;
+import com.teamseven.MusicVillain.Security.JWT.MemberJwtAuthorizationManager;
+import com.teamseven.MusicVillain.Security.JWT.AuthorizationResult;
+import com.teamseven.MusicVillain.Dto.ServiceResult;
 import com.teamseven.MusicVillain.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -14,10 +14,10 @@ import java.util.List;
 @RestController
 public class MemberController {
     private final MemberService memberService;
-    private final MemberAuthorizationManager authManager;
+    private final MemberJwtAuthorizationManager authManager;
 
     @Autowired
-    public MemberController(MemberService memberService, MemberAuthorizationManager authManager){
+    public MemberController(MemberService memberService, MemberJwtAuthorizationManager authManager){
         this.memberService = memberService;
         this.authManager = authManager;
     }

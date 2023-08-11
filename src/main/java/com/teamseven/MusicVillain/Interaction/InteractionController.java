@@ -2,14 +2,12 @@ package com.teamseven.MusicVillain.Interaction;
 
 import com.teamseven.MusicVillain.Interaction.RequestBodyForm.InteractionCreationRequestBody;
 import com.teamseven.MusicVillain.ResponseDto;
-import com.teamseven.MusicVillain.ResponseObject;
-import com.teamseven.MusicVillain.ServiceResult;
+import com.teamseven.MusicVillain.Dto.ResponseObject;
+import com.teamseven.MusicVillain.Dto.ServiceResult;
 import com.teamseven.MusicVillain.Status;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
 @RestController
 public class InteractionController {
 

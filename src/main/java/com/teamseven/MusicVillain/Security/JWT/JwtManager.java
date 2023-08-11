@@ -1,9 +1,9 @@
-package com.teamseven.MusicVillain.Security;
+package com.teamseven.MusicVillain.Security.JWT;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.teamseven.MusicVillain.ENV;
-import com.teamseven.MusicVillain.ServiceResult;
+import com.teamseven.MusicVillain.Dto.ServiceResult;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.http.HttpHeaders;
 import java.util.Date;

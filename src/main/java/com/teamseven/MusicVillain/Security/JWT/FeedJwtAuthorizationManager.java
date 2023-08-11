@@ -1,22 +1,18 @@
-package com.teamseven.MusicVillain.Security.OAuth;
+package com.teamseven.MusicVillain.Security.JWT;
 
 import com.teamseven.MusicVillain.Feed.Feed;
 import com.teamseven.MusicVillain.Feed.FeedRepository;
-import com.teamseven.MusicVillain.Member.Member;
-import com.teamseven.MusicVillain.Security.JwtManager;
-import com.teamseven.MusicVillain.ServiceResult;
+import com.teamseven.MusicVillain.Dto.ServiceResult;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 @Component
-public class FeedAuthorizationManager extends AuthorizationManager{
+public class FeedJwtAuthorizationManager extends JwtAuthorizationManager {
 
     private FeedRepository feedRepository;
 
     @Autowired
-    public FeedAuthorizationManager(FeedRepository feedRepository) {
+    public FeedJwtAuthorizationManager(FeedRepository feedRepository) {
         this.feedRepository = feedRepository;
     }
 
@@ -32,12 +28,18 @@ public class FeedAuthorizationManager extends AuthorizationManager{
 
         // check jwtToken is valid
         ServiceResult verifyResult = JwtManager.verifyToken(jwtToken);
-        if(verifyResult.isFailed())
+        if (verifyResult.isFailed())
             return AuthorizationResult.fail();
+
+
 
         // check this member is feed's owner
         String tmpMemberId = verifyResult.getData().toString();
         String feedOwnerMemberId = feed.getOwner().getMemberId();
+
+        if (tmpMemberId == null || feedOwnerMemberId == null)
+            return AuthorizationResult.fail("Member Not Found");
+
 
         if(!tmpMemberId.equals(feedOwnerMemberId))
             return AuthorizationResult.fail("Feed owner's memberId does not match authorized memberId.");

@@ -1,4 +1,4 @@
-package com.teamseven.MusicVillain;
+package com.teamseven.MusicVillain.Util;
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.StreamUtils;
@@ -13,6 +13,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 public class Utility {
+
     public byte[] AudioCutter(MultipartFile audioFile, int startTime, int endTime) throws IOException {
         try {
             AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(audioFile.getInputStream());

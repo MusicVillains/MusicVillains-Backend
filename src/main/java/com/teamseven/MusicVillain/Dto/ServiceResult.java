@@ -1,4 +1,4 @@
-package com.teamseven.MusicVillain;
+package com.teamseven.MusicVillain.Dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

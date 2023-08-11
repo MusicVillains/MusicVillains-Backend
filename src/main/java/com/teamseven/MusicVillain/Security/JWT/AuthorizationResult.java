@@ -1,4 +1,4 @@
-package com.teamseven.MusicVillain.Security.OAuth;
+package com.teamseven.MusicVillain.Security.JWT;
 
 import com.teamseven.MusicVillain.Member.Member;
 import lombok.Builder;

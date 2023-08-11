@@ -1,7 +1,7 @@
 package com.teamseven.MusicVillain.Security.OAuth;
 
 import com.teamseven.MusicVillain.Member.Member;
-import com.teamseven.MusicVillain.RandomNicknameGenerator;
+import com.teamseven.MusicVillain.Util.RandomNicknameGenerator;
 import com.teamseven.MusicVillain.Security.UserDetailsImpl;
 import com.teamseven.MusicVillain.Member.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;

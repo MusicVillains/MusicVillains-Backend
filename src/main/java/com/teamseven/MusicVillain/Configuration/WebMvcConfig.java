@@ -1,4 +1,4 @@
-package com.teamseven.MusicVillain;
+package com.teamseven.MusicVillain.Configuration;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;

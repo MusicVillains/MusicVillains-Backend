@@ -1,10 +1,11 @@
-package com.teamseven.MusicVillain.Security.OAuth;
+package com.teamseven.MusicVillain.Security.JWT;
 
 
 import com.teamseven.MusicVillain.ENV;
+import com.teamseven.MusicVillain.Security.JWT.AuthorizationResult;
 import org.springframework.http.HttpHeaders;
 
-public abstract class AuthorizationManager {
+public abstract class JwtAuthorizationManager {
     public boolean authorizeMode = ENV.AUTHORIZE_MODE;
 
     public AuthorizationResult authorize(HttpHeaders headers, String entityId){

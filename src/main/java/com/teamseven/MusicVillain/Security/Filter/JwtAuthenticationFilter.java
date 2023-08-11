@@ -2,7 +2,7 @@ package com.teamseven.MusicVillain.Security.Filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.teamseven.MusicVillain.Member.Member;
-import com.teamseven.MusicVillain.Security.JwtManager;
+import com.teamseven.MusicVillain.Security.JWT.JwtManager;
 import com.teamseven.MusicVillain.Security.UserDetailsImpl;
 import com.teamseven.MusicVillain.Member.MemberRepository;
 import com.teamseven.MusicVillain.Security.LoginAttemptMember;

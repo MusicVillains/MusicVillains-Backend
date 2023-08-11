@@ -5,15 +5,13 @@ import com.teamseven.MusicVillain.Feed.FeedRepository;
 import com.teamseven.MusicVillain.Feed.FeedService;
 import com.teamseven.MusicVillain.Interaction.InteractionRepository;
 import com.teamseven.MusicVillain.Interaction.InteractionService;
-import com.teamseven.MusicVillain.ServiceResult;
-import com.teamseven.MusicVillain.Status;
+import com.teamseven.MusicVillain.Dto.ServiceResult;
+import com.teamseven.MusicVillain.Util.RandomUUIDGenerator;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -67,7 +65,7 @@ public class MemberService {
         if (!isValidUserIdPattern(memberCreationRequestBody.getUserId())) {
             return ServiceResult.fail("Invalid user id pattern");
         }
-        String generatedMemberId = UUID.randomUUID().toString().replace("-", "");
+        String generatedMemberId = RandomUUIDGenerator.generate();
         // 새로운 멤버 생성
         Member member = Member.builder()
                 .memberId(generatedMemberId)
