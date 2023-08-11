@@ -1,6 +1,7 @@
 package com.teamseven.MusicVillain.Security.OAuth;
 
 import com.teamseven.MusicVillain.Member.Member;
+import com.teamseven.MusicVillain.RandomNicknameGenerator;
 import com.teamseven.MusicVillain.Security.UserDetailsImpl;
 import com.teamseven.MusicVillain.Member.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +59,6 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
                 System.out.println(">>> 기존 회원의 providerType: " + member.getProviderType());
                 System.out.println(">>> request의 providerType: " + providerType);
             }
-         //   else  { updateMember(member, userInfo);}  // 업데이트는 나중에 적용 예정
         }
         else {
             member = createUser(userInfo, providerType);
@@ -73,7 +73,7 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
         System.out.println("[DEBUG] OAuth2UserServiceImpl.createUser(..) Entered");
 
         String generatedUserId = providerType +"_"+ oAuth2UserInfo.getId();
-        String generatedName = "-"; // 랜덤한 단어 조합으로 생성할 예정
+        String generatedName = RandomNicknameGenerator.generate() ; // 랜덤한 단어 조합으로 생성할 예정
 //        if(oAuth2UserInfo.getEmail() != null) {
 //            String generatedName = oAuth2UserInfo.getEmail().split("@")[0];
 //            String generatedUserId = generatedName + "_" + providerType;
