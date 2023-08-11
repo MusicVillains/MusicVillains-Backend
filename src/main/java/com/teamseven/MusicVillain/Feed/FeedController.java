@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
@@ -65,14 +66,16 @@ public class FeedController {
     // feedId로 record 가져오기
     // http://localhost:8080/feeds/record?feedId=6a9a17e91a334c3498213b6c89ac22c3
     public RecordResponseBody getFeedRecord(@RequestParam("feedId") String feedId){
-        //        String encodedByteArrayAsString = Base64.getEncoder().encodeToString(recordResponseDto.getRecordRawData());
-//        System.out.println("encodedByteArrayAsString: " + encodedByteArrayAsString);
-//
-//        byte[] decodedByteArray = Base64.getDecoder().decode(encodedByteArrayAsString);
-//        System.out.println("decodedByteArray: " + decodedByteArray);
-//
-//        String resourcePath = "/Users/gunmo/Desktop/Team7-Backend/src/main/resources/static/output." + recordResponseDto.getRecordFileType().split("/")[1];
-//        writeBytesToFile(decodedByteArray, resourcePath);
+        RecordResponseBody recordResponseDto = feedService.getRecordByFeedId(feedId);
+
+        String encodedByteArrayAsString = Base64.getEncoder().encodeToString(recordResponseDto.getRecordRawData());
+        System.out.println("encodedByteArrayAsString: " + encodedByteArrayAsString);
+
+        byte[] decodedByteArray = Base64.getDecoder().decode(encodedByteArrayAsString);
+        System.out.println("decodedByteArray: " + decodedByteArray);
+
+        String resourcePath = "/Users/gunmo/Desktop/Team7-Backend/src/main/resources/static/output." + recordResponseDto.getRecordFileType().split("/")[1];
+        writeBytesToFile(decodedByteArray, resourcePath);
 
         return feedService.getRecordByFeedId(feedId);
     }
@@ -83,8 +86,7 @@ public class FeedController {
             outputStream.write(data);
             System.out.println("File written successfully.");
         } catch (IOException e) {
-            e.printStackTrace();
-        }
+            e.printStackTrace(); }
     }
 
     @GetMapping("/feeds/member")
@@ -102,12 +104,19 @@ public class FeedController {
         if(result.isFailed()) return ResponseObject.of(Status.BAD_REQUEST);
         return ResponseObject.of(Status.OK,feedId);
     }
-
-    // [!] Implement Later
     @PostMapping("/feeds/viewFeed")
     // url: http://localhost:8080/feeds/viewFeed?id={feedId}
+    // feed 조회수 증가
     public ResponseObject viewCountUp(@RequestParam("id") String feedId){
         ServiceResult result = feedService.feedViewCountUp(feedId);
+        return result.isFailed() ? ResponseObject.of(Status.BAD_REQUEST,result.getData())
+                : ResponseObject.of(Status.OK,result.getData());
+    }
+
+    // [!] Check Needed!
+    @GetMapping("/feeds/interactionFeeds")
+    public ResponseObject getInteractionFeedsByMemberId(@RequestParam("memberId") String memberId){
+        ServiceResult result = feedService.getInteractionFeedsByMemberId(memberId);
         return result.isFailed() ? ResponseObject.of(Status.BAD_REQUEST,result.getData())
                 : ResponseObject.of(Status.OK,result.getData());
     }

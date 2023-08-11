@@ -7,6 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.*;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -69,4 +70,6 @@ public class Member {
         // role이 null이면 빈 리스트를 리턴
         return new ArrayList<>();
     }
+
+    
 }

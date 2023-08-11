@@ -20,4 +20,6 @@ public interface InteractionRepository extends JpaRepository<Interaction, String
     void deleteByInteractionFeedFeedId(String feedId);
     void deleteByInteractionMemberMemberId(String memberId);
     void deleteByInteractionId(String interactionId);
+
+    List<Interaction> findAllByInteractionMemberMemberId(String memberId);
 }

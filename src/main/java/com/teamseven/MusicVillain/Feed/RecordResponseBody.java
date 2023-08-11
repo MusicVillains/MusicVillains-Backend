@@ -8,7 +8,7 @@ public class RecordResponseBody {
     public int statusCode;
     public String message;
     public String recordId;
-    public String recordFileType;
+    public String recordFileType; // image/png
     public int recordFileSize;
     public int recordDuration;
     public byte[] recordRawData;

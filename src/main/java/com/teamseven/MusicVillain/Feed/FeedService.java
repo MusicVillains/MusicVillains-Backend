@@ -1,5 +1,6 @@
 package com.teamseven.MusicVillain.Feed;
 
+import com.teamseven.MusicVillain.Interaction.Interaction;
 import com.teamseven.MusicVillain.Interaction.InteractionRepository;
 import com.teamseven.MusicVillain.Member.Member;
 import com.teamseven.MusicVillain.Member.MemberRepository;
@@ -13,10 +14,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.sql.SQLOutput;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import com.teamseven.MusicVillain.Record.Record;
 import org.springframework.web.multipart.MultipartFile;
@@ -164,4 +162,20 @@ public class FeedService {
     }
 
 
+    public ServiceResult getInteractionFeedsByMemberId(String memberId) {
+        Member member = memberRepository.findByMemberId(memberId);
+        if(member == null){
+            return ServiceResult.of(ServiceResult.FAIL, "Member Not Found");
+        }
+        List<Interaction> interactionList = interactionRepository.findAllByInteractionMemberMemberId(memberId);
+
+        List<Feed> interactionFeedList = new ArrayList<>();
+
+        for(Interaction interaction : interactionList){
+            interactionFeedList.add(interaction.getInteractionFeed());
+        }
+
+        return ServiceResult.success(FeedDto.toFeedDtoList(interactionFeedList));
+
+    }
 }
