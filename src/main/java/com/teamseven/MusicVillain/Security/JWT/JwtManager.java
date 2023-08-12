@@ -2,7 +2,7 @@ package com.teamseven.MusicVillain.Security.JWT;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.teamseven.MusicVillain.ENV;
+import com.teamseven.MusicVillain.Utils.ENV;
 import com.teamseven.MusicVillain.Dto.ServiceResult;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.http.HttpHeaders;
@@ -25,11 +25,8 @@ public class JwtManager {
     }
 
     public static ServiceResult verifyToken(String authorizationHeader){
-        System.out.println("[HOTFIX] JwtManager.verifyToken() jwtToken: " + authorizationHeader);
 
         if (!isValidJwtHeaderFormat(authorizationHeader)) {
-            System.out.println("[HOTFIX] Invalid Jwt Format");
-
             return ServiceResult.of(ServiceResult.FAIL,
                     "Invalid Jwt Format",
                     null);

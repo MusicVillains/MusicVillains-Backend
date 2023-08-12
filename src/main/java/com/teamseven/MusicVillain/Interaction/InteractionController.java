@@ -1,10 +1,9 @@
 package com.teamseven.MusicVillain.Interaction;
 
-import com.teamseven.MusicVillain.Interaction.RequestBodyForm.InteractionCreationRequestBody;
-import com.teamseven.MusicVillain.ResponseDto;
-import com.teamseven.MusicVillain.Dto.ResponseObject;
+import com.teamseven.MusicVillain.Dto.RequestBody.InteractionCreationRequestBody;
+import com.teamseven.MusicVillain.Dto.ResponseBody.ResponseObject;
 import com.teamseven.MusicVillain.Dto.ServiceResult;
-import com.teamseven.MusicVillain.Status;
+import com.teamseven.MusicVillain.Dto.ResponseBody.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

@@ -1,6 +1,6 @@
 package com.teamseven.MusicVillain.Security.OAuth;
 
-import com.teamseven.MusicVillain.ENV;
+import com.teamseven.MusicVillain.Utils.ENV;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

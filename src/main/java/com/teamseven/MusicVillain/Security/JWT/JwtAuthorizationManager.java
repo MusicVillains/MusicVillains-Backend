@@ -1,8 +1,7 @@
 package com.teamseven.MusicVillain.Security.JWT;
 
 
-import com.teamseven.MusicVillain.ENV;
-import com.teamseven.MusicVillain.Security.JWT.AuthorizationResult;
+import com.teamseven.MusicVillain.Utils.ENV;
 import org.springframework.http.HttpHeaders;
 
 public abstract class JwtAuthorizationManager {

@@ -2,14 +2,18 @@ package com.teamseven.MusicVillain.Interaction;
 
 import com.teamseven.MusicVillain.Feed.Feed;
 import com.teamseven.MusicVillain.Feed.FeedRepository;
-import com.teamseven.MusicVillain.Interaction.RequestBodyForm.InteractionCreationRequestBody;
+import com.teamseven.MusicVillain.Dto.RequestBody.InteractionCreationRequestBody;
 import com.teamseven.MusicVillain.Member.Member;
 import com.teamseven.MusicVillain.Member.MemberRepository;
 import com.teamseven.MusicVillain.Dto.ServiceResult;
+import com.teamseven.MusicVillain.Notification.NotificaitonRepository;
+import com.teamseven.MusicVillain.Notification.Notification;
+import com.teamseven.MusicVillain.Utils.RandomUUIDGenerator;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -20,18 +24,25 @@ public class InteractionService {
     private final InteractionRepository interactionRepository;
     private final MemberRepository memberRepository;
     private final FeedRepository feedRepository;
+    private final NotificaitonRepository notificaitonRepository;
+
 
     @Autowired
-    public InteractionService(InteractionRepository interactionRepository, MemberRepository memberRepository, FeedRepository feedRepository){
+    public InteractionService(InteractionRepository interactionRepository,
+                              MemberRepository memberRepository, FeedRepository feedRepository,
+                              NotificaitonRepository notificaitonRepository){
+
         this.interactionRepository = interactionRepository;
         this.memberRepository = memberRepository;
         this.feedRepository = feedRepository;
+        this.notificaitonRepository = notificaitonRepository;
     }
 
     public List<Interaction> getAllInteractions(){
         return interactionRepository.findAll();
     }
 
+    @Transactional
     public ServiceResult insertInteraction(InteractionCreationRequestBody interactionCreationRequestBody){
         // feed 테이블의 interaction_count도 증가시켜줘야함
 
@@ -55,14 +66,25 @@ public class InteractionService {
                     .interactionMember(tmpMember) // 좋아요 누른 멤버
                     .build();
             interactionRepository.save(tmpInteraction);
-            feedRepository.save(tmpFeed);
+
+            Notification tmpNotification =
+                    Notification.builder()
+                            .notificationId(RandomUUIDGenerator.generate())
+                            .interaction(tmpInteraction)
+                            .owner(tmpFeed.getOwner())
+                            .ownerRead(Notification.NOTIFICATION_UNREAD)
+                            .createdAt(LocalDateTime.now())
+                            .build();
+            notificaitonRepository.save(tmpNotification);
+
             return ServiceResult.of(ServiceResult.SUCCESS, "Interaction created", generatedInteractionId);
         }
         else {
+            // 관련 notificaiton 삭제
+            notificaitonRepository.deleteByInteraction(checkInteraction);
+            // 인터렉션 삭제하여 좋아요 취소로 동작하도록 함.
             // 좋아요 취소로 동작
-            // interaction 테이블에서 해당 엔트리 삭제후 feed 테이블의 interaction_count 감소시켜줌
             interactionRepository.delete(checkInteraction);
-            feedRepository.save(tmpFeed);
             return ServiceResult.of(ServiceResult.SUCCESS, "Interaction deleted", null);
         }
     }
@@ -91,6 +113,20 @@ public class InteractionService {
         for (String interactionId : interactionIdListToDelete) {
            this.deleteInteractionByInteractionId(interactionId);
         }
+
+    }
+
+    @Transactional
+    public void deleteInterationsByFeedId(String feedId) {
+        List<Interaction> interactionList = interactionRepository.findByInteractionFeedFeedId(feedId);
+
+        //  notification 삭제
+        for(Interaction i: interactionList){
+            notificaitonRepository.deleteByInteraction(i);
+        }
+
+        // interaction 삭제
+        interactionRepository.deleteByInteractionFeedFeedId(feedId);
 
     }
 

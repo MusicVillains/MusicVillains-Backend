@@ -1,11 +1,12 @@
 package com.teamseven.MusicVillain.Feed;
 
-import com.teamseven.MusicVillain.Dto.ResponseObject;
+import com.teamseven.MusicVillain.Dto.ResponseBody.ResponseObject;
+import com.teamseven.MusicVillain.Dto.ResponseBody.RecordResponseBody;
 import com.teamseven.MusicVillain.Security.JWT.MemberJwtAuthorizationManager;
 import com.teamseven.MusicVillain.Security.JWT.AuthorizationResult;
 import com.teamseven.MusicVillain.Security.JWT.FeedJwtAuthorizationManager;
 import com.teamseven.MusicVillain.Dto.ServiceResult;
-import com.teamseven.MusicVillain.Status;
+import com.teamseven.MusicVillain.Dto.ResponseBody.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
@@ -104,8 +105,8 @@ public class FeedController {
     @DeleteMapping("/feeds/{feedId}")
     // feedId로 feed 삭제하기
     public ResponseObject deleteFeed(@PathVariable("feedId") String feedId,
-    HttpHeaders headers){
-
+    @RequestHeader HttpHeaders headers){
+        System.out.println("─> [FeedController] deleteFeed() called");
         AuthorizationResult authResult = feedAuthManager.authorize(headers,feedId);
         if(authResult.isFailed())
             return ResponseObject.of(Status.UNAUTHORIZED,authResult.getMessage());

@@ -5,6 +5,7 @@ import com.teamseven.MusicVillain.Member.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Repository
@@ -22,4 +23,6 @@ public interface InteractionRepository extends JpaRepository<Interaction, String
     void deleteByInteractionId(String interactionId);
 
     List<Interaction> findAllByInteractionMemberMemberId(String memberId);
+
+    List<Interaction> findByInteractionFeedFeedId(String feedId);
 }

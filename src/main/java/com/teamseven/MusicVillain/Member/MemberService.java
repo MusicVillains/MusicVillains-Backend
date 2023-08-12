@@ -6,13 +6,13 @@ import com.teamseven.MusicVillain.Feed.FeedService;
 import com.teamseven.MusicVillain.Interaction.InteractionRepository;
 import com.teamseven.MusicVillain.Interaction.InteractionService;
 import com.teamseven.MusicVillain.Dto.ServiceResult;
-import com.teamseven.MusicVillain.Util.RandomUUIDGenerator;
+import com.teamseven.MusicVillain.Dto.RequestBody.MemberCreationRequestBody;
+import com.teamseven.MusicVillain.Utils.RandomUUIDGenerator;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -73,6 +73,7 @@ public class MemberService {
                 .userInfo(bCryptPasswordEncoder.encode(memberCreationRequestBody.getUserInfo()))
                 .name(memberCreationRequestBody.getName())
                 .email(memberCreationRequestBody.getEmail())
+                .providerType("LOCAL")
                 .role("USER")
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())

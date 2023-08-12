@@ -1,10 +1,11 @@
 package com.teamseven.MusicVillain.Member;
 
-import com.teamseven.MusicVillain.Dto.ResponseObject;
+import com.teamseven.MusicVillain.Dto.ResponseBody.ResponseObject;
+import com.teamseven.MusicVillain.Dto.RequestBody.MemberCreationRequestBody;
 import com.teamseven.MusicVillain.Security.JWT.MemberJwtAuthorizationManager;
 import com.teamseven.MusicVillain.Security.JWT.AuthorizationResult;
 import com.teamseven.MusicVillain.Dto.ServiceResult;
-import com.teamseven.MusicVillain.Status;
+import com.teamseven.MusicVillain.Dto.ResponseBody.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;

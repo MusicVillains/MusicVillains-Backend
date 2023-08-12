@@ -1,13 +1,17 @@
 package com.teamseven.MusicVillain.Feed;
 
+import com.teamseven.MusicVillain.Dto.FeedDto;
 import com.teamseven.MusicVillain.Interaction.Interaction;
 import com.teamseven.MusicVillain.Interaction.InteractionRepository;
+import com.teamseven.MusicVillain.Interaction.InteractionService;
 import com.teamseven.MusicVillain.Member.Member;
 import com.teamseven.MusicVillain.Member.MemberRepository;
+import com.teamseven.MusicVillain.Notification.NotificaitonRepository;
 import com.teamseven.MusicVillain.Record.RecordRepository;
 import com.teamseven.MusicVillain.Dto.ServiceResult;
-import com.teamseven.MusicVillain.Status;
-import com.teamseven.MusicVillain.Util.RandomUUIDGenerator;
+import com.teamseven.MusicVillain.Dto.ResponseBody.RecordResponseBody;
+import com.teamseven.MusicVillain.Dto.ResponseBody.Status;
+import com.teamseven.MusicVillain.Utils.RandomUUIDGenerator;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,18 +23,26 @@ import java.util.*;
 import com.teamseven.MusicVillain.Record.Record;
 import org.springframework.web.multipart.MultipartFile;
 
+
 @Service
 public class FeedService {
     private final FeedRepository feedRepository;
     private final InteractionRepository interactionRepository;
     private final RecordRepository recordRepository;
     private final MemberRepository memberRepository;
+    private final NotificaitonRepository notificaitonRepository;
+    private final InteractionService interactionService;
+
     @Autowired
-    public FeedService(FeedRepository feedRepository, RecordRepository recordRepository, MemberRepository memberRepository, InteractionRepository interactionRepository) {
+    public FeedService(FeedRepository feedRepository, RecordRepository recordRepository,
+                       MemberRepository memberRepository, InteractionRepository interactionRepository,
+                       NotificaitonRepository notificaitonRepository, InteractionService interactionService) {
         this.feedRepository = feedRepository;
         this.recordRepository = recordRepository;
         this.memberRepository = memberRepository;
         this.interactionRepository = interactionRepository;
+        this.notificaitonRepository = notificaitonRepository;
+        this.interactionService = interactionService;
     }
     public ServiceResult getAllFeeds(){
 
@@ -140,15 +152,21 @@ public class FeedService {
 
     @Transactional
     public ServiceResult deleteFeedByFeedId(String feedId){
+        System.out.println("Enter FeedService.deleteFeedByFeedId()");
         Feed feedToDelete = feedRepository.findByFeedId(feedId);
         // 존재하는 피드인지 확인
         if(feedToDelete == null){
             return ServiceResult.of(ServiceResult.FAIL, "Feed Not Found");}
 
-        // 피드에 대한 Interaciton 삭제
-        interactionRepository.deleteByInteractionFeedFeedId(feedToDelete.feedId);
+        // 피드에 대한 Interaction을 삭제하기 전에 해당 인터렉션에 대한 Notification 먼저 삭제
+
+        // 피드에 대한 Interaciton 삭제,
+        //interactionRepository.deleteByInteractionFeedFeedId(feedToDelete.feedId);
+        interactionService.deleteInterationsByFeedId(feedId); // 여기서 내부적으로 각 인터렉션과 관련된 Notification도 삭제됨
+
         // Feed 삭제, Record는 Feed쪽에서 CASCADE로 자동 삭제됨
         feedRepository.deleteByFeedId(feedId);
+        System.out.println("Exit FeedService.deleteFeedByFeedId()");
         return ServiceResult.of(ServiceResult.SUCCESS, "Feed Deleted", feedId);
 
     }
