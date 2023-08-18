@@ -1,0 +1,54 @@
+name: CI-CD
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3.5.3
+    
+    - name: Build with Gradle
+      uses: gradle/gradle-build-action@v2.7.0
+      with:
+        arguments: build
+
+    - name: Upload Jars
+      uses: actions/upload-artifact@v3.1.2
+      with:
+        name: jars
+        path: build/libs/*.jar
+    
+  Delivery:
+    runs-on: ubuntu-latest
+    needs: Build
+    steps:
+    - name: Install sshpass   
+      run: sudo apt install sshpass
+    
+    - name: Download Jars
+      uses: actions/download-artifact@v2.1.1
+      with:
+        name: jars
+        
+    - name: Deliver Jars using SCP
+      run: sshpass -p ${{ secrets.SSH_KEY }} scp -P ${{ secrets.SSH_PORT }} *.jar ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_TARGET_IP }}:~/jars
+
+  Deploy:
+    runs-on: ubuntu-latest
+    needs: [Build, Delivery]
+    steps:
+    - name: Install sshpass   
+      run: sudo apt install sshpass
+      
+    - name: Execute remote commands
+      run: |
+        sshpass -p ${{ secrets.SSH_KEY }} ssh -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_TARGET_IP }} "sudo fuser -k 8080/tcp"
+        sshpass -p ${{ secrets.SSH_KEY }} ssh -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_TARGET_IP }} "sudo nohup java -jar ~/jars/*.jar &"
+    
+      
+  
+    
