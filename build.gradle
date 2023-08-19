@@ -53,3 +53,9 @@ tasks.named('asciidoctor') {
 	inputs.dir snippetsDir
 	dependsOn test
 }
+
+task copyApplicationYml(type: Copy) {
+	from './src/main/java/com/teamseven/MusicVillain/Private'
+	include '*.yml'
+	into './src/main/resources'
+}
