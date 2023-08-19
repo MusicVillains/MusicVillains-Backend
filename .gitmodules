@@ -1,0 +1,3 @@
+[submodule "Private"]
+    path = src/main/java/com/teamseven/MusicVillain/Private
+    url = https://github.com/MusicVillains/Team7-Backend-Private
