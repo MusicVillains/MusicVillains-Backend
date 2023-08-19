@@ -28,7 +28,9 @@ public class InteractionController {
     @GetMapping("/interactions/count")
     // url: /interaction/count?feedId={feedId}
     public ResponseObject getInteractionCountByFeedId(@RequestParam("feedId") String feedId){
+
         ServiceResult result = interactionService.getInteractionCountByFeedId(feedId);
+
         return result.isFailed() ? ResponseObject.of(Status.BAD_REQUEST, result.getData())
                 : ResponseObject.of(Status.OK, result.getData());
     }

@@ -51,8 +51,9 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
         // Member member = memberRepository.findByEmail(userInfo.getEmail());
         String expectedUserId = providerType +"_"+ userInfo.getId();
         Member member = memberRepository.findByUserId(expectedUserId);
-
         if (member != null) {
+            System.out.println(">>> member: " + member.userId);
+
             System.out.println(">>> 이미 존재하는 회원이므로 별도로 가입하지 않음");
             if (providerType.equals(member.getProviderType()) == false) {
                 System.out.println("[WARNING] Invalid Provider type");

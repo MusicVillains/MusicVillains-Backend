@@ -7,15 +7,20 @@ import com.teamseven.MusicVillain.Security.JWT.AuthorizationResult;
 import com.teamseven.MusicVillain.Security.JWT.FeedJwtAuthorizationManager;
 import com.teamseven.MusicVillain.Dto.ServiceResult;
 import com.teamseven.MusicVillain.Dto.ResponseBody.Status;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.Controller;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
 
 @RestController
+
 public class FeedController {
     private final FeedService feedService;
     private FeedJwtAuthorizationManager feedAuthManager;
@@ -137,4 +142,5 @@ public class FeedController {
         return result.isFailed() ? ResponseObject.of(Status.BAD_REQUEST,result.getData())
                 : ResponseObject.of(Status.OK,result.getData());
     }
+
 }
