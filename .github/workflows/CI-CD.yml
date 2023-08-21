@@ -20,13 +20,18 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
-        
-    - name: Build with Gradle
-      uses: gradle/gradle-build-action@v2
-      with:
-        arguments: | 
-          copyApplicationYml
-          build
+
+    - name: Build with Gradle without using action
+      run: |
+        ./gradlew copyApplicationYml
+        ./gradlew bootJar
+      
+    # - name: Build with Gradle
+    #   uses: gradle/gradle-build-action@v2
+    #   with:
+    #     arguments: | 
+    #       copyApplicationYml
+    #       build
           
     - name: Upload Jars
       uses: actions/upload-artifact@v3.1.2
