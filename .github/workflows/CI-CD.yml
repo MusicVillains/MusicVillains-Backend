@@ -52,7 +52,7 @@ jobs:
         name: jars
         
     - name: Deliver Jars using SCP
-      run: sshpass -p ${{ secrets.SSH_KEY }} scp -P ${{ secrets.SSH_PORT }} *.jar ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_TARGET_IP }}:~/jars
+      run: sshpass -p ${{ secrets.SSH_KEY }} scp -o StrictHostKeyChecking=no -P ${{ secrets.SSH_PORT }} *.jar ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_TARGET_IP }}:~/jars
 
   Deploy:
     runs-on: ubuntu-latest
