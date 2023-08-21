@@ -20,10 +20,12 @@ jobs:
         distribution: 'temurin'
         
     - name: Build with Gradle
-      uses: gradle/gradle-build-action@v2.7.0
+      uses: gradle/gradle-build-action@v2
       with:
-        arguments: build
-
+        arguments: | 
+          copyApplicationYml
+          build
+          
     - name: Upload Jars
       uses: actions/upload-artifact@v3.1.2
       with:
