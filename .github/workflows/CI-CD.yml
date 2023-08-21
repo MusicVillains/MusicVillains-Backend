@@ -54,9 +54,8 @@ jobs:
       
     - name: Execute remote commands
       run: |
-        sshpass -p ${{ secrets.SSH_KEY }} ssh -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_TARGET_IP }} "sudo fuser -k 8080/tcp"
-        sshpass -p ${{ secrets.SSH_KEY }} ssh -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_TARGET_IP }} "sudo nohup java -jar ~/jars/*.jar &"
-    
+        sshpass -p ${{ secrets.SSH_KEY }} ssh -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_TARGET_IP }} "sudo fuser -k 8080/tcp || true"
+        sshpass -p ${{ secrets.SSH_KEY }} ssh -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_TARGET_IP }} "sudo nohup java -jar ~/*.jar > ~/nohup.log 2>&1 &"
       
   
     
