@@ -52,7 +52,7 @@ jobs:
         name: jars
         
     - name: Deliver Jars using SCP
-      run: sshpass -p ${{ secrets.SSH_KEY }} scp -o StrictHostKeyChecking=no -P ${{ secrets.SSH_PORT }} *.jar ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_TARGET_IP }}:~/jars
+      run: sshpass -p ${{ secrets.SSH_KEY }} scp -o StrictHostKeyChecking=no -P ${{ secrets.SSH_PORT }} *.jar ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_TARGET_IP }}:~/deploy/
 
   Deploy:
     runs-on: ubuntu-latest
@@ -64,7 +64,8 @@ jobs:
     - name: Execute remote commands
       run: |
         sshpass -p ${{ secrets.SSH_KEY }} ssh -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_TARGET_IP }} "sudo fuser -k 8080/tcp || true"
-        sshpass -p ${{ secrets.SSH_KEY }} ssh -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_TARGET_IP }} "sudo nohup java -jar ~/*.jar > ~/nohup.log 2>&1 &"
-      
+        sshpass -p ${{ secrets.SSH_KEY }} ssh -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_TARGET_IP }} "sudo nohup java -jar ~/deploy/*.jar > ~/nohup.log 2>&1 &"
+        sshpass -p ${{ secrets.SSH_KEY }} ssh -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_TARGET_IP }} "sudo echo "[$(date)] Deploy done" >> deploy_log.txt"
+
   
     
