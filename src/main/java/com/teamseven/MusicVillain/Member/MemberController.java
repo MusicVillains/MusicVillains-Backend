@@ -6,6 +6,8 @@ import com.teamseven.MusicVillain.Security.JWT.MemberJwtAuthorizationManager;
 import com.teamseven.MusicVillain.Security.JWT.AuthorizationResult;
 import com.teamseven.MusicVillain.Dto.ServiceResult;
 import com.teamseven.MusicVillain.Dto.ResponseBody.Status;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +16,8 @@ import java.util.List;
 
 @RestController
 public class MemberController {
+    private Logger log = LoggerFactory.getLogger(this.getClass());
+
     private final MemberService memberService;
     private final MemberJwtAuthorizationManager authManager;
 
@@ -25,11 +29,14 @@ public class MemberController {
 
     @GetMapping("/members")
     public ResponseObject members(){
+        log.debug("members() called - @GetMapping(\"/members\")");
         List<Member> memberList = memberService.getAllMembers();
         return ResponseObject.of(Status.OK, memberList);
     }
     @GetMapping("/members/{memberId}")
     public ResponseObject getMemberById(@PathVariable("memberId") String memberId){
+        log.debug("getMemberById() called - @GetMapping(\"/members/{memberId}\")");
+        log.debug("@PathVariable(\"memberId\"): {}", memberId);
         ServiceResult serviceResult = memberService.getMemberById(memberId);
         return serviceResult.isFailed() ? ResponseObject.of(Status.BAD_REQUEST, null)
                 : ResponseObject.of(Status.OK, serviceResult.getData());
@@ -37,6 +44,8 @@ public class MemberController {
 
     @PostMapping("/members")
     public ResponseObject insertMember(@RequestBody MemberCreationRequestBody memberCreationRequestBody){
+        log.debug("insertMember() called - @PostMapping(\"/members\")");
+
         ServiceResult result = memberService.insertMember(memberCreationRequestBody);
 
         return result.isFailed() ? ResponseObject.of(Status.CREATION_FAIL, result.getData())

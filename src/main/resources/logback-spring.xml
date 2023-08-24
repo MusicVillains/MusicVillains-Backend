@@ -6,6 +6,10 @@
             <pattern>%highlight([%-5level]) %white(%d{HH:mm:ss}) %cyan(%logger) %n>> %boldYellow(%msg%n%n)</pattern>
         </encoder>
     </appender>
+    <logger name ="com.teamseven.MusicVillain" level="DEBUG" />
+
+<!--    <logger name ="com.teamseven.MusicVillain.Member" level="INFO" />-->
+
     <logger name ="com.teamseven.MusicVillain.View.ViewController" level="TRACE" />
     <root level="INFO">
         <appender-ref ref="CONSOLE" />
