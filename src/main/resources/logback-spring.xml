@@ -3,7 +3,7 @@
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
 <!--            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %5level %logger - %msg%n</pattern>-->
-            <pattern>%highlight([%-5level]) %white(%d{HH:mm:ss}) %cyan(%logger) %n>> %boldYellow(%msg%n%n)</pattern>
+            <pattern>%white(%d{HH:mm:ss}) :: %highlight(%-5level) :: %cyan(%logger) %n>> %boldYellow(%msg%n%n)</pattern>
         </encoder>
     </appender>
     <logger name ="com.teamseven.MusicVillain" level="DEBUG" />

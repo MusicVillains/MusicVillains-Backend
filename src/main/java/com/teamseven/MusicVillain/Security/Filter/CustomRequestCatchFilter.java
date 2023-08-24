@@ -3,10 +3,11 @@ package com.teamseven.MusicVillain.Security.Filter;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-
+@Slf4j
 public class CustomRequestCatchFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
@@ -15,19 +16,24 @@ public class CustomRequestCatchFilter implements Filter {
         // HttpServletRequest, HttpServletResponse 로 다운 캐스팅
         HttpServletRequest req = (HttpServletRequest) request;
 
-        System.out.println("──────────────────────── Request Occur ────────────────────────");
-        System.out.println("Time: " + LocalDateTime.now());
-        if (((HttpServletRequest) request).getMethod()!= null)
-        System.out.println("Method: " + req.getMethod().toString());
-        if (request.getContentType() != null)
-        System.out.println("ContentType: " + req.getContentType().toString());
-        if (((HttpServletRequest) request).getRequestURL() != null)
-            System.out.println("RequestURL: " + req.getRequestURL().toString());
-        if (((HttpServletRequest) request).getQueryString() != null)
-            System.out.println("QueryString: " + req.getQueryString().toString());
+//        System.out.println("──────────────────────── Request Occur ────────────────────────");
+//        System.out.println("Time: " + LocalDateTime.now());
+//        if (((HttpServletRequest) request).getMethod()!= null)
+//        System.out.println("Method: " + req.getMethod().toString());
+//        if (request.getContentType() != null)
+//        System.out.println("ContentType: " + req.getContentType().toString());
+//        if (((HttpServletRequest) request).getRequestURL() != null)
+//            System.out.println("RequestURL: " + req.getRequestURL().toString());
+//        if (((HttpServletRequest) request).getQueryString() != null)
+//            System.out.println("QueryString: " + req.getQueryString().toString());
+//        System.out.println("───────────────────────────────────────────────────────────────");
+//        System.out.println("");
 
-        System.out.println("───────────────────────────────────────────────────────────────");
-        System.out.println("");
+        if(req.getQueryString() == null){
+            log.info("Request: ({}){}", req.getMethod().toString(),req.getRequestURL().toString());}
+        else{
+            log.info("Request: ({}){}?{}", req.getMethod().toString(),req.getRequestURL().toString(), req.getQueryString().toString()); ;}
+
 
 
 
