@@ -55,7 +55,8 @@ tasks.named('asciidoctor') {
 }
 
 task copyApplicationYml(type: Copy) {
-	from './src/main/java/com/teamseven/MusicVillain/Private'
+//	from './src/main/java/com/teamseven/MusicVillain/Private'
+	from 'Private'
 	include '*.yml'
 	into './src/main/resources'
 }
