@@ -42,6 +42,7 @@ public class OAuth2AuthenticationSuccessHandler extends SavedRequestAwareAuthent
                 "}";
         response.getWriter().write(ResponseJsonString);
         System.out.println(">>> Response Json String: " + ResponseJsonString);
+        redirectURL = redirectURL + "?token=" + generatedJwtToken;
         System.out.println(">>> Redirect URL: " + redirectURL);
         getRedirectStrategy().sendRedirect(request, response, redirectURL); // Response 전송하고, 로그인 후 이동해야할 프론트 페이지로 redirect
     }
