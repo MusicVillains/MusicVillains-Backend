@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 public class ENV{
     public final static Boolean IS_LOCAL = false;
 
+    // OAuth
+    public static String KAKAO_CLIENT_ID;
     public final static String BASE_URL = "http://localhost:8080";
     public final static String SPRING_PORT = "8080";
     public final static String LOCAL_LOGGIN_SUCCESS_REDIRECT_URL = BASE_URL + "/dev/loginSuccess"; // temporary
@@ -58,4 +60,7 @@ public class ENV{
     public void SET_JWT_TOKEN_EXPIRE_TIME(int expireTime){
         this.JWT_TOKEN_EXPIRE_TIME = expireTime;
     }
+
+    @Value("${oauth2.client.registration.kakao.client-id")
+    public void SET_KAKAO_CLIENT_ID(String kakaoClientId){this.KAKAO_CLIENT_ID = kakaoClientId;}
 }
