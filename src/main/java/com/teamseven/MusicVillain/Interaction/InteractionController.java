@@ -4,9 +4,10 @@ import com.teamseven.MusicVillain.Dto.RequestBody.InteractionCreationRequestBody
 import com.teamseven.MusicVillain.Dto.ResponseBody.ResponseObject;
 import com.teamseven.MusicVillain.Dto.ServiceResult;
 import com.teamseven.MusicVillain.Dto.ResponseBody.Status;
+import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
+@Hidden
 @RestController
 public class InteractionController {
 

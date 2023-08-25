@@ -1,5 +1,6 @@
 package com.teamseven.MusicVillain.Dto.ResponseBody;
 
+
 public class ResponseObject {
     public int statusCode;
     public String message;

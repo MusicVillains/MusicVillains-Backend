@@ -1,11 +1,12 @@
 package com.teamseven.MusicVillain.Security;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 @CrossOrigin(origins = "*")
-
+@Hidden
 @Controller
 public class SecurityTestController {
 

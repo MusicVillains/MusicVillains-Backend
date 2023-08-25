@@ -2,6 +2,7 @@ package com.teamseven.MusicVillain.View;
 
 import com.teamseven.MusicVillain.Member.MemberController;
 import com.teamseven.MusicVillain.Member.MemberService;
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 
-
+@Hidden
 @Controller
 //@Slf4j
 public class ViewController {

@@ -7,6 +7,7 @@ import com.teamseven.MusicVillain.Security.JWT.AuthorizationResult;
 import com.teamseven.MusicVillain.Security.JWT.FeedJwtAuthorizationManager;
 import com.teamseven.MusicVillain.Dto.ServiceResult;
 import com.teamseven.MusicVillain.Dto.ResponseBody.Status;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +20,8 @@ import org.springframework.web.servlet.mvc.Controller;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+@Hidden
 @RestController
-
 public class FeedController {
     private final FeedService feedService;
     private FeedJwtAuthorizationManager feedAuthManager;
@@ -110,7 +111,7 @@ public class FeedController {
     @DeleteMapping("/feeds/{feedId}")
     // feedId로 feed 삭제하기
     public ResponseObject deleteFeed(@PathVariable("feedId") String feedId,
-    @RequestHeader HttpHeaders headers){
+                                     @RequestHeader HttpHeaders headers){
         System.out.println("─> [FeedController] deleteFeed() called");
         AuthorizationResult authResult = feedAuthManager.authorize(headers,feedId);
         if(authResult.isFailed())
