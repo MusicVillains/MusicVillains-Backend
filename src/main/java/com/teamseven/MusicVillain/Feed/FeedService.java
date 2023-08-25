@@ -101,11 +101,23 @@ public class FeedService {
 
         Record generatedRecord = Record.builder()
                 .recordId(RandomUUIDGenerator.generate())
-                .recordFileSize(recordFile.getBytes().length)
+                //.recordFileSize(recordFile.getBytes().length)
                 .recordDuration(recordDuration)
-                .recordFileType(recordFile.getContentType())
-                .recordRawData(recordFile.getBytes())
+                //.recordFileType(recordFile.getContentType())
+                //.recordRawData(recordFile.getBytes())
                 .build();
+        // NPE 방지
+        if(recordFile == null) {
+            generatedRecord.setRecordFileType("Empty");
+            generatedRecord.setRecordFileSize(0);
+            generatedRecord.setRecordRawData(null);
+
+        }else{
+            generatedRecord.setRecordFileType(recordFile.getContentType());
+            generatedRecord.setRecordFileSize(recordFile.getBytes().length);
+            generatedRecord.setRecordRawData(recordFile.getBytes());
+        }
+
         recordRepository.save(generatedRecord);
         System.out.println("[>] Record created and saved to database");
 
