@@ -57,17 +57,15 @@ public class FeedController {
     @PostMapping("/feeds")
     public ResponseObject createFeed(
             // MultipartFile 받으려면 @RequestParam 사용해야하므로 다음과 같이 form-data로 받도록 함.
-            @RequestParam("feedName") String feedName,
-            @RequestParam("feedType") String feedType,
             @RequestParam("ownerId") String ownerId,
             @RequestParam("musicName") String musicName,
             @RequestParam("musicianName") String musicianName,
+            @RequestParam("feedType") String feedType,
             @RequestParam("description") String feedDescription,
             @RequestParam("recordDuration") int recordDuration,
             @RequestParam("recordFile") MultipartFile recordFile) throws IOException {
         System.out.println("─> [FeedController] createFeed() called");
         System.out.println("- Parameters:");
-        System.out.println("  - feedName: " + feedName);
         System.out.println("  - feedType: " + feedType);
         System.out.println("  - ownerId: " + ownerId);
         System.out.println("  - musicName: " + musicName);
@@ -76,7 +74,7 @@ public class FeedController {
         System.out.println("  - recordDuration: " + recordDuration);
         System.out.println("  - recordFile: " + recordFile);
 
-        ServiceResult result = feedService.insertFeed(feedName, ownerId, feedType,feedDescription, recordDuration, recordFile,musicName,musicianName);
+        ServiceResult result = feedService.insertFeed( ownerId, feedType,feedDescription, recordDuration, recordFile,musicName,musicianName);
         if (result.isFailed()) return ResponseObject.of(Status.CREATION_FAIL, result.getData());
         System.out.println("─> [FeedController] createFeed() finished");
         return ResponseObject.of(Status.OK, result.getData());

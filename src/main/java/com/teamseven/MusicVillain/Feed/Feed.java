@@ -23,9 +23,6 @@ public class Feed {
     @Column(name = "feed_id")
     public String feedId; // PK, uuid.toString()
 
-    @Column(name = "feed_name")
-    public String feedName;
-
     @Column(name = "feed_type")
     public String feedType;
 
@@ -57,9 +54,8 @@ public class Feed {
     public String musicianName;
 
     @Builder
-    public Feed(String feedId, String feedName, String feedType, Member owner, Record record, LocalDateTime createdAt, LocalDateTime updatedAt, String description, int viewCount, String musicName, String musicianName) {
+    public Feed(String feedId, String feedType, Member owner, Record record, LocalDateTime createdAt, LocalDateTime updatedAt, String description, int viewCount, String musicName, String musicianName) {
         this.feedId = feedId;
-        this.feedName = feedName;
         this.feedType = feedType;
         this.owner = owner;
         this.record = record;

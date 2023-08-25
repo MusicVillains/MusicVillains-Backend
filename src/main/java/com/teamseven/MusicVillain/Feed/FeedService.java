@@ -13,6 +13,7 @@ import com.teamseven.MusicVillain.Dto.ResponseBody.RecordResponseBody;
 import com.teamseven.MusicVillain.Dto.ResponseBody.Status;
 import com.teamseven.MusicVillain.Utils.RandomUUIDGenerator;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 
 @Service
+@Slf4j
 public class FeedService {
     private final FeedRepository feedRepository;
     private final InteractionRepository interactionRepository;
@@ -70,32 +72,30 @@ public class FeedService {
                 .build();
     }
 
-    public ServiceResult insertFeed(String feedName, String ownerId, String feedType, String feedDescription, int recordDuration, MultipartFile recordFile,
+    public ServiceResult insertFeed( String ownerId, String feedType, String feedDescription, int recordDuration, MultipartFile recordFile,
                                     String musicName, String musicianName
     ) throws IOException {
-
-        System.out.println("─> [FeedService] insertFeed() called");
-        System.out.println("- Parameters:");
-        System.out.println("  - feedName: " + feedName);
-        System.out.println("  - ownerId: " + ownerId);
-        System.out.println("  - feedType: " + feedType);
-        System.out.println("  - feedDescription: " + feedDescription);
-        System.out.println("  - recordDuration: " + recordDuration);
-        System.out.println("  - recordFile: " + recordFile);
-        System.out.println("  - musicName: " + musicName);
-        System.out.println("  - musicianName: " + musicianName);
+        log.debug("insertFeed() called");
+        log.debug("- Parameters:");
+        log.debug("  - ownerId: " + ownerId);
+        log.debug("  - feedType: " + feedType);
+        log.debug("  - feedDescription: " + feedDescription);
+        log.debug("  - recordDuration: " + recordDuration);
+        log.debug("  - recordFile: " + recordFile);
+        log.debug("  - musicName: " + musicName);
+        log.debug("  - musicianName: " + musicianName);
 
         Member feedOwner = memberRepository.findByMemberId(ownerId);
 
         if (feedOwner == null){
-            System.out.println("[!] insertFeed() failed: Member Not Found");
-            System.out.println("─> [FeedService] Exit insertFeed() with exception");
+            log.debug("[!] insertFeed() failed: Member Not Found");
+            log.debug("─> [FeedService] Exit insertFeed() with exception");
             return ServiceResult.fail("Member Not Found");
         }
 
-        if(feedName == null || ownerId == null || feedType == null){
-            System.out.println("[!] insertFeed() failed: missing parameter");
-            System.out.println("─> [FeedService] Exit insertFeed() with exception");
+        if( musicName == null || ownerId == null || feedType == null){
+            log.debug("[!] insertFeed() failed: missing parameter");
+            log.debug("─> [FeedService] Exit insertFeed() with exception");
             return ServiceResult.fail("missing parameter");
         }
 
@@ -114,7 +114,6 @@ public class FeedService {
         feedRepository.save(
                 Feed.builder()
                         .feedId(generatedFeedId)
-                        .feedName(feedName)
                         .feedType(feedType)
                         .owner(feedOwner)
                         .record(generatedRecord)

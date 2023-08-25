@@ -17,7 +17,6 @@ import java.util.*;
 public class FeedDto {
 
     public String feedId;
-    public String feedName;
     public String feedType;
     public String ownerId;
     public String ownerName;
@@ -33,7 +32,6 @@ public class FeedDto {
 
     public FeedDto(Feed feed){
         this.setFeedId(feed.getFeedId());
-        this.setFeedName(feed.getFeedName());
         this.setFeedType(feed.getFeedType());
         this.setOwnerId(feed.getOwner().getMemberId());
         this.setOwnerName(feed.getOwner().getName());
