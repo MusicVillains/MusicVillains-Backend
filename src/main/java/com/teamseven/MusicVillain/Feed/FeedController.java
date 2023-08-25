@@ -46,6 +46,14 @@ public class FeedController {
         return ResponseObject.of(Status.OK,feedService.getFeedByFeedId(feedId));
     }
 
+    @GetMapping("/feeds/feedType")
+    // feedType으로 모든 feed 가져오기
+    // 주소 예시: http://localhost:8080/feeds/feedType?value=고음괴물
+    public ResponseObject getAllFeedsByFeedType(@RequestParam("value") String feedType){
+        ServiceResult result = feedService.getAllFeedsByFeedType(feedType);
+        return ResponseObject.of(Status.OK,result.getData());
+    }
+
     @PostMapping("/feeds")
     public ResponseObject createFeed(
             // MultipartFile 받으려면 @RequestParam 사용해야하므로 다음과 같이 form-data로 받도록 함.

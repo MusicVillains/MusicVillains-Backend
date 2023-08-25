@@ -134,10 +134,15 @@ public class FeedService {
     public ServiceResult getAllFeedsByMemberId(String memberId) {
         Member member = memberRepository.findByMemberId(memberId);
 
-        List<FeedDto> resultFeedEntityList = FeedDto.toFeedDtoList(feedRepository.findAllByOwnerMemberId(memberId));
+        List<FeedDto> resultFeedDtoList = FeedDto.toFeedDtoList(feedRepository.findAllByOwnerMemberId(memberId));
 
-        return ServiceResult.success(resultFeedEntityList);
+        return ServiceResult.success(resultFeedDtoList);
 
+    }
+
+    public ServiceResult getAllFeedsByFeedType(String feedType){
+        List<FeedDto> resultFeedDtoList = FeedDto.toFeedDtoList(feedRepository.findAllByFeedType(feedType));
+        return ServiceResult.success(resultFeedDtoList);
     }
 
     public ServiceResult feedViewCountUp(String feedId){
