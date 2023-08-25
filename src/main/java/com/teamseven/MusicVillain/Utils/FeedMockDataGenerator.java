@@ -57,7 +57,7 @@ public class FeedMockDataGenerator {
             feedService.insertFeed(
                     randomMemberId, randomMusicType,
                     "mock" ,0, null ,
-                    randomMockMusicObject.musicianName, randomMockMusicObject.musicianName);
+                    randomMockMusicObject.musicName, randomMockMusicObject.musicianName);
         }
     }
 
