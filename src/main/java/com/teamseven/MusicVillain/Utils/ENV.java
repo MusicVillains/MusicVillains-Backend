@@ -61,6 +61,6 @@ public class ENV{
         this.JWT_TOKEN_EXPIRE_TIME = expireTime;
     }
 
-    @Value("${oauth2.client.registration.kakao.client-id")
+    @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
     public void SET_KAKAO_CLIENT_ID(String kakaoClientId){this.KAKAO_CLIENT_ID = kakaoClientId;}
 }
