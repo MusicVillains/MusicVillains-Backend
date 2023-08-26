@@ -1,9 +1,11 @@
 package com.teamseven.MusicVillain.Dto;
 import com.teamseven.MusicVillain.Feed.Feed;
+import com.teamseven.MusicVillain.Dto.Converter.FeedDtoConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import com.teamseven.MusicVillain.Member.Member;
 import com.teamseven.MusicVillain.Record.Record;
+
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -14,6 +16,8 @@ public class DtoTest {
     public static Feed feed;
     public static FeedDto feedDto;
     static {
+        FeedDtoConverter converter = new FeedDtoConverter();
+
         feed = new Feed();
         feed.setFeedId("feedId-Test");
         feed.setFeedType("feedType-Test");
@@ -31,29 +35,17 @@ public class DtoTest {
         feed.setUpdatedAt(LocalDateTime.now());
         feed.setDescription("description-Test");
 
-        feedDto = new FeedDto().toDto(feed);
+        feedDto = converter.convert(feed);
     }
+
     @Test
     public void testFeedDto() {
-        feed = new Feed();
-        feed.setFeedId("feedId-Test");
-        feed.setFeedType("feedType-Test");
-        Member owner = new Member();
-        owner.setMemberId("ownerId-Test");
-        owner.setName("ownerName-Test");
-        feed.setOwner(owner);
-        Record record = new Record();
-        record.setRecordId("recordId-Test");
-        feed.setRecord(record);
-        feed.setMusicName("musicName-Test");
-        feed.setMusicianName("musicianName-Test");
-        feed.setViewCount(100);
-        feed.setCreatedAt(LocalDateTime.now());
-        feed.setUpdatedAt(LocalDateTime.now());
-        feed.setDescription("description-Test");
+        FeedDtoConverter converter = new FeedDtoConverter();
 
-        FeedDto feedDto = new FeedDto().toDto(feed);
+        FeedDto feedDto = converter.convert(feed);
         log.info(feedDto.toString());
+
+        // Assertions
         assert(feedDto.getFeedId().equals("feedId-Test"));
         assert(feedDto.getFeedType().equals("feedType-Test"));
         assert(feedDto.getOwnerId().equals("ownerId-Test"));
@@ -67,9 +59,9 @@ public class DtoTest {
         assert(feedDto.getDescription().equals("description-Test"));
 
         List<Feed> feedList = Arrays.asList(feed, new Feed());
-        List<FeedDto> feedDtoList = new FeedDto().toDtoList(feedList);
+        List<FeedDto> feedDtoList = converter.convertList(feedList);
         log.info(feedDtoList.toString());
+
         assert(feedDtoList.size() == 2);
     }
-
 }
