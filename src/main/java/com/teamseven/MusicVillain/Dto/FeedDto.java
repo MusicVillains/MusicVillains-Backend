@@ -14,7 +14,7 @@ import java.util.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class FeedDto {
+public class FeedDto implements DataTransferObject<Feed, FeedDto>{
 
     public String feedId;
     public String feedType;
@@ -43,13 +43,15 @@ public class FeedDto {
         this.setMusicianName(feed.getMusicianName());
         this.setViewCount(feed.getViewCount());
     }
-    public static FeedDto toFeedDto(Feed feed){
+    @Override
+    public FeedDto toDto(Feed feed) {
         return new FeedDto(feed);
     }
 
-    public static List<FeedDto> toFeedDtoList(List<Feed> feedList){
+    @Override
+    public List<FeedDto> toDtoList(List<Feed> feedList) {
         List<FeedDto> feedDtoList = new ArrayList<>();
-        for(Feed feed : feedList){
+        for (Feed feed : feedList) {
             feedDtoList.add(new FeedDto(feed));
         }
         return feedDtoList;

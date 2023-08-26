@@ -1,6 +1,7 @@
 package com.teamseven.MusicVillain.Feed;
 
-import com.teamseven.MusicVillain.Dto.FeedDto;
+import com.teamseven.MusicVillain.Dto.*;
+import com.teamseven.MusicVillain.Dto.Converter.FeedDtoConverter;
 import com.teamseven.MusicVillain.Interaction.Interaction;
 import com.teamseven.MusicVillain.Interaction.InteractionRepository;
 import com.teamseven.MusicVillain.Interaction.InteractionService;
@@ -8,7 +9,6 @@ import com.teamseven.MusicVillain.Member.Member;
 import com.teamseven.MusicVillain.Member.MemberRepository;
 import com.teamseven.MusicVillain.Notification.NotificaitonRepository;
 import com.teamseven.MusicVillain.Record.RecordRepository;
-import com.teamseven.MusicVillain.Dto.ServiceResult;
 import com.teamseven.MusicVillain.Dto.ResponseBody.RecordResponseBody;
 import com.teamseven.MusicVillain.Dto.ResponseBody.Status;
 import com.teamseven.MusicVillain.Utils.RandomUUIDGenerator;
@@ -46,10 +46,13 @@ public class FeedService {
         this.notificaitonRepository = notificaitonRepository;
         this.interactionService = interactionService;
     }
-    public ServiceResult getAllFeeds(){
 
-        List<FeedDto> feedDtoList = FeedDto.toFeedDtoList(
-                feedRepository.findAllByOrderByCreatedAtDesc());
+    @Autowired
+    private FeedDtoConverter feedDtoConverter;
+
+    public ServiceResult getAllFeeds(){
+        List<Feed> feeds = feedRepository.findAllByOrderByCreatedAtDesc();
+        List<FeedDto> feedDtoList = feedDtoConverter.convertList(feeds);
         return ServiceResult.success(feedDtoList);
     }
 
@@ -143,16 +146,14 @@ public class FeedService {
     }
 
     public ServiceResult getAllFeedsByMemberId(String memberId) {
-        Member member = memberRepository.findByMemberId(memberId);
-
-        List<FeedDto> resultFeedDtoList = FeedDto.toFeedDtoList(feedRepository.findAllByOwnerMemberId(memberId));
-
+        List<Feed> feeds = feedRepository.findAllByOwnerMemberId(memberId);
+        List<FeedDto> resultFeedDtoList = feedDtoConverter.convertList(feeds);
         return ServiceResult.success(resultFeedDtoList);
-
     }
 
     public ServiceResult getAllFeedsByFeedType(String feedType){
-        List<FeedDto> resultFeedDtoList = FeedDto.toFeedDtoList(feedRepository.findAllByFeedType(feedType));
+        List<Feed> feeds = feedRepository.findAllByFeedType(feedType);
+        List<FeedDto> resultFeedDtoList = feedDtoConverter.convertList(feeds);
         return ServiceResult.success(resultFeedDtoList);
     }
 
@@ -192,7 +193,9 @@ public class FeedService {
     }
 
     public FeedDto getFeedByFeedId(String feedId) {
-        return FeedDto.toFeedDto(feedRepository.findByFeedId(feedId));
+        Feed feed = feedRepository.findByFeedId(feedId);
+        FeedDto feedDtoInstance = new FeedDto();
+        return feedDtoInstance.toDto(feed);
     }
 
 
@@ -209,7 +212,8 @@ public class FeedService {
             interactionFeedList.add(interaction.getInteractionFeed());
         }
 
-        return ServiceResult.success(FeedDto.toFeedDtoList(interactionFeedList));
+        List<FeedDto> resultFeedDtoList = feedDtoConverter.convertList(interactionFeedList);
+        return ServiceResult.success(resultFeedDtoList);
 
     }
 
