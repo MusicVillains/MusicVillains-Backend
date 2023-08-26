@@ -1,6 +1,6 @@
 package com.teamseven.MusicVillain.Member;
 
-import com.teamseven.MusicVillain.Dto.ResponseBody.ResponseObject;
+import com.teamseven.MusicVillain.Dto.ResponseBody.ResponseObject_old;
 import com.teamseven.MusicVillain.Dto.RequestBody.MemberCreationRequestBody;
 import com.teamseven.MusicVillain.Security.JWT.MemberJwtAuthorizationManager;
 import com.teamseven.MusicVillain.Security.JWT.AuthorizationResult;
@@ -13,7 +13,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,30 +35,30 @@ public class MemberController {
 //    @Tag(name = "회원 관련 API", description = "Swagger 테스트")
     @GetMapping("/members")
     @Operation(summary = "모든 회원 조회", description = "데이터 베이스에 등록된 모든 회원 정보를 조회합니다.")
-    public ResponseObject members(){
+    public ResponseObject_old members(){
         log.debug("members() called - @GetMapping(\"/members\")");
         List<Member> memberList = memberService.getAllMembers();
-        return ResponseObject.of(Status.OK, memberList);
+        return ResponseObject_old.of(Status.OK, memberList);
     }
     @GetMapping("/members/{memberId}")
     @Operation(summary = "특정 회원 정보 조회", description = "특정 회원의 정보를 조회합니다.")
-    public ResponseObject getMemberById(
+    public ResponseObject_old getMemberById(
             @Parameter(description = "조회할 회원의 멤버 아이디", required = true)
             @PathVariable("memberId") String memberId){
         log.debug("getMemberById() called - @GetMapping(\"/members/{memberId}\")");
         log.debug("@PathVariable(\"memberId\"): {}", memberId);
         ServiceResult serviceResult = memberService.getMemberById(memberId);
-        return serviceResult.isFailed() ? ResponseObject.of(Status.BAD_REQUEST, null)
-                : ResponseObject.of(Status.OK, serviceResult.getData());
+        return serviceResult.isFailed() ? ResponseObject_old.of(Status.BAD_REQUEST, null)
+                : ResponseObject_old.of(Status.OK, serviceResult.getData());
     }
 
     @Hidden
     @PostMapping("/members")
-    public ResponseObject insertMember(@RequestBody MemberCreationRequestBody memberCreationRequestBody){
+    public ResponseObject_old insertMember(@RequestBody MemberCreationRequestBody memberCreationRequestBody){
         log.debug("insertMember() called - @PostMapping(\"/members\")");
         ServiceResult result = memberService.insertMember(memberCreationRequestBody);
-        return result.isFailed() ? ResponseObject.of(Status.CREATION_FAIL, result.getData())
-                : ResponseObject.of(Status.CREATED, result.getData());
+        return result.isFailed() ? ResponseObject_old.of(Status.CREATION_FAIL, result.getData())
+                : ResponseObject_old.of(Status.CREATED, result.getData());
     }
 
     /**
@@ -76,7 +75,7 @@ public class MemberController {
     @PostMapping("/members/{memberId}")
     @Operation(summary = "회원 이름 변경", description = "회원의 이름(닉네임)을 변경합니다.")
 
-    public ResponseObject modifyMemberNickname(
+    public ResponseObject_old modifyMemberNickname(
             @Parameter(description = "변경할 회원의 멤버 아이디", required = true)
             @PathVariable("memberId") String memberId,
             @Parameter(description = "변경할 닉네임", required = true)
@@ -87,12 +86,12 @@ public class MemberController {
         AuthorizationResult authResult =
                 authManager.authorize(requestHeader, memberId);
 
-        if (authResult.isFailed()) return ResponseObject.of(Status.UNAUTHORIZED, authResult.getMessage());
+        if (authResult.isFailed()) return ResponseObject_old.of(Status.UNAUTHORIZED, authResult.getMessage());
 
         ServiceResult result = memberService.modifyMemberNickname(memberId, nickname);
 
-        return result.isFailed() ? ResponseObject.of(Status.BAD_REQUEST, result.getData())
-                : ResponseObject.of(Status.OK, result.getData());
+        return result.isFailed() ? ResponseObject_old.of(Status.BAD_REQUEST, result.getData())
+                : ResponseObject_old.of(Status.OK, result.getData());
     }
 
     /**
@@ -107,7 +106,7 @@ public class MemberController {
     @DeleteMapping("/members/{memberId}")
     @Operation(summary = "회원 탈퇴", description = "회원을 탈퇴시킵니다.")
 
-    public ResponseObject deleteMemberByMemberId(
+    public ResponseObject_old deleteMemberByMemberId(
             @Parameter(description = "탈퇴할 회원의 멤버 아이디", required = true)
             @PathVariable("memberId") String memberId,
             @Parameter(description = "JWT Token", required = true)
@@ -117,8 +116,8 @@ public class MemberController {
 
         ServiceResult result = memberService.deleteMemberByMemberId(memberId);
 
-        return result.isFailed() ? ResponseObject.of(Status.BAD_REQUEST, result.getMessage())
-                : ResponseObject.of(Status.OK, result.getData());
+        return result.isFailed() ? ResponseObject_old.of(Status.BAD_REQUEST, result.getMessage())
+                : ResponseObject_old.of(Status.OK, result.getData());
     }
 
 }
