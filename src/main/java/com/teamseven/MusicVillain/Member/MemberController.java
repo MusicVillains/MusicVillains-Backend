@@ -13,7 +13,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,18 +38,19 @@ public class MemberController {
     public ResponseObject members(){
         log.debug("members() called - @GetMapping(\"/members\")");
         List<Member> memberList = memberService.getAllMembers();
-        return ResponseObject.of(Status.OK, memberList);
+        return ResponseObject.OK(memberList);
     }
     @GetMapping("/members/{memberId}")
     @Operation(summary = "특정 회원 정보 조회", description = "특정 회원의 정보를 조회합니다.")
     public ResponseObject getMemberById(
             @Parameter(description = "조회할 회원의 멤버 아이디", required = true)
             @PathVariable("memberId") String memberId){
+
         log.debug("getMemberById() called - @GetMapping(\"/members/{memberId}\")");
         log.debug("@PathVariable(\"memberId\"): {}", memberId);
         ServiceResult serviceResult = memberService.getMemberById(memberId);
-        return serviceResult.isFailed() ? ResponseObject.of(Status.BAD_REQUEST, null)
-                : ResponseObject.of(Status.OK, serviceResult.getData());
+        return serviceResult.isFailed() ? ResponseObject.BAD_REQUEST()
+                : ResponseObject.OK(serviceResult.getData());
     }
 
     @Hidden
@@ -58,8 +58,8 @@ public class MemberController {
     public ResponseObject insertMember(@RequestBody MemberCreationRequestBody memberCreationRequestBody){
         log.debug("insertMember() called - @PostMapping(\"/members\")");
         ServiceResult result = memberService.insertMember(memberCreationRequestBody);
-        return result.isFailed() ? ResponseObject.of(Status.CREATION_FAIL, result.getData())
-                : ResponseObject.of(Status.CREATED, result.getData());
+        return result.isFailed() ? ResponseObject.CREATION_FAIL(result.getData())
+                : ResponseObject.CREATED(result.getData());
     }
 
     /**
@@ -87,12 +87,12 @@ public class MemberController {
         AuthorizationResult authResult =
                 authManager.authorize(requestHeader, memberId);
 
-        if (authResult.isFailed()) return ResponseObject.of(Status.UNAUTHORIZED, authResult.getMessage());
+        if (authResult.isFailed()) return ResponseObject.UNAUTHORIZED(authResult.getMessage());
 
         ServiceResult result = memberService.modifyMemberNickname(memberId, nickname);
 
-        return result.isFailed() ? ResponseObject.of(Status.BAD_REQUEST, result.getData())
-                : ResponseObject.of(Status.OK, result.getData());
+        return result.isFailed() ? ResponseObject.BAD_REQUEST(result.getData())
+                : ResponseObject.OK(result.getData());
     }
 
     /**
@@ -117,8 +117,8 @@ public class MemberController {
 
         ServiceResult result = memberService.deleteMemberByMemberId(memberId);
 
-        return result.isFailed() ? ResponseObject.of(Status.BAD_REQUEST, result.getMessage())
-                : ResponseObject.of(Status.OK, result.getData());
+        return result.isFailed() ? ResponseObject.NO_CONTENT()
+                : ResponseObject.OK(result.getData());
     }
 
 }

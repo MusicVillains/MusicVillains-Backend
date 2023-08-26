@@ -24,14 +24,13 @@ public class NotificationController {
     // url : /notifications?memberId=memberId
     public ResponseObject getNotificationsByMemberId(@RequestParam("memberId") String memberId){
         ServiceResult serviceResult = notificationService.getNotificaitonsByOwnerMemberID(memberId);
-
-        return serviceResult.isFailed() ? ResponseObject.of(Status.BAD_REQUEST, serviceResult.getData())
-                : ResponseObject.of(Status.OK, serviceResult.getData());
+        return serviceResult.isFailed() ? ResponseObject.BAD_REQUEST(serviceResult.getData())
+                : ResponseObject.OK(serviceResult.getData());
     }
     @PostMapping("/notifications/read")
     public ResponseObject readNotification(@RequestParam("notificationId") String notificationId){
         ServiceResult serviceResult = notificationService.readNotification(notificationId);
-        return serviceResult.isFailed() ? ResponseObject.of(Status.BAD_REQUEST, serviceResult.getMessage())
-                : ResponseObject.of(Status.OK, serviceResult.getData());
+        return serviceResult.isFailed() ? ResponseObject.BAD_REQUEST(serviceResult.getMessage())
+                : ResponseObject.OK(serviceResult.getData());
     }
 }

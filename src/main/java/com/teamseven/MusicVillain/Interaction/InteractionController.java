@@ -22,8 +22,8 @@ public class InteractionController {
     public ResponseObject doInteraction(@RequestBody InteractionCreationRequestBody requestBody){
 
         ServiceResult result =  interactionService.insertInteraction(requestBody);
-        return result.isFailed() ? ResponseObject.of(Status.BAD_REQUEST, result.getData())
-                : ResponseObject.of(Status.OK, result.getData());
+        return result.isFailed() ? ResponseObject.BAD_REQUEST(result.getData())
+                : ResponseObject.OK(result.getData());
     }
 
     @GetMapping("/interactions/count")
@@ -32,8 +32,8 @@ public class InteractionController {
 
         ServiceResult result = interactionService.getInteractionCountByFeedId(feedId);
 
-        return result.isFailed() ? ResponseObject.of(Status.BAD_REQUEST, result.getData())
-                : ResponseObject.of(Status.OK, result.getData());
+        return result.isFailed() ? ResponseObject.BAD_REQUEST(result.getData())
+                : ResponseObject.OK(result.getData());
     }
 
 }
