@@ -1,7 +1,13 @@
 package com.teamseven.MusicVillain.Dto.ResponseBody;
 
 
+@Deprecated
 public class ResponseObject_old {
+    /**
+     * @Deprecated:
+     *  This class is deprecated. Use {@link ResponseObject} instead.
+     */
+
     public int statusCode;
     public String message;
     public Object data;

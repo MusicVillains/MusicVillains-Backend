@@ -1,22 +1,26 @@
 package com.teamseven.MusicVillain.Dto.ResponseBody;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 
+@Getter
+@Setter
+@Slf4j
 public class ResponseObject extends ResponseEntity {
+    /**
+     * @Author: @Woody_K
+     * @Date: 2023-08-26
+     * @Description:
+     *  Even if there is no data to be transmitted,
+     *  the body is forcibly put into Response to keep the format statusCode, message, and data
+     *  using `CustomResponseBody` class
+     */
 
-    /* ──────────────────────────── Fields ───────────────────────────── */
-
-    /* Private Fields */
-    private Status status; // -> This field does not need to be output to Response(JSON)
-
-    /* Public Fields */
-    public int statusCode;
-    public String message;
-    public Object data;
-    /* ───────────────────────────────────────────────────────────────── */
 
     /* ──────────────────────── Generate Instance ────────────────────── */
     public static ResponseObject of(Status status, String message, Object data){
@@ -27,30 +31,38 @@ public class ResponseObject extends ResponseEntity {
     public static ResponseObject of(Status status, Object data){
         return new ResponseObject(status, data);
     }
+
+    public static ResponseObject of(Status status){
+        return new ResponseObject(status);
+    }
     /* ─────────────────────────────────────────────────────────────── */
 
     /* ──────────────────────── Constructors ──────────────────────── */
     public ResponseObject(Status status){
-        super(HttpStatusCode.valueOf(status.getStatusCode()));
-        this.statusCode = status.getStatusCode();
-        this.message = status.getMessage();
-        this.data = null;
+
+        super(CustomResponseBody.builder()
+                .statusCode(status.getStatusCode())
+                .message(status.getMessage())
+                .data(null)
+                .build(), HttpStatusCode.valueOf(status.getStatusCode()));
     }
 
     public ResponseObject(Status status, Object data){
-        super(data ,HttpStatusCode.valueOf(status.getStatusCode()));
-        this.statusCode = status.getStatusCode();
-        this.message = status.getMessage();
-        this.data = data;
+        super(CustomResponseBody.builder()
+                .statusCode(status.getStatusCode())
+                .message(status.getMessage())
+                .data(data)
+                .build(), HttpStatusCode.valueOf(status.getStatusCode()));
     }
 
     // Customize message
     public ResponseObject(Status status, String message, Object data){
 
-        super(data ,HttpStatusCode.valueOf(status.getStatusCode()));
-        this.statusCode = status.getStatusCode();
-        this.message = message;
-        this.data = data;
+        super(CustomResponseBody.builder()
+                .statusCode(status.getStatusCode())
+                .message(message)
+                .data(data)
+                .build() ,HttpStatusCode.valueOf(status.getStatusCode()));
     }
     /* ───────────────────────────────────────────────────────────────── */
 
@@ -60,8 +72,15 @@ public class ResponseObject extends ResponseEntity {
         return new ResponseObject(Status.OK, data);
     }
 
-    public static ResponseObject BAD_REQUEST(Object data){
+    public static ResponseObject NO_CONTENT(){
+        return new ResponseObject(Status.NO_CONTENT);
+    }
+
+    public static ResponseObject BAD_REQUEST(){
         return new ResponseObject(Status.BAD_REQUEST);
+    }
+    public static ResponseObject BAD_REQUEST(Object data){
+        return new ResponseObject(Status.BAD_REQUEST, data);
     }
 
     public static ResponseObject NOT_FOUND(){
@@ -72,6 +91,10 @@ public class ResponseObject extends ResponseEntity {
         return new ResponseObject(Status.UNAUTHORIZED);
     }
 
+    public static ResponseObject UNAUTHORIZED(Object data){
+        return new ResponseObject(Status.UNAUTHORIZED, data);
+    }
+
     public static ResponseObject CONFLICT(){
         return new ResponseObject(Status.CONFLICT);
     }
@@ -79,6 +102,23 @@ public class ResponseObject extends ResponseEntity {
     public static ResponseObject FORBIDDEN(){
         return new ResponseObject(Status.FORBIDDEN);
     }
+
+
+    public static ResponseObject CREATED(){
+        return new ResponseObject(Status.CREATED);
+    }
+    public static ResponseObject CREATED(Object data){
+        return new ResponseObject(Status.CREATED, data);
+    }
+
+    public static ResponseObject CREATION_FAIL(){
+        return new ResponseObject(Status.CREATION_FAIL);
+    }
+    public static ResponseObject CREATION_FAIL(Object data){
+        return new ResponseObject(Status.CREATION_FAIL, data);
+    }
+
+
     /* ─────────────────────────────────────────────────────────── */
 
 
