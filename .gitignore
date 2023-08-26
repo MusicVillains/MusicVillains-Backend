@@ -176,3 +176,6 @@ gradle-app.setting
 application.properties
 application.yml
 JwtVariables.java
+
+### for Personal ###
+/src/main/java/com/teamseven/MusicVillain/Personal/*
