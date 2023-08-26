@@ -177,5 +177,5 @@ application.properties
 application.yml
 JwtVariables.java
 
-## Personal Directory ##
-src/main/java/com/teamseven/MusicVillain/Personal
+### for Personal ###
+/src/main/java/com/teamseven/MusicVillain/Personal/*
