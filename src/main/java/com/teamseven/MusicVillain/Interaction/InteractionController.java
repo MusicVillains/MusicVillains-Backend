@@ -1,7 +1,7 @@
 package com.teamseven.MusicVillain.Interaction;
 
 import com.teamseven.MusicVillain.Dto.RequestBody.InteractionCreationRequestBody;
-import com.teamseven.MusicVillain.Dto.ResponseBody.ResponseObject;
+import com.teamseven.MusicVillain.Dto.ResponseBody.ResponseObject_old;
 import com.teamseven.MusicVillain.Dto.ServiceResult;
 import com.teamseven.MusicVillain.Dto.ResponseBody.Status;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -19,21 +19,21 @@ public class InteractionController {
     }
 
     @PostMapping("/interactions")
-    public ResponseObject doInteraction(@RequestBody InteractionCreationRequestBody requestBody){
+    public ResponseObject_old doInteraction(@RequestBody InteractionCreationRequestBody requestBody){
 
         ServiceResult result =  interactionService.insertInteraction(requestBody);
-        return result.isFailed() ? ResponseObject.of(Status.BAD_REQUEST, result.getData())
-                : ResponseObject.of(Status.OK, result.getData());
+        return result.isFailed() ? ResponseObject_old.of(Status.BAD_REQUEST, result.getData())
+                : ResponseObject_old.of(Status.OK, result.getData());
     }
 
     @GetMapping("/interactions/count")
     // url: /interaction/count?feedId={feedId}
-    public ResponseObject getInteractionCountByFeedId(@RequestParam("feedId") String feedId){
+    public ResponseObject_old getInteractionCountByFeedId(@RequestParam("feedId") String feedId){
 
         ServiceResult result = interactionService.getInteractionCountByFeedId(feedId);
 
-        return result.isFailed() ? ResponseObject.of(Status.BAD_REQUEST, result.getData())
-                : ResponseObject.of(Status.OK, result.getData());
+        return result.isFailed() ? ResponseObject_old.of(Status.BAD_REQUEST, result.getData())
+                : ResponseObject_old.of(Status.OK, result.getData());
     }
 
 }
