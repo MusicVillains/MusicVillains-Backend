@@ -28,11 +28,7 @@ public class ViewController {
 
     @GetMapping({"/", "/index"})
     public String index(){
-        log.info("index.html");
-        log.debug("index.html");
-        log.trace("index.html");
-        log.error("index.html");
-        return "index"; // returns index.html
+        return "redirect:/swagger-ui/index.html"; // returns index.html
     }
 
     @GetMapping("/dev/loginForm")
