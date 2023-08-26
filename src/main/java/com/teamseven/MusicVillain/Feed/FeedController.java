@@ -7,6 +7,8 @@ import com.teamseven.MusicVillain.Security.JWT.AuthorizationResult;
 import com.teamseven.MusicVillain.Security.JWT.FeedJwtAuthorizationManager;
 import com.teamseven.MusicVillain.Dto.ServiceResult;
 import com.teamseven.MusicVillain.Dto.ResponseBody.Status;
+import com.teamseven.MusicVillain.Member.Member;
+import com.teamseven.MusicVillain.Dto.DtoTest;
 import io.swagger.v3.oas.annotations.Hidden;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -146,6 +148,16 @@ public class FeedController {
         ServiceResult result = feedService.getInteractionFeedsByMemberId(memberId);
         return result.isFailed() ? ResponseObject.BAD_REQUEST(result.getData())
                 : ResponseObject.OK(result.getData());
+    }
+
+    @GetMapping("/dev/test/getTestFeed")
+    // 테스트용 피드 가져오기
+    // 주소 예시: http://localhost:8080/dev/test/getTestFeed
+    public ResponseObject getTestFeed() {
+        if (DtoTest.feed == null) {
+            return ResponseObject.of(Status.BAD_REQUEST, "Test feed not initialized.");
+        }
+        return ResponseObject.of(Status.OK, DtoTest.feedDto);
     }
 
 }
