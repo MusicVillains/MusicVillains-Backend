@@ -33,13 +33,9 @@ public class FeedDto implements DataTransferObject<Feed, FeedDto>{
     public FeedDto(Feed feed){
         this.setFeedId(feed.getFeedId());
         this.setFeedType(feed.getFeedType());
-        if (feed.getOwner() != null) {
-            this.setOwnerId(feed.getOwner().getMemberId());
-            this.setOwnerName(feed.getOwner().getName());
-        }
-        if (feed.getRecord() != null) {
-            this.setRecordId(feed.getRecord().getRecordId());
-        }
+        this.setOwnerId(feed.getOwner().getMemberId());
+        this.setOwnerName(feed.getOwner().getName());
+        this.setRecordId(feed.getRecord().getRecordId());
         this.setCreatedAt(feed.getCreatedAt());
         this.setUpdatedAt(feed.getUpdatedAt());
         this.setDescription(feed.getDescription());

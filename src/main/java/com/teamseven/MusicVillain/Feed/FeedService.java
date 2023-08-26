@@ -1,6 +1,7 @@
 package com.teamseven.MusicVillain.Feed;
 
-import com.teamseven.MusicVillain.Dto.FeedDto;
+import com.teamseven.MusicVillain.Dto.*;
+import com.teamseven.MusicVillain.Dto.Converter.FeedDtoConverter;
 import com.teamseven.MusicVillain.Interaction.Interaction;
 import com.teamseven.MusicVillain.Interaction.InteractionRepository;
 import com.teamseven.MusicVillain.Interaction.InteractionService;
@@ -8,7 +9,6 @@ import com.teamseven.MusicVillain.Member.Member;
 import com.teamseven.MusicVillain.Member.MemberRepository;
 import com.teamseven.MusicVillain.Notification.NotificaitonRepository;
 import com.teamseven.MusicVillain.Record.RecordRepository;
-import com.teamseven.MusicVillain.Dto.ServiceResult;
 import com.teamseven.MusicVillain.Dto.ResponseBody.RecordResponseBody;
 import com.teamseven.MusicVillain.Dto.ResponseBody.Status;
 import com.teamseven.MusicVillain.Utils.RandomUUIDGenerator;
@@ -47,14 +47,12 @@ public class FeedService {
         this.interactionService = interactionService;
     }
 
-    private List<FeedDto> convertToDtoList(List<Feed> feedList) {
-        FeedDto feedDtoInstance = new FeedDto(); // FeedDto 인스턴스 생성
-        return feedDtoInstance.toDtoList(feedList); // 인스턴스를 통한 메서드 호출
-    }
+    @Autowired
+    private FeedDtoConverter feedDtoConverter;
 
     public ServiceResult getAllFeeds(){
         List<Feed> feeds = feedRepository.findAllByOrderByCreatedAtDesc();
-        List<FeedDto> feedDtoList = convertToDtoList(feeds);
+        List<FeedDto> feedDtoList = feedDtoConverter.convertList(feeds);
         return ServiceResult.success(feedDtoList);
     }
 
@@ -149,13 +147,13 @@ public class FeedService {
 
     public ServiceResult getAllFeedsByMemberId(String memberId) {
         List<Feed> feeds = feedRepository.findAllByOwnerMemberId(memberId);
-        List<FeedDto> resultFeedDtoList = convertToDtoList(feeds);
+        List<FeedDto> resultFeedDtoList = feedDtoConverter.convertList(feeds);
         return ServiceResult.success(resultFeedDtoList);
     }
 
     public ServiceResult getAllFeedsByFeedType(String feedType){
         List<Feed> feeds = feedRepository.findAllByFeedType(feedType);
-        List<FeedDto> resultFeedDtoList = convertToDtoList(feeds);
+        List<FeedDto> resultFeedDtoList = feedDtoConverter.convertList(feeds);
         return ServiceResult.success(resultFeedDtoList);
     }
 
@@ -214,7 +212,7 @@ public class FeedService {
             interactionFeedList.add(interaction.getInteractionFeed());
         }
 
-        List<FeedDto> resultFeedDtoList = convertToDtoList(interactionFeedList);
+        List<FeedDto> resultFeedDtoList = feedDtoConverter.convertList(interactionFeedList);
         return ServiceResult.success(resultFeedDtoList);
 
     }
