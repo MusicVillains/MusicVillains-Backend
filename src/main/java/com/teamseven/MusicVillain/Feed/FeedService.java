@@ -50,12 +50,29 @@ public class FeedService {
     @Autowired
     private FeedDtoConverter feedDtoConverter;
 
+    /**
+     * 모든 피드를 생성된 시간의 내림차순으로 반환합니다.
+     *
+     * @author Woody K
+     * @since JDK 17
+     *
+     * @return ServiceResult 객체. 성공시 모든 FeedDto 객체의 리스트를 포함.
+     */
     public ServiceResult getAllFeeds(){
         List<Feed> feeds = feedRepository.findAllByOrderByCreatedAtDesc();
         List<FeedDto> feedDtoList = feedDtoConverter.convertList(feeds);
         return ServiceResult.success(feedDtoList);
     }
 
+    /**
+     * 지정된 피드 ID와 연관된 레코드를 반환합니다.
+     *
+     * @author Woody K
+     * @since JDK 17
+     *
+     * @param feedId 레코드 정보를 가져올 피드의 ID
+     * @return RecordResponseBody 객체. 레코드의 세부 정보를 포함.
+     */
     public RecordResponseBody getRecordByFeedId(String feedId){
 
         Feed feed = feedRepository.findByFeedId(feedId);
@@ -75,6 +92,22 @@ public class FeedService {
                 .build();
     }
 
+    /**
+     * 새로운 피드를 데이터베이스에 삽입합니다.
+     *
+     * @author Woody K
+     * @since JDK 17
+     *
+     * @param ownerId 피드의 소유자 ID
+     * @param feedType 피드의 타입
+     * @param feedDescription 피드의 설명
+     * @param recordDuration 레코드의 지속 시간
+     * @param recordFile 레코드 파일
+     * @param musicName 음악의 이름
+     * @param musicianName 음악가의 이름
+     * @return ServiceResult 객체. 성공시 생성된 피드 ID를 포함.
+     * @throws IOException 파일 처리 중 발생할 수 있는 예외
+     */
     public ServiceResult insertFeed( String ownerId, String feedType, String feedDescription, int recordDuration, MultipartFile recordFile,
                                     String musicName, String musicianName
     ) throws IOException {
@@ -145,18 +178,45 @@ public class FeedService {
         return ServiceResult.of(ServiceResult.SUCCESS, "Feed created", generatedFeedId);
     }
 
+    /**
+     * 지정된 멤버 ID의 모든 피드를 반환합니다.
+     *
+     * @author Woody K
+     * @since JDK 17
+     *
+     * @param memberId 피드를 조회할 멤버의 ID
+     * @return ServiceResult 객체. 성공시 해당 멤버의 모든 FeedDto 객체의 리스트를 포함.
+     */
     public ServiceResult getAllFeedsByMemberId(String memberId) {
         List<Feed> feeds = feedRepository.findAllByOwnerMemberId(memberId);
         List<FeedDto> resultFeedDtoList = feedDtoConverter.convertList(feeds);
         return ServiceResult.success(resultFeedDtoList);
     }
 
+    /**
+     * 지정된 피드 타입의 모든 피드를 반환합니다.
+     *
+     * @author Woody K
+     * @since JDK 17
+     *
+     * @param feedType 조회할 피드의 타입
+     * @return ServiceResult 객체. 성공시 해당 타입의 모든 FeedDto 객체의 리스트를 포함.
+     */
     public ServiceResult getAllFeedsByFeedType(String feedType){
         List<Feed> feeds = feedRepository.findAllByFeedType(feedType);
         List<FeedDto> resultFeedDtoList = feedDtoConverter.convertList(feeds);
         return ServiceResult.success(resultFeedDtoList);
     }
 
+    /**
+     * 지정된 피드의 조회수를 1 증가시킵니다.
+     *
+     * @author Woody K
+     * @since JDK 17
+     *
+     * @param feedId 조회수를 증가시킬 피드의 ID
+     * @return ServiceResult 객체. 성공시 증가된 조회수를 포함.
+     */
     public ServiceResult feedViewCountUp(String feedId){
         Feed feed = feedRepository.findByFeedId(feedId);
         if(feed == null){
@@ -167,6 +227,15 @@ public class FeedService {
         return ServiceResult.of(ServiceResult.SUCCESS, "Feed View Count Up", feed.viewCount);
     }
 
+    /**
+     * 지정된 피드 ID의 피드를 삭제합니다.
+     *
+     * @author Woody K
+     * @since JDK 17
+     *
+     * @param feedId 삭제할 피드의 ID
+     * @return ServiceResult 객체. 성공 또는 실패 메시지를 포함.
+     */
     @Transactional
     public ServiceResult deleteFeedByFeedId(String feedId){
         System.out.println("Enter FeedService.deleteFeedByFeedId()");
@@ -188,17 +257,43 @@ public class FeedService {
 
     }
 
+    /**
+     * 멤버 ID가 유효한지 검사합니다.
+     *
+     * @author Woody K
+     * @since JDK 17
+     *
+     * @param memberId 검사할 멤버의 ID
+     * @return boolean. 유효한 멤버 ID인 경우 true, 그렇지 않은 경우 false.
+     */
     public boolean checkIsValidMemberId(String memberId){
         return memberRepository.findByMemberId(memberId) != null;
     }
 
+    /**
+     * 지정된 피드 ID에 대한 피드 정보를 반환합니다.
+     *
+     * @author Woody K
+     * @since JDK 17
+     *
+     * @param feedId 정보를 가져올 피드의 ID
+     * @return FeedDto 객체. 해당 피드의 정보를 포함.
+     */
     public FeedDto getFeedByFeedId(String feedId) {
         Feed feed = feedRepository.findByFeedId(feedId);
         FeedDto feedDtoInstance = new FeedDto();
         return feedDtoInstance.toDto(feed);
     }
 
-
+    /**
+     * 지정된 멤버 ID가 상호 작용한 모든 피드를 반환합니다.
+     *
+     * @author Woody K
+     * @since JDK 17
+     *
+     * @param memberId 피드를 조회할 멤버의 ID
+     * @return ServiceResult 객체. 성공시 해당 멤버가 상호 작용한 모든 FeedDto 객체의 리스트를 포함.
+     */
     public ServiceResult getInteractionFeedsByMemberId(String memberId) {
         Member member = memberRepository.findByMemberId(memberId);
         if(member == null){
@@ -217,6 +312,15 @@ public class FeedService {
 
     }
 
+    /**
+     * 지정된 피드 ID의 피드 소유자 멤버 ID를 반환합니다.
+     *
+     * @author Woody K
+     * @since JDK 17
+     *
+     * @param feedId 소유자의 멤버 ID를 가져올 피드의 ID
+     * @return ServiceResult 객체. 성공시 해당 피드의 소유자 멤버 ID를 포함.
+     */
     public ServiceResult getFeedOwnerMemberIdByFeedId(String feedId) {
 
         Feed tmpFeed = feedRepository.findByFeedId(feedId);

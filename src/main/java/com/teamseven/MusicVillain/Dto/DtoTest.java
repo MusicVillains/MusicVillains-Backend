@@ -35,14 +35,14 @@ public class DtoTest {
         feed.setUpdatedAt(LocalDateTime.now());
         feed.setDescription("description-Test");
 
-        feedDto = converter.convert(feed);
+        feedDto = converter.convertToDto(feed);
     }
 
     @Test
     public void testFeedDto() {
         FeedDtoConverter converter = new FeedDtoConverter();
 
-        FeedDto feedDto = converter.convert(feed);
+        FeedDto feedDto = converter.convertToDto(feed);
         log.info(feedDto.toString());
 
         // Assertions

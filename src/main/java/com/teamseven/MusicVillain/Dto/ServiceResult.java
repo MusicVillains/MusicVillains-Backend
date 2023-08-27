@@ -1,5 +1,6 @@
 package com.teamseven.MusicVillain.Dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,6 +12,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ServiceResult{
     public static final String SUCCESS = "success";
+    @Schema(example = "fail")
     public static final String FAIL = "fail";
 
     public String result;

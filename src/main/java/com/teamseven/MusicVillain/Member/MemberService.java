@@ -41,15 +41,44 @@ public class MemberService {
 
 
     /* ──────────────────────── MEMBER CRUD ──────────────────────── */
+
+    /**
+     * 모든 멤버를 데이터베이스에서 가져옵니다.
+     *
+     * @author Woody K
+     * @since JDK 17
+     *
+     * @return 멤버 정보 리스트
+     */
     public List<Member> getAllMembers(){
         return memberRepository.findAll();
     }
+
+    /**
+     * 멤버 ID로 멤버 정보를 조회합니다.
+     *
+     * @author Woody K
+     * @since JDK 17
+     *
+     * @param memberId 조회할 멤버의 ID
+     * @return ServiceResult 객체. 멤버 정보 또는 실패 메시지를 포함.
+     */
     public ServiceResult getMemberById(String memberId) {
         Member member = memberRepository.findByMemberId(memberId);
         if(member == null) return ServiceResult.fail("Member not found");
 
         return ServiceResult.success(member);
     }
+
+    /**
+     * 새로운 멤버를 데이터베이스에 생성합니다.
+     *
+     * @author Woody K
+     * @since JDK 17
+     *
+     * @param memberCreationRequestBody 새 멤버 생성에 필요한 데이터
+     * @return ServiceResult 객체. 생성된 멤버의 ID 또는 실패 메시지를 포함.
+     */
     public ServiceResult insertMember(MemberCreationRequestBody memberCreationRequestBody){
         // 이미 존재하는 멤버인지 확인
         if(memberRepository.findByUserId(memberCreationRequestBody.getUserId()) != null){
@@ -85,6 +114,17 @@ public class MemberService {
         return ServiceResult.success(generatedMemberId);
 
     }
+
+    /**
+     * 멤버의 닉네임을 수정합니다.
+     *
+     * @author Woody K
+     * @since JDK 17
+     *
+     * @param memberId 닉네임을 수정할 멤버의 ID
+     * @param nickname 멤버에게 부여할 새 닉네임
+     * @return ServiceResult 객체. 성공 또는 실패 메시지를 포함.
+     */
     public ServiceResult modifyMemberNickname(String memberId, String nickname) {
         Member member = memberRepository.findByMemberId(memberId);
         if (member == null) return ServiceResult.fail("Member not found");
@@ -95,6 +135,16 @@ public class MemberService {
         return ServiceResult.success("nickname changed");
     }
 
+    /**
+     * 멤버 ID로 멤버를 삭제합니다.
+     * 이 작업은 해당 멤버와 관련된 모든 인터랙션과 피드도 삭제합니다.
+     *
+     * @author Woody K
+     * @since JDK 17
+     *
+     * @param memberId 삭제할 멤버의 ID
+     * @return ServiceResult 객체. 삭제된 멤버의 ID 또는 실패 메시지를 포함.
+     */
     @Transactional
     public ServiceResult deleteMemberByMemberId(String memberId){
         // 멤버가 존재하는지 확인
@@ -123,12 +173,28 @@ public class MemberService {
     }
 
     /* ──────────────────────── UTILS ──────────────────────── */
-
+    /**
+     * 멤버가 데이터베이스에 존재하는지 확인합니다.
+     *
+     * @author Woody K
+     * @since JDK 17
+     *
+     * @param userId 확인할 멤버의 사용자 ID
+     * @return 멤버가 존재하면 true, 그렇지 않으면 false
+     */
     private boolean isExistMember(String userId) {
         return memberRepository.findByMemberId(userId) != null;
     }
 
-    // 사용자 아이디 유효성 검사 메서드
+    /**
+     * 사용자 ID 패턴이 유효한지 검사합니다.
+     *
+     * @author Woody K
+     * @since JDK 17
+     *
+     * @param userId 검사할 사용자 ID
+     * @return 사용자 ID가 유효하면 true, 그렇지 않으면 false
+     */
     private boolean isValidUserIdPattern(String userId) {
         // 특수문자 또는 숫자로 시작하는지 검사하는 정규표현식
         String pattern = "^[a-zA-Z][a-zA-Z0-9]*$";
