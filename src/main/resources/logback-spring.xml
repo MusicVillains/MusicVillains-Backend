@@ -10,7 +10,7 @@
 
 <!--    <logger name ="com.teamseven.MusicVillain.Member" level="INFO" />-->
 
-    <logger name ="com.teamseven.MusicVillain.View.ViewController" level="TRACE" />
+    <logger name ="com.teamseven.MusicVillain.Member.MemberService" level="TRACE" />
     <root level="INFO">
         <appender-ref ref="CONSOLE" />
     </root>

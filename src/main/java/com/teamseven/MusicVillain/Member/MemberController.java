@@ -1,5 +1,6 @@
 package com.teamseven.MusicVillain.Member;
 
+import com.teamseven.MusicVillain.Dto.DataTransferObject;
 import com.teamseven.MusicVillain.Dto.ResponseBody.ResponseObject;
 import com.teamseven.MusicVillain.Dto.RequestBody.MemberCreationRequestBody;
 import com.teamseven.MusicVillain.Security.JWT.MemberJwtAuthorizationManager;
@@ -56,8 +57,8 @@ public class MemberController {
             })
     public ResponseObject members(){
         log.debug("members() called - @GetMapping(\"/members\")");
-        List<Member> memberList = memberService.getAllMembers();
-        return ResponseObject.OK(memberList);
+        List<DataTransferObject> resultDtoList = memberService.getAllMembers();
+        return ResponseObject.OK(resultDtoList);
     }
 
     /**
