@@ -29,13 +29,8 @@ public class FeedDtoDtoConverter implements DtoConverter<Feed, FeedDto> {
     }
 
     @Override
-<<<<<<< HEAD:src/main/java/com/teamseven/MusicVillain/Dto/Converter/FeedDtoConverter.java
-    public List<FeedDto> convertList(List<Feed> sourceList) {
-        return sourceList.stream()
-=======
     public List<FeedDto> convertToDtoList(List<Feed> entityList) {
         return entityList.stream()
->>>>>>> f91bbef1dd0cac2589df7ca7c1633fd8ba5320cc:src/main/java/com/teamseven/MusicVillain/Dto/Converter/FeedDtoDtoConverter.java
                 .map(this::convertToDto) // 각 Feed 객체를 FeedDto로 변환
                 .collect(Collectors.toList()); // List<FeedDto>로 모아 반환
     }
