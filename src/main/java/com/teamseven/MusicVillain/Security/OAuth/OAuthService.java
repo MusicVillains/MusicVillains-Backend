@@ -1,5 +1,6 @@
 package com.teamseven.MusicVillain.Security.OAuth;
 
+import com.teamseven.MusicVillain.Dto.ServiceResult;
 import com.teamseven.MusicVillain.Utils.ENV;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,9 +20,10 @@ public class OAuthService {
 
     /* Kakao REST API reference: https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api*/
     public void getKakaoAccessTokenBykakaoAuthorizationCode(String kakaoAuthorizationCode) {
-        String accessToken = "";
-        String refreshToken = "";
+        String kakaoAccessToken = "";
+        String kakaoRefreshToken = "";
         String reqURL = "https://kauth.kakao.com/oauth/token";
+
         try {
             URL url = new URL(reqURL);
 
@@ -41,25 +43,25 @@ public class OAuthService {
             int responseCode = conn.getResponseCode();
             System.out.println("responseCode : " + responseCode);
 
-            // Get Response(json fomat) from conn.getInputStream
+            // get response body from conn.getInputStream
             BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             String line = "";
-            String result = "";
+            String responseBody = "";
 
             while ((line = br.readLine()) != null) {
-                result += line;
+                responseBody += line;
             }
-           log.debug("response body : " + result);
+           log.trace("responseBody : {}", responseBody);
 
-            //Get access_token, refresh_token from response using JsonParser
+            // Get access_token, refresh_token from response using JsonParser
             JsonParser parser = new JsonParser();
-            JsonElement element = parser.parse(result);
+            JsonElement element = parser.parse(responseBody);
 
-            accessToken = element.getAsJsonObject().get("access_token").getAsString();
-            refreshToken = element.getAsJsonObject().get("refresh_token").getAsString();
+            kakaoAccessToken = element.getAsJsonObject().get("access_token").getAsString();
+            kakaoRefreshToken = element.getAsJsonObject().get("refresh_token").getAsString();
 
-            log.debug("access_token : " + accessToken);
-            log.debug("refresh_token : " + refreshToken);
+            log.trace("access_token : {}", kakaoAccessToken);
+            log.trace("refresh_token : {}", kakaoRefreshToken);
 
             br.close();
             bw.close();
@@ -71,4 +73,55 @@ public class OAuthService {
             throw new RuntimeException(e);
         }
     }
+
+    public ServiceResult getKakaoMemberIdByKakaoAccessToken(String kakaoAccessToken) {
+
+        String reqURL = "https://kapi.kakao.com/v2/user/me";
+
+        //access_token을 이용하여 사용자 정보 조회
+        try {
+            URL url = new URL(reqURL);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+            conn.setRequestMethod("POST");
+            conn.setDoOutput(true);
+            conn.setRequestProperty("Authorization", "Bearer " + kakaoAccessToken); // put kakaoAccessToken to header
+
+            // check response code (200 ? success : fail)
+            int responseCode = conn.getResponseCode();
+            log.trace("responseCode : {}", responseCode);
+
+            // get response body from conn.getInputStream
+            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            String line = "";
+            String responseBody = "";
+
+            while ((line = br.readLine()) != null) {
+                responseBody += line;
+            }
+            log.trace("responseBody : {}", responseBody);
+
+            // Parsing JSON response body using JsonParser
+            JsonParser parser = new JsonParser();
+            JsonElement element = parser.parse(responseBody);
+
+            int id = element.getAsJsonObject().get("id").getAsInt(); // get Kakao memberId, which is unique
+            /*
+            boolean hasEmail = element.getAsJsonObject().get("kakao_account").getAsJsonObject().get("has_email").getAsBoolean();
+            String email = "";
+            if (hasEmail) {
+                email = element.getAsJsonObject().get("kakao_account").getAsJsonObject().get("email").getAsString();
+            }
+            */
+            br.close();
+            return ServiceResult.success(id);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ServiceResult.fail("Failed to get Kakao member id");
+        }
+
+
+    }
+
 }
