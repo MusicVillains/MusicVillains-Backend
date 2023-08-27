@@ -56,7 +56,7 @@ public class ENV{
         this.JWT_TOKEN_SUBJECT = subject;
     }
 
-    @Value("${env.secret.jwt.token-expire-time}")
+    @Value("${env.secret.jwt.access-token-expire-time}")
     public void SET_JWT_TOKEN_EXPIRE_TIME(int expireTime){
         this.JWT_TOKEN_EXPIRE_TIME = expireTime;
     }
