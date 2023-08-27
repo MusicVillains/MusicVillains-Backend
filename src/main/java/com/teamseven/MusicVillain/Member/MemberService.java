@@ -1,5 +1,5 @@
 package com.teamseven.MusicVillain.Member;
-
+import com.teamseven.MusicVillain.Dto.DataTransferObject;
 import com.teamseven.MusicVillain.Feed.Feed;
 import com.teamseven.MusicVillain.Feed.FeedRepository;
 import com.teamseven.MusicVillain.Feed.FeedService;
@@ -8,15 +8,19 @@ import com.teamseven.MusicVillain.Interaction.InteractionService;
 import com.teamseven.MusicVillain.Dto.ServiceResult;
 import com.teamseven.MusicVillain.Dto.RequestBody.MemberCreationRequestBody;
 import com.teamseven.MusicVillain.Utils.RandomUUIDGenerator;
-import jakarta.transaction.Transactional;
+import com.teamseven.MusicVillain.Dto.Converter.DtoConverter;
+import com.teamseven.MusicVillain.Dto.Converter.DtoConverterFactory;
+import com.teamseven.MusicVillain.Dto.MemberDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
+import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@Slf4j
 public class MemberService {
 
     private final MemberRepository memberRepository;
@@ -26,6 +30,13 @@ public class MemberService {
     private final FeedService feedService;
     private final InteractionService interactionService;
 
+    private DtoConverter dtoConverter =
+            DtoConverterFactory.getConverter(Member.class, MemberDto.class);
+    {
+        /* ──────────────────────── For test ──────────────────────────── */
+        log.trace("MemberService dtoConverter : {}", dtoConverter.getClass());
+
+    }
 
     @Autowired
     public MemberService(MemberRepository memberRepository, BCryptPasswordEncoder bCryptPasswordEncoder,
@@ -41,14 +52,19 @@ public class MemberService {
 
 
     /* ──────────────────────── MEMBER CRUD ──────────────────────── */
-    public List<Member> getAllMembers(){
-        return memberRepository.findAll();
+    public List<DataTransferObject> getAllMembers(){
+        List<DataTransferObject> dtoList =
+                dtoConverter.convertToDtoList(memberRepository.findAll());
+        return dtoList;
     }
     public ServiceResult getMemberById(String memberId) {
-        Member member = memberRepository.findByMemberId(memberId);
-        if(member == null) return ServiceResult.fail("Member not found");
 
-        return ServiceResult.success(member);
+        DataTransferObject dto =
+                dtoConverter.convertToDto(memberRepository.findByMemberId(memberId));
+
+        if(dto == null) return ServiceResult.fail("Member not found");
+
+        return ServiceResult.success(dto);
     }
     public ServiceResult insertMember(MemberCreationRequestBody memberCreationRequestBody){
         // 이미 존재하는 멤버인지 확인
@@ -88,7 +104,6 @@ public class MemberService {
     public ServiceResult modifyMemberNickname(String memberId, String nickname) {
         Member member = memberRepository.findByMemberId(memberId);
         if (member == null) return ServiceResult.fail("Member not found");
-
         member.setName(nickname);
         memberRepository.save(member);
 

@@ -1,5 +1,6 @@
 package com.teamseven.MusicVillain.Member;
 
+import com.teamseven.MusicVillain.Dto.DataTransferObject;
 import com.teamseven.MusicVillain.Dto.ResponseBody.ResponseObject;
 import com.teamseven.MusicVillain.Dto.RequestBody.MemberCreationRequestBody;
 import com.teamseven.MusicVillain.Security.JWT.MemberJwtAuthorizationManager;
@@ -37,8 +38,8 @@ public class MemberController {
     @Operation(summary = "모든 회원 조회", description = "데이터 베이스에 등록된 모든 회원 정보를 조회합니다.")
     public ResponseObject members(){
         log.debug("members() called - @GetMapping(\"/members\")");
-        List<Member> memberList = memberService.getAllMembers();
-        return ResponseObject.OK(memberList);
+        List<DataTransferObject> resultDtoList = memberService.getAllMembers();
+        return ResponseObject.OK(resultDtoList);
     }
     @GetMapping("/members/{memberId}")
     @Operation(summary = "특정 회원 정보 조회", description = "특정 회원의 정보를 조회합니다.")
