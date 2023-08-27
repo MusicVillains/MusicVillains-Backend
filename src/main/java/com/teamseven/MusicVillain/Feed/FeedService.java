@@ -1,9 +1,8 @@
 package com.teamseven.MusicVillain.Feed;
 
 import com.teamseven.MusicVillain.Dto.*;
-import com.teamseven.MusicVillain.Dto.Converter.Converter;
+import com.teamseven.MusicVillain.Dto.Converter.DtoConverter;
 import com.teamseven.MusicVillain.Dto.Converter.DtoConverterFactory;
-import com.teamseven.MusicVillain.Dto.Converter.FeedDtoConverter;
 import com.teamseven.MusicVillain.Interaction.Interaction;
 import com.teamseven.MusicVillain.Interaction.InteractionRepository;
 import com.teamseven.MusicVillain.Interaction.InteractionService;
@@ -49,12 +48,12 @@ public class FeedService {
         this.interactionService = interactionService;
     }
 
-    private Converter feedDtoConverter =
+    private DtoConverter feedDtoDtoConverter =
             DtoConverterFactory.getConverter(Feed.class, FeedDto.class);
 
     public ServiceResult getAllFeeds(){
         List<Feed> feeds = feedRepository.findAllByOrderByCreatedAtDesc();
-        List<FeedDto> feedDtoList = feedDtoConverter.convertList(feeds);
+        List<FeedDto> feedDtoList = feedDtoDtoConverter.convertToDtoList(feeds);
         return ServiceResult.success(feedDtoList);
     }
 
@@ -149,18 +148,20 @@ public class FeedService {
 
     public ServiceResult getAllFeedsByMemberId(String memberId) {
         List<Feed> feeds = feedRepository.findAllByOwnerMemberId(memberId);
-        List<FeedDto> resultFeedDtoList = feedDtoConverter.convertList(feeds);
+        List<FeedDto> resultFeedDtoList = feedDtoDtoConverter.convertToDtoList(feeds);
         return ServiceResult.success(resultFeedDtoList);
     }
 
     public ServiceResult getAllFeedsByFeedType(String feedType){
         List<Feed> feeds = feedRepository.findAllByFeedType(feedType);
-        List<FeedDto> resultFeedDtoList = feedDtoConverter.convertList(feeds);
+        List<FeedDto> resultFeedDtoList = feedDtoDtoConverter.convertToDtoList(feeds);
         return ServiceResult.success(resultFeedDtoList);
     }
 
     public ServiceResult feedViewCountUp(String feedId){
+
         Feed feed = feedRepository.findByFeedId(feedId);
+
         if(feed == null){
             return ServiceResult.of(ServiceResult.FAIL, "Feed Not Found");
         }
@@ -214,7 +215,7 @@ public class FeedService {
             interactionFeedList.add(interaction.getInteractionFeed());
         }
 
-        List<FeedDto> resultFeedDtoList = feedDtoConverter.convertList(interactionFeedList);
+        List<FeedDto> resultFeedDtoList = feedDtoDtoConverter.convertToDtoList(interactionFeedList);
         return ServiceResult.success(resultFeedDtoList);
 
     }
