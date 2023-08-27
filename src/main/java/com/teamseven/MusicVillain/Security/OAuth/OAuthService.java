@@ -250,8 +250,9 @@ public class OAuthService {
         String memberRole = tmpMember.getRole();
 
         // Generate JWT Access Token
-        String jwtAccessToken = JwtManager.generateToken(memberId, memberUserId, memberRole);
-        String jwtRefreshToken = ""; // [!] Will be implemented later
+        String jwtAccessToken = JwtManager.generateAccessToken(memberId, memberUserId, memberRole);
+        String jwtRefreshToken = JwtManager.generateRefreshToken(memberId,memberUserId,memberRole);
+        // [!] Will be implemented later
 
         // return logged-in member's memberId and JWT Token
         Map<String, String> serviceResultData = new HashMap<>();
