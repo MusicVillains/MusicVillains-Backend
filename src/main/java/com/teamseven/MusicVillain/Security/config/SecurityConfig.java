@@ -63,10 +63,11 @@ public class SecurityConfig {
                         .userInfoEndpoint((userInfoEndpoint) -> userInfoEndpoint
                                 //oauth2Login을 진행하게 되면 loadUser라는 함수를 호출하게 되는데 이것을 OAuth2UserServiceImpl에서 호출하겠다는 설정.
                                 .userService(oAuth2UserServiceImpl())) // 로그인 성공 시 후속 조치를 진행할 OAuth2UserService 인터페이스의 구현체 등록
-                        .successHandler(oAuth2AuthenticationSuccessHandler())
-                        .failureHandler(oAuth2AuthenticationFailureHandler()))
+                        /*.successHandler(oAuth2AuthenticationSuccessHandler()) // [!] Temporarily disabled
+                          .failureHandler(oAuth2AuthenticationFailureHandler()) */ // [!] Temporarily disabled
                         //.defaultSuccessUrl("/OAuth/loginSuccess")
                         //.failureUrl("/OAuth/loginFailure")) //  실패 시 /OAuth/loginFailure 호출
+                )
 
                 // form login 사용 안함
                 .formLogin((formLogin) -> formLogin.disable())
