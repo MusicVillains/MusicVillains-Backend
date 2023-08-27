@@ -53,7 +53,8 @@ public class OAuthService {
             StringBuilder sb = new StringBuilder();
             sb.append("grant_type=authorization_code");
             sb.append("&client_id=" + ENV.KAKAO_CLIENT_ID); // client_id = REST API Key
-            sb.append("&redirect_uri=http://localhost:3000/kakaoredirect"); // [!] Check Needed, 인가코드 받은 redirect_uri
+            sb.append("&redirect_uri=http://localhost:3000/kakaoredirect"); // 인가코드를 받은 redirect URI
+            //sb.append("&redirect_uri=http://localhost:8080/kakaoCallBack"); // [!] temporary for test
             sb.append("&code=" + kakaoAuthorizationCode);
             bw.write(sb.toString());
             bw.flush();
@@ -197,7 +198,7 @@ public class OAuthService {
 
         // get kakaoAccessToken using kakaoAuthorizationCode
         ServiceResult accessTokenServiceResult
-                = this.getKakaoMemberIdByKakaoAccessToken(kakaoAuthorizationCode);
+                = this.getKakaoAccessTokenByKakaoAuthorizationCode(kakaoAuthorizationCode);
 
         // check if kakaoMemberIdServiceResult is failed
         if (accessTokenServiceResult.isFailed()){
