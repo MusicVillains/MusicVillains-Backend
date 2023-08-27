@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Component
 public class FeedDtoConverter implements Converter<Feed, FeedDto> {
     @Override
     public FeedDto convert(Feed source) {
