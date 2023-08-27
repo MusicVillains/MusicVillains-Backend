@@ -1,6 +1,6 @@
 package com.teamseven.MusicVillain.Notification;
 
-import com.teamseven.MusicVillain.Dto.ResponseBody.ResponseObject_old;
+import com.teamseven.MusicVillain.Dto.ResponseBody.ResponseObject;
 import com.teamseven.MusicVillain.Dto.ResponseBody.Status;
 import com.teamseven.MusicVillain.Dto.ServiceResult;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -22,16 +22,15 @@ public class NotificationController {
 
     @GetMapping("/notifications")
     // url : /notifications?memberId=memberId
-    public ResponseObject_old getNotificationsByMemberId(@RequestParam("memberId") String memberId){
+    public ResponseObject getNotificationsByMemberId(@RequestParam("memberId") String memberId){
         ServiceResult serviceResult = notificationService.getNotificaitonsByOwnerMemberID(memberId);
-
-        return serviceResult.isFailed() ? ResponseObject_old.of(Status.BAD_REQUEST, serviceResult.getData())
-                : ResponseObject_old.of(Status.OK, serviceResult.getData());
+        return serviceResult.isFailed() ? ResponseObject.BAD_REQUEST(serviceResult.getData())
+                : ResponseObject.OK(serviceResult.getData());
     }
     @PostMapping("/notifications/read")
-    public ResponseObject_old readNotification(@RequestParam("notificationId") String notificationId){
+    public ResponseObject readNotification(@RequestParam("notificationId") String notificationId){
         ServiceResult serviceResult = notificationService.readNotification(notificationId);
-        return serviceResult.isFailed() ? ResponseObject_old.of(Status.BAD_REQUEST, serviceResult.getMessage())
-                : ResponseObject_old.of(Status.OK, serviceResult.getData());
+        return serviceResult.isFailed() ? ResponseObject.BAD_REQUEST(serviceResult.getMessage())
+                : ResponseObject.OK(serviceResult.getData());
     }
 }
