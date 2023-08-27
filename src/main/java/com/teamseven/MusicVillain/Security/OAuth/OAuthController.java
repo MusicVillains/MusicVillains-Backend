@@ -19,7 +19,7 @@ public class OAuthController {
 
     /* TODO: Test needed */
     @PostMapping("/oauth2/kakao/login")
-    public ResponseObject kakaoLogin(KakaoOAuthLoginRequestBody kakaoOAuthLoginRequestBody){
+    public ResponseObject kakaoLogin(@RequestBody KakaoOAuthLoginRequestBody kakaoOAuthLoginRequestBody){
 
         if(kakaoOAuthLoginRequestBody.code == null){
             return ResponseObject.of(Status.BAD_REQUEST,
