@@ -10,9 +10,9 @@ import java.util.Date;
 
 public class JwtManager {
     
-    public static String generateToken(String memberId, String userId, String role) {
+    public static String generateAccessToken(String memberId, String userId, String role) {
         return JWT.create().withSubject(ENV.JWT_TOKEN_SUBJECT()) // 토큰 발행자
-                .withExpiresAt(new Date(System.currentTimeMillis()+ (60000*ENV.JWT_TOKEN_EXPIRE_TIME))) // 토큰 만료 시간, 10분으로 설정
+                .withExpiresAt(new Date(System.currentTimeMillis()+(60000*ENV.JWT_ACCESS_TOKEN_EXPIRE_TIME))) // 토큰 만료 시간
                 // 토큰에 담을 정보는 withClaim으로 담는다. 정해져있는 것은 아니고 넣고싶은거 설정해주면 됨
                 .withClaim("memberId", (memberId))// 토큰에 담을 정보
                 .withClaim("userId",(userId)) // 토큰에 담을 정보
@@ -20,11 +20,20 @@ public class JwtManager {
                 .sign(Algorithm.HMAC512(ENV.JWT_SECRET_KEY())); // 토큰 암호화 알고리즘, secret key 넣어줘야 함
     }
 
-    public static ServiceResult verifyToken(HttpHeaders requestHeaders){
-        return verifyToken(getJwtTokenHeaderFromHttpHeaders(requestHeaders));
+    public static String generateRefreshToken(String memberId, String userId, String role) {
+        return JWT.create().withSubject(ENV.JWT_TOKEN_SUBJECT())
+                .withExpiresAt(new Date(System.currentTimeMillis()+(60000*ENV.JWT_REFRESH_TOKEN_EXPIRE_TIME))) // 토큰 만료 시간
+                .withClaim("memberId", (memberId))
+                .withClaim("userId",(userId))
+                .withClaim("role", (role))
+                .sign(Algorithm.HMAC512(ENV.JWT_SECRET_KEY()));
     }
 
-    public static ServiceResult verifyToken(String authorizationHeader){
+    public static ServiceResult verifyAccessToken(HttpHeaders requestHeaders){
+        return verifyAccessToken(getJwtTokenHeaderFromHttpHeaders(requestHeaders));
+    }
+
+    public static ServiceResult verifyAccessToken(String authorizationHeader){
 
         if (!isValidJwtHeaderFormat(authorizationHeader)) {
             return ServiceResult.of(ServiceResult.FAIL,

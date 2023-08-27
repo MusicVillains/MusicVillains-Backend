@@ -27,7 +27,7 @@ public class FeedJwtAuthorizationManager extends JwtAuthorizationManager {
             return AuthorizationResult.fail("feedId does not exist.");
 
         // check jwtToken is valid
-        ServiceResult verifyResult = JwtManager.verifyToken(jwtToken);
+        ServiceResult verifyResult = JwtManager.verifyAccessToken(jwtToken);
         if (verifyResult.isFailed())
             return AuthorizationResult.fail();
 

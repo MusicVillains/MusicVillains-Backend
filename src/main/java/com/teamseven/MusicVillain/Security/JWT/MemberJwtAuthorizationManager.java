@@ -21,7 +21,7 @@ public class MemberJwtAuthorizationManager extends JwtAuthorizationManager {
     public AuthorizationResult authorize(String jwtToken, String memberId) {
         if (this.authorizeMode == false) return AuthorizationResult.success(memberId, null);
 
-        ServiceResult verifyResult = JwtManager.verifyToken(jwtToken);
+        ServiceResult verifyResult = JwtManager.verifyAccessToken(jwtToken);
 
         if(verifyResult.isFailed())
             return AuthorizationResult.fail(verifyResult.getMessage());

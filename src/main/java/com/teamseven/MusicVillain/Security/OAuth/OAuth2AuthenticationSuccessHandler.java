@@ -26,7 +26,7 @@ public class OAuth2AuthenticationSuccessHandler extends SavedRequestAwareAuthent
         String redirectURL = ENV.LOGGIN_SUCCESS_REDIRECT_URL(); // 프론트쪽 로그인 성공 페이지로 리다이렉트
 
         Member memberInUserDetails = ((UserDetailsImpl)authentication.getPrincipal()).getMember();
-        String generatedJwtToken = JwtManager.generateToken(
+        String generatedJwtToken = JwtManager.generateAccessToken(
                 memberInUserDetails.getMemberId(),
                 memberInUserDetails.getUserId(),
                 memberInUserDetails.getRole());

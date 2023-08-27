@@ -46,7 +46,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         }
 
         String jwtToken = request.getHeader("Authorization").replace("Bearer ", ""); // Bearer 없애고, 뒤에 있는 토큰값만 가져옴
-        ServiceResult result = JwtManager.verifyToken(jwtToken);
+        ServiceResult result = JwtManager.verifyAccessToken(jwtToken);
 
         if(result.isFailed()){
             chain.doFilter(request, response);
