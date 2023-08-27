@@ -9,7 +9,7 @@ import org.springframework.http.HttpHeaders;
 import java.util.Date;
 
 public class JwtManager {
-    
+    /* ──────────────────────── Generate Token ────────────────────── */
     public static String generateAccessToken(String memberId, String userId, String role) {
         return JWT.create().withSubject(ENV.JWT_TOKEN_SUBJECT()) // 토큰 발행자
                 .withExpiresAt(new Date(System.currentTimeMillis()+(60000*ENV.JWT_ACCESS_TOKEN_EXPIRE_TIME))) // 토큰 만료 시간
@@ -29,6 +29,7 @@ public class JwtManager {
                 .sign(Algorithm.HMAC512(ENV.JWT_SECRET_KEY()));
     }
 
+    /* ──────────────────────── Verify Token ────────────────────── */
     public static ServiceResult verifyAccessToken(HttpHeaders requestHeaders){
         return verifyAccessToken(getJwtTokenHeaderFromHttpHeaders(requestHeaders));
     }
@@ -70,6 +71,10 @@ public class JwtManager {
 
     }
 
+    /* ````````````````````````````````````````````````````````````` */
+
+
+    /* ────────────────────────── Utils ─────────────────────────── */
     public static String getJwtTokenHeaderFromHttpHeaders(HttpHeaders httpHeaders){
         return httpHeaders.getFirst("Authorization");
     }
