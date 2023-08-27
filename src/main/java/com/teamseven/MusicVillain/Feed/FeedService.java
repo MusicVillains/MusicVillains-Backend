@@ -1,6 +1,8 @@
 package com.teamseven.MusicVillain.Feed;
 
 import com.teamseven.MusicVillain.Dto.*;
+import com.teamseven.MusicVillain.Dto.Converter.Converter;
+import com.teamseven.MusicVillain.Dto.Converter.DtoConverterFactory;
 import com.teamseven.MusicVillain.Dto.Converter.FeedDtoConverter;
 import com.teamseven.MusicVillain.Interaction.Interaction;
 import com.teamseven.MusicVillain.Interaction.InteractionRepository;
@@ -47,8 +49,8 @@ public class FeedService {
         this.interactionService = interactionService;
     }
 
-    @Autowired
-    private FeedDtoConverter feedDtoConverter;
+    private Converter feedDtoConverter =
+            DtoConverterFactory.getConverter(Feed.class, FeedDto.class);
 
     public ServiceResult getAllFeeds(){
         List<Feed> feeds = feedRepository.findAllByOrderByCreatedAtDesc();

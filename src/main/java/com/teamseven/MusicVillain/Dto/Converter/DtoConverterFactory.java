@@ -4,7 +4,7 @@ import com.teamseven.MusicVillain.Dto.FeedDto;
 import com.teamseven.MusicVillain.Feed.Feed;
 
 public class DtoConverterFactory {
-    public <S, T> Converter<S, T> getConverter(Class<S> sourceClass, Class<T> targetClass) {
+    public static <S, T> Converter<S, T> getConverter(Class<S> sourceClass, Class<T> targetClass) {
 
         if (sourceClass == Feed.class && targetClass == FeedDto.class) {
             return (Converter<S, T>) new FeedDtoConverter();
