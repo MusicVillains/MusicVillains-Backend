@@ -6,6 +6,7 @@ import com.teamseven.MusicVillain.Feed.FeedService;
 import com.teamseven.MusicVillain.Interaction.Interaction;
 import com.teamseven.MusicVillain.Interaction.InteractionService;
 import com.teamseven.MusicVillain.Member.Member;
+import com.teamseven.MusicVillain.Member.MemberRepository;
 import com.teamseven.MusicVillain.Member.MemberService;
 import com.teamseven.MusicVillain.Notification.NotificaitonRepository;
 import com.teamseven.MusicVillain.Notification.Notification;
@@ -21,6 +22,7 @@ import java.util.List;
 @Controller
 public class DatabaseViewContorller {
     private final MemberService memberService;
+    private final MemberRepository memberRepository;
     private final FeedService feedService;
     private final FeedRepository feedRepository;
     private final RecordService recordService;
@@ -30,19 +32,21 @@ public class DatabaseViewContorller {
     @Autowired
     public DatabaseViewContorller(MemberService memberService, FeedService feedService,
                                   RecordService recordService, InteractionService interactionService,
-                                  FeedRepository feedRepository, NotificaitonRepository notificaitonRepository) {
+                                  FeedRepository feedRepository, NotificaitonRepository notificaitonRepository,
+                                  MemberRepository memberRepository) {
         this.memberService = memberService;
         this.feedService = feedService;
         this.recordService = recordService;
         this.interactionService = interactionService;
         this.feedRepository = feedRepository;
         this.notificaitonRepository = notificaitonRepository;
+        this.memberRepository = memberRepository;
 
     }
 
     @GetMapping("/view/members")
     public String memberView(Model model) {
-        List<Member> memberList = memberService.getAllMembers();
+        List<Member> memberList = memberRepository.findAll();
         model.addAttribute("memberList", memberList);
         return "member_view";
     }

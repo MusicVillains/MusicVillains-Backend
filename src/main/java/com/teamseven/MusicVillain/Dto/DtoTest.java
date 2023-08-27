@@ -1,6 +1,6 @@
 package com.teamseven.MusicVillain.Dto;
 import com.teamseven.MusicVillain.Feed.Feed;
-import com.teamseven.MusicVillain.Dto.Converter.FeedDtoConverter;
+import com.teamseven.MusicVillain.Dto.Converter.FeedDtoDtoConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import com.teamseven.MusicVillain.Member.Member;
@@ -16,7 +16,7 @@ public class DtoTest {
     public static Feed feed;
     public static FeedDto feedDto;
     static {
-        FeedDtoConverter converter = new FeedDtoConverter();
+        FeedDtoDtoConverter converter = new FeedDtoDtoConverter();
 
         feed = new Feed();
         feed.setFeedId("feedId-Test");
@@ -35,14 +35,14 @@ public class DtoTest {
         feed.setUpdatedAt(LocalDateTime.now());
         feed.setDescription("description-Test");
 
-        feedDto = converter.convert(feed);
+        feedDto = converter.convertToDto(feed);
     }
 
     @Test
     public void testFeedDto() {
-        FeedDtoConverter converter = new FeedDtoConverter();
+        FeedDtoDtoConverter converter = new FeedDtoDtoConverter();
 
-        FeedDto feedDto = converter.convert(feed);
+        FeedDto feedDto = converter.convertToDto(feed);
         log.info(feedDto.toString());
 
         // Assertions
@@ -59,7 +59,7 @@ public class DtoTest {
         assert(feedDto.getDescription().equals("description-Test"));
 
         List<Feed> feedList = Arrays.asList(feed, new Feed());
-        List<FeedDto> feedDtoList = converter.convertList(feedList);
+        List<FeedDto> feedDtoList = converter.convertToDtoList(feedList);
         log.info(feedDtoList.toString());
 
         assert(feedDtoList.size() == 2);

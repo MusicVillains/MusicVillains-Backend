@@ -22,6 +22,15 @@ public class NotificationService {
         this.memberRepository = memberRepository;
     }
 
+    /**
+     * 특정 회원의 모든 알림을 가져옵니다.
+     *
+     * @author Woody K
+     * @since JDK 17
+     *
+     * @param memberId 알림을 조회할 회원의 ID
+     * @return ServiceResult 객체. 성공 또는 실패 메시지를 포함.
+     */
     public ServiceResult getNotificaitonsByOwnerMemberID(String memberId){
         Member tmpMember =memberRepository.findByMemberId(memberId);
         if (tmpMember == null) return ServiceResult.fail("Member not found");
@@ -29,6 +38,15 @@ public class NotificationService {
         return ServiceResult.success( NotificationDto.toDtoList(notifications));
     }
 
+    /**
+     * 특정 알림을 읽음 상태로 변경합니다.
+     *
+     * @author Woody K
+     * @since JDK 17
+     *
+     * @param notificationId 읽음 상태로 변경할 알림의 ID
+     * @return ServiceResult 객체. 성공 또는 실패 메시지를 포함.
+     */
     public ServiceResult readNotification(String notificationId){
         Notification tmpNotification = notificaitonRepository.findByNotificationId(notificationId);
         if (tmpNotification == null) return ServiceResult.fail("Notification not found");

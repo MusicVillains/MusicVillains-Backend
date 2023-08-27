@@ -38,10 +38,29 @@ public class InteractionService {
         this.notificaitonRepository = notificaitonRepository;
     }
 
+
+    /**
+     * 모든 인터랙션을 반환합니다.
+     *
+     * @author Woody K
+     * @since JDK 17
+     *
+     * @return 모든 Interaction 객체의 List
+     */
     public List<Interaction> getAllInteractions(){
         return interactionRepository.findAll();
     }
 
+    /**
+     * 새로운 인터랙션을 삽입하거나 이미 존재하는 인터랙션을 삭제합니다.
+     * (좋아요/좋아요 취소 기능)
+     *
+     * @author Woody K
+     * @since JDK 17
+     *
+     * @param interactionCreationRequestBody Interaction 생성에 필요한 데이터
+     * @return ServiceResult 객체. 성공 또는 실패 메시지를 포함.
+     */
     @Transactional
     public ServiceResult insertInteraction(InteractionCreationRequestBody interactionCreationRequestBody){
         // feed 테이블의 interaction_count도 증가시켜줘야함
@@ -88,6 +107,15 @@ public class InteractionService {
             return ServiceResult.of(ServiceResult.SUCCESS, "Interaction deleted", null);
         }
     }
+
+    /**
+     * 특정 인터랙션 ID에 해당하는 인터랙션을 삭제합니다.
+     *
+     * @author Woody K
+     * @since JDK 17
+     *
+     * @param interactionId 삭제할 인터랙션의 ID
+     */
     @Transactional
     public void deleteInteractionByInteractionId(String interactionId){
         Interaction targetInteraction = interactionRepository.findByInteractionId(interactionId);
@@ -99,6 +127,14 @@ public class InteractionService {
         interactionRepository.deleteByInteractionId(interactionId);
     }
 
+    /**
+     * 특정 회원 ID가 가진 모든 인터랙션을 삭제합니다.
+     *
+     * @author Woody K
+     * @since JDK 17
+     *
+     * @param memberId 인터랙션을 삭제할 회원의 ID
+     */
     @Transactional
     public void deleteInteractionByMemberId(String memberId){
         // deleteByInteractionMemberMemberId 로 한번에 삭제해버리면 안됨.
@@ -116,6 +152,14 @@ public class InteractionService {
 
     }
 
+    /**
+     * 특정 피드 ID에 연관된 모든 인터랙션을 삭제합니다.
+     *
+     * @author Woody K
+     * @since JDK 17
+     *
+     * @param feedId 인터랙션을 삭제할 피드의 ID
+     */
     @Transactional
     public void deleteInterationsByFeedId(String feedId) {
         List<Interaction> interactionList = interactionRepository.findByInteractionFeedFeedId(feedId);
@@ -130,6 +174,15 @@ public class InteractionService {
 
     }
 
+    /**
+     * 특정 피드 ID에 연관된 인터랙션의 개수를 반환합니다.
+     *
+     * @author Woody K
+     * @since JDK 17
+     *
+     * @param feedId 인터랙션 개수를 알고 싶은 피드의 ID
+     * @return ServiceResult 객체. 성공시 피드에 연관된 인터랙션의 개수를 포함.
+     */
     public ServiceResult getInteractionCountByFeedId(String feedId) {
 
         return ServiceResult.success(interactionRepository.countByInteractionFeedFeedId(feedId));

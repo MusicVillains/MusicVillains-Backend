@@ -1,16 +1,14 @@
 package com.teamseven.MusicVillain.Dto.Converter;
 
-import com.teamseven.MusicVillain.Dto.Converter.Converter;
 import com.teamseven.MusicVillain.Dto.FeedDto;
 import com.teamseven.MusicVillain.Feed.Feed;
-import org.springframework.stereotype.Component;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Component
-public class FeedDtoConverter implements Converter<Feed, FeedDto> {
+public class FeedDtoDtoConverter implements DtoConverter<Feed, FeedDto> {
     @Override
-    public FeedDto convert(Feed source) {
+    public FeedDto convertToDto(Feed source) {
         FeedDto feedDto = new FeedDto();
         feedDto.setFeedId(source.getFeedId());
         feedDto.setFeedType(source.getFeedType());
@@ -31,9 +29,10 @@ public class FeedDtoConverter implements Converter<Feed, FeedDto> {
     }
 
     @Override
-    public List<FeedDto> convertList(List<Feed> sourceList) {
-        return sourceList.stream()
-                .map(this::convert) // 각 Feed 객체를 FeedDto로 변환
+    public List<FeedDto> convertToDtoList(List<Feed> entityList) {
+        return entityList.stream()
+                .map(this::convertToDto) // 각 Feed 객체를 FeedDto로 변환
                 .collect(Collectors.toList()); // List<FeedDto>로 모아 반환
     }
+
 }

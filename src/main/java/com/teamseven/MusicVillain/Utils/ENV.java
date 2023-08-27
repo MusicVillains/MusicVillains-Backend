@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 public class ENV{
     public final static Boolean IS_LOCAL = false;
 
+    // OAuth
+    public static String KAKAO_CLIENT_ID;
     public final static String BASE_URL = "http://localhost:8080";
     public final static String SPRING_PORT = "8080";
     public final static String LOCAL_LOGGIN_SUCCESS_REDIRECT_URL = BASE_URL + "/dev/loginSuccess"; // temporary
@@ -19,7 +21,8 @@ public class ENV{
     /* For JWT and Secure */
     public final static Boolean AUTHORIZE_MODE = false;
     public static  String JWT_SECRET_KEY;
-    public static int JWT_TOKEN_EXPIRE_TIME;
+    public static int JWT_ACCESS_TOKEN_EXPIRE_TIME;
+    public static int JWT_REFRESH_TOKEN_EXPIRE_TIME;
     public static String JWT_TOKEN_SUBJECT;
     public static final String JWT_TOKEN_PREFIX = "Bearer "; // 토큰 앞에 붙는 prefix
     public static String LOGGIN_SUCCESS_REDIRECT_URL(){
@@ -37,7 +40,7 @@ public class ENV{
     }
 
     public static int JWT_TOKEN_EXPIRE_TIME(){
-        return JWT_TOKEN_EXPIRE_TIME;
+        return JWT_ACCESS_TOKEN_EXPIRE_TIME;
     }
 
     public static String JWT_TOKEN_SUBJECT(){
@@ -54,8 +57,16 @@ public class ENV{
         this.JWT_TOKEN_SUBJECT = subject;
     }
 
-    @Value("${env.secret.jwt.token-expire-time}")
-    public void SET_JWT_TOKEN_EXPIRE_TIME(int expireTime){
-        this.JWT_TOKEN_EXPIRE_TIME = expireTime;
+    @Value("${env.secret.jwt.access-token-expire-time}")
+    public void SET_JWT_ACCESS_TOKEN_EXPIRE_TIME(int accessTokenExpireTime){
+        this.JWT_ACCESS_TOKEN_EXPIRE_TIME = accessTokenExpireTime;
     }
+
+    @Value("${env.secret.jwt.refresh-token-expire-time}")
+    public void SET_JWT_REFRESH_TOKEN_EXPIRE_TIME(int refreshTokenExpireTime){
+        this.JWT_REFRESH_TOKEN_EXPIRE_TIME = refreshTokenExpireTime;
+    }
+
+    @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
+    public void SET_KAKAO_CLIENT_ID(String kakaoClientId){this.KAKAO_CLIENT_ID = kakaoClientId;}
 }
