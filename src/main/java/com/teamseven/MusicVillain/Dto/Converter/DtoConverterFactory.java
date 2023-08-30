@@ -12,7 +12,7 @@ public class DtoConverterFactory {
         if (sourceClass == Feed.class && targetClass == FeedDto.class) {
             return (DtoConverter<S, T>) new FeedDtoDtoConverter();
         } else if (sourceClass == Member.class && targetClass == MemberDto.class) {
-            return (DtoConverter<S, T>) new MemberDtoDtoConverter();
+            return (DtoConverter<S, T>) new MemberDtoConverter();
 //        } else if (sourceClass == Notification.class && targetClass == NotificationDto.class) {
 //            return (Converter<S, T>) new NotificationDtoConverter();
         } else {

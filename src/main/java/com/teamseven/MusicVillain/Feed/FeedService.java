@@ -203,7 +203,16 @@ public class FeedService {
      * @param feedType 조회할 피드의 타입
      * @return ServiceResult 객체. 성공시 해당 타입의 모든 FeedDto 객체의 리스트를 포함.
      */
+    /* WARN: test needed */
     public ServiceResult getAllFeedsByFeedType(String feedType){
+        if (feedType == null){
+            return ServiceResult.fail("feedType is null");
+        }
+
+        if(feedType.equals("all") || feedType.equals("전체")){
+            return this.getAllFeeds();
+        }
+
         List<Feed> feeds = feedRepository.findAllByFeedType(feedType);
         List<FeedDto> resultFeedDtoList = feedDtoDtoConverter.convertToDtoList(feeds);
         return ServiceResult.success(resultFeedDtoList);
