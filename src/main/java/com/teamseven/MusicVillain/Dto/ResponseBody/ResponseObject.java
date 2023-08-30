@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
@@ -63,6 +64,14 @@ public class ResponseObject extends ResponseEntity {
                 .message(message)
                 .data(data)
                 .build() ,HttpStatusCode.valueOf(status.getStatusCode()));
+    }
+
+    public ResponseObject(HttpHeaders headers, Status status, String message, Object data){
+        super(CustomResponseBody.builder()
+                .statusCode(status.getStatusCode())
+                .message(message)
+                .data(data)
+                .build(), headers, HttpStatusCode.valueOf(status.getStatusCode()));
     }
     /* ───────────────────────────────────────────────────────────────── */
 
