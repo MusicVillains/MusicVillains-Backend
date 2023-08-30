@@ -9,6 +9,8 @@
     <logger name ="com.teamseven.MusicVillain" level="DEBUG" />
 
 <!--    <logger name ="com.teamseven.MusicVillain.Member" level="INFO" />-->
+    <logger name ="com.teamseven.MusicVillain.Security.OAuth.OAuthController" level="TRACE" />
+    <logger name ="com.teamseven.MusicVillain.Security.OAuth.OAuthService" level="TRACE" />
 
     <logger name ="com.teamseven.MusicVillain.Member.MemberService" level="TRACE" />
     <root level="INFO">

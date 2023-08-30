@@ -6,7 +6,7 @@ import com.teamseven.MusicVillain.Member.Member;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class MemberDtoDtoConverter implements DtoConverter<Member, MemberDto> {
+public class MemberDtoConverter implements DtoConverter<Member, MemberDto> {
 
     @Override
     public MemberDto convertToDto(Member memberEntity) {
