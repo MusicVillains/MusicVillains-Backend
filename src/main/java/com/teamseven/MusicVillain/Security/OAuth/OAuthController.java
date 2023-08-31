@@ -1,18 +1,15 @@
 package com.teamseven.MusicVillain.Security.OAuth;
 
-import com.teamseven.MusicVillain.Dto.ResponseBody.CustomResponseBody;
 import com.teamseven.MusicVillain.Dto.ResponseBody.ResponseObject;
 import com.teamseven.MusicVillain.Dto.ResponseBody.Status;
 import com.teamseven.MusicVillain.Dto.ServiceResult;
+import com.teamseven.MusicVillain.Security.JWT.JwtManager;
 import io.swagger.v3.oas.annotations.Hidden;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @Hidden
@@ -35,16 +32,20 @@ public class OAuthController {
          - see:
             * kakao developer's setting: https://developers.kakao.com*/
     @GetMapping("/oauth2/kakao/callback")
-    public String catchKakaoAuthenticationCodeCallBack(@RequestParam("code") String code){
+    public Object catchKakaoAuthenticationCodeCallBack(@RequestParam("code") String code){
         log.trace("> Enter catchKakaoAuthenticationCodeCallBack()");
         log.trace("* code: {}", code);
 
-        return code;
+        // return code;
+        KakaoOAuthLoginRequestBody body = new KakaoOAuthLoginRequestBody();
+        body.code = code;
+
+        return this.kakaoLogin(body);
     }
 
     /* TODO: Test needed */
     @PostMapping("/oauth2/kakao/login")
-    public ResponseEntity kakaoLogin(@RequestBody KakaoOAuthLoginRequestBody kakaoOAuthLoginRequestBody){
+    public ResponseObject kakaoLogin(@RequestBody KakaoOAuthLoginRequestBody kakaoOAuthLoginRequestBody){
         log.trace("> Enter kakaoLogin()\n"+
                 "\twith kakaoOAuthLoginRequestBody.code: {} ", kakaoOAuthLoginRequestBody.code);
 
@@ -87,5 +88,24 @@ public class OAuthController {
         return ResponseObject.of(Status.OK,
                  kakaoOauthLoginResult.getMessage(),
                 serviceResultData);
+    }
+
+    @PostMapping("/oauth2/kakao/logout")
+    public ResponseObject kakaoLogout(@RequestHeader HttpHeaders requestHeader){
+        String authorization = JwtManager.getAuthorizationFieldFromHttpHeaders(requestHeader);
+
+        log.trace(authorization);
+        ServiceResult kakaoLogoutServiceResult =
+                oAuthService.kakaoOauthLogout(authorization);
+        log.trace("> Enter kakaoLogout()\n"+
+                "\twith accessToken: {} ", authorization);
+        log.trace("* kakaoLogoutServiceResult Message: {}", kakaoLogoutServiceResult.getMessage());
+
+        if(kakaoLogoutServiceResult.isFailed()) return ResponseObject.onlyData(
+                Status.AUTHENTICATION_FAIL,
+                kakaoLogoutServiceResult.getMessage());
+
+        return ResponseObject.onlyData(Status.OK,
+                kakaoLogoutServiceResult.getMessage());
     }
 }
