@@ -28,7 +28,7 @@ public class ResponseObject extends ResponseEntity {
     /* CUSTOM_RESPONSE_BODY_MODE
        - if true: use customized response body(class CustomResponseBody),
        - if false: use raw data as response body */
-    private static boolean customResponseBodyMode = false;
+    private static boolean customResponseBodyMode = true;
 
 
     /* ──────────────────────── Generate Instance ────────────────────── */
