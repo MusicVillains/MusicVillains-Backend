@@ -101,13 +101,13 @@ public class JwtManager {
             // occurs when jwt token is expired
             e.printStackTrace();
             return ServiceResult.of(ServiceResult.FAIL,
-                    e.getMessage().toString(),
+                    "Expired Jwt Token",
                     null);
         }
         catch(Exception e) {
             e.printStackTrace();
             return ServiceResult.of(ServiceResult.FAIL,
-                    e.getMessage().toString(),
+                    "Invalid Jwt Token",
                     null);
         }
 
