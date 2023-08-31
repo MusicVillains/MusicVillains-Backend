@@ -13,15 +13,13 @@ import org.springframework.util.MultiValueMap;
 @Slf4j
 public class ResponseObject extends ResponseEntity {
     /**
-     * @Author: @Woody_K
-     * @Date: 2023-08-26
-     * @Description:
-     *  Even if there is no data to be transmitted,
-     *  the body is forcibly put into Response to keep the format statusCode, message, and data
-     *  using `CustomResponseBody` class
-     *
-     *  useCustomizedResponse 옵션을 사용하기 위해 기존 생성자를  private로 선언하여,
-     *  of 메소드로만 생성할 수 있도록 강제함.
+     * Even if there is no data to be transmitted,
+     * the body is forcibly put into Response to keep the format statusCode, message, and data
+     * using `CustomResponseBody` class <br><br>
+     * - `useCustomizedResponse` 옵션을 사용하기 위해 기존 생성자를 private로 선언하여, of 메소드로만 생성할 수 있도록 강제함.
+     * @author @Woody K
+     * @date 2023-08-26
+     * @see CustomResponseBody
      */
 
     /* ──────────────────────── Option ────────────────────── */
