@@ -8,6 +8,7 @@ import com.teamseven.MusicVillain.Security.JWT.AuthorizationResult;
 import com.teamseven.MusicVillain.Dto.ServiceResult;
 import com.teamseven.MusicVillain.Dto.ResponseBody.Status;
 import com.teamseven.MusicVillain.Dto.MemberDto;
+import com.teamseven.MusicVillain.Security.OAuth.OAuthService;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -15,6 +16,8 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,20 +27,15 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @Tag(name = "회원 관련 API")
 public class MemberController {
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
     private final MemberService memberService;
     private final MemberJwtAuthorizationManager authManager;
+    private final OAuthService oAuthService;
 
-    @Autowired
-
-    public MemberController(MemberService memberService, MemberJwtAuthorizationManager authManager){
-        this.memberService = memberService;
-        this.authManager = authManager;
-    }
-//    @Tag(name = "회원 관련 API", description = "Swagger 테스트")
 
     /**
      * 모든 회원 조회 | GET | /members
@@ -159,6 +157,7 @@ public class MemberController {
      * @return [성공] 삭제된 멤버의 memberId 반환,
      *         [실패] 실패 메시지 반환
      */
+    /* TODO: Refactioring */
     @DeleteMapping("/members/{memberId}")
     @Operation(summary = "회원 탈퇴", description = "회원을 탈퇴시킵니다.",
             responses = {@ApiResponse(
@@ -174,12 +173,28 @@ public class MemberController {
             @Parameter(description = "JWT Token", required = true)
             @RequestHeader HttpHeaders requestHeader){
 
-        authManager.authorize(requestHeader, memberId);
+        AuthorizationResult auth = authManager.authorize(requestHeader, memberId);
+        if(auth.isFailed()){
+            log.trace("Authorization failed: {}", auth.getMessage());
+            return ResponseObject.onlyData(Status.UNAUTHORIZED, auth.getMessage());
+        }
 
-        ServiceResult result = memberService.deleteMemberByMemberId(memberId);
+        ServiceResult deleteMemberResult = memberService.deleteMemberByMemberId(memberId);
+        if(deleteMemberResult.isFailed()){
+            log.trace("Delete Member failed: {}", deleteMemberResult.getMessage());
 
-        return result.isFailed() ? ResponseObject.NO_CONTENT()
-                : ResponseObject.OK(result.getData());
+            return ResponseObject.onlyData(Status.BAD_REQUEST, deleteMemberResult.getMessage());
+        }
+        else{
+            ServiceResult unlinkMemberResult = oAuthService.unlinkMember(memberId);
+            if (unlinkMemberResult.isFailed()){
+                log.trace("Unlink Member failed: {}", unlinkMemberResult.getMessage());
+                return ResponseObject.onlyData(Status.BAD_REQUEST, "Unlink failed");
+            }
+        }
+
+        return ResponseObject.of(Status.OK, deleteMemberResult.getData());
+
     }
 
 }
