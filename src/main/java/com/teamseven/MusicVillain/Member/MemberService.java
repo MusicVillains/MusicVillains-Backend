@@ -7,10 +7,13 @@ import com.teamseven.MusicVillain.Interaction.InteractionRepository;
 import com.teamseven.MusicVillain.Interaction.InteractionService;
 import com.teamseven.MusicVillain.Dto.ServiceResult;
 import com.teamseven.MusicVillain.Dto.RequestBody.MemberCreationRequestBody;
+import com.teamseven.MusicVillain.Security.JWT.JwtManager;
+import com.teamseven.MusicVillain.Security.JWT.JwtTokenRepository;
 import com.teamseven.MusicVillain.Utils.RandomUUIDGenerator;
 import com.teamseven.MusicVillain.Dto.Converter.DtoConverter;
 import com.teamseven.MusicVillain.Dto.Converter.DtoConverterFactory;
 import com.teamseven.MusicVillain.Dto.MemberDto;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,6 +24,7 @@ import java.util.List;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class MemberService {
 
     private final MemberRepository memberRepository;
@@ -29,6 +33,7 @@ public class MemberService {
     private final InteractionRepository interactionRepository;
     private final FeedService feedService;
     private final InteractionService interactionService;
+    private final JwtTokenRepository jwtTokenRepository;
 
     private DtoConverter dtoConverter =
             DtoConverterFactory.getConverter(Member.class, MemberDto.class);
@@ -36,18 +41,6 @@ public class MemberService {
         /* ──────────────────────── For test ──────────────────────────── */
         log.trace("MemberService dtoConverter : {}", dtoConverter.getClass());
 
-    }
-
-    @Autowired
-    public MemberService(MemberRepository memberRepository, BCryptPasswordEncoder bCryptPasswordEncoder,
-                         FeedRepository feedRepository, InteractionRepository interactionRepository,
-                         FeedService feedService, InteractionService interactionService){
-        this.memberRepository = memberRepository;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-        this.feedRepository = feedRepository;
-        this.interactionRepository = interactionRepository;
-        this.feedService = feedService;
-        this.interactionService = interactionService;
     }
 
 
@@ -164,6 +157,7 @@ public class MemberService {
     public ServiceResult deleteMemberByMemberId(String memberId){
         // 멤버가 존재하는지 확인
         if(isExistMember(memberId) == false){
+            log.trace("Member does not exist");
             return ServiceResult.fail("member does not exist");
         }
 
@@ -183,6 +177,10 @@ public class MemberService {
 
         // 멤버 삭제
         memberRepository.deleteByMemberId(memberId);
+
+        // 관련 토큰 삭제
+        jwtTokenRepository.deleteAllByOwnerIdAndType(memberId, JwtManager.TYPE_ACCESS_TOKEN());
+        jwtTokenRepository.deleteAllByOwnerIdAndType(memberId, JwtManager.TYPE_REFRESH_TOKEN());
 
         return ServiceResult.success(memberId);
     }

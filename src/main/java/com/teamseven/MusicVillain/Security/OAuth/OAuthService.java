@@ -1,17 +1,22 @@
 package com.teamseven.MusicVillain.Security.OAuth;
 
+import com.auth0.jwt.JWT;
+import com.teamseven.MusicVillain.Dto.Converter.DateConverter;
 import com.teamseven.MusicVillain.Dto.Converter.MemberDtoConverter;
 import com.teamseven.MusicVillain.Dto.MemberDto;
 import com.teamseven.MusicVillain.Dto.ServiceResult;
 import com.teamseven.MusicVillain.Member.Member;
 import com.teamseven.MusicVillain.Member.MemberRepository;
 import com.teamseven.MusicVillain.Security.JWT.JwtManager;
+import com.teamseven.MusicVillain.Security.JWT.JwtToken;
+import com.teamseven.MusicVillain.Security.JWT.JwtTokenRepository;
 import com.teamseven.MusicVillain.Security.MemberRole;
 import com.teamseven.MusicVillain.Utils.ENV;
 import com.teamseven.MusicVillain.Utils.RandomNicknameGenerator;
 import com.teamseven.MusicVillain.Utils.RandomUUIDGenerator;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonElement;
@@ -22,21 +27,18 @@ import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class OAuthService {
     /**
      *
      * @Test - needed
      */
 
-    private MemberRepository memberRepository;
-    @Autowired
-    public OAuthService(MemberRepository memberRepository){
-        this.memberRepository = memberRepository;
-    }
+    private final MemberRepository memberRepository;
+    private final JwtTokenRepository jwtTokenRepository;
 
     /* Kakao REST API reference: https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api */
     public ServiceResult getKakaoAccessTokenByKakaoAuthorizationCode(String kakaoAuthorizationCode) {
@@ -66,8 +68,9 @@ public class OAuthService {
             StringBuilder sb = new StringBuilder();
             sb.append("grant_type=authorization_code");
             sb.append("&client_id=" + ENV.KAKAO_CLIENT_ID); // client_id = REST API Key
-            sb.append("&redirect_uri=http://localhost:3000/kakaoredirect"); // 인가코드를 받은 redirect URI
-            /* sb.append("&redirect_uri=http://localhost:8080/oauth2/kakao/callback"); // when test in local */
+            // sb.append("&redirect_uri=http://localhost:3000/kakaoredirect"); // 인가코드를 받은 redirect URI
+            /* WARN: Change after test */
+            sb.append("&redirect_uri=http://localhost:8080/oauth2/kakao/callback"); // when test in local
 
             sb.append("&code=" + kakaoAuthorizationCode);
             bw.write(sb.toString());
@@ -106,7 +109,6 @@ public class OAuthService {
             log.trace("> Kakao access token and refresh token received\n"
                     + "\t- access_token : {}\n"
                     + "\t- refresh_token : {}", kakaoAccessToken, kakaoRefreshToken);
-
 
             br.close();
             bw.close();
@@ -231,6 +233,7 @@ public class OAuthService {
         return ServiceResult.success(generatedMemberId);
     }
 
+    /* WARN: test needed */
     public ServiceResult kakaoOauthLogin(String kakaoAuthorizationCode){
         log.trace("> Enter KakaoOauthLogin()\n"
                 +"\t-with kakaoAuthorizationCode: {}", kakaoAuthorizationCode);
@@ -250,8 +253,6 @@ public class OAuthService {
                 ((Map)accessTokenServiceResult.getData()).get("kakaoAccessToken").toString();
 
         log.trace("kakaoAccessToken: {}", kakaoAccessToken);
-
-
         log.trace("kakaoOauthLogin -> get kakaoMemberId using kakaoAccessToken");
 
         // get kakaoMemberId using kakaoAccessToken
@@ -297,8 +298,44 @@ public class OAuthService {
         String memberRole = tmpMember.getRole();
 
         // Generate JWT Access Token
-        String accessToken = JwtManager.generateAccessToken(memberId, memberUserId, memberRole);
-        String refreshToken = JwtManager.generateRefreshToken(memberId, memberUserId, memberRole);
+        String generatedAccessToken = JwtManager.generateAccessToken(memberId, memberUserId, memberRole);
+        String generatedRefreshToken = JwtManager.generateRefreshToken(memberId, memberUserId, memberRole);
+
+        // check if there's already JWT Token of this member in DB
+        JwtToken accessTokenEntity = jwtTokenRepository.findByOwnerIdAndType(memberId,"access");
+        JwtToken refreshTokenEntity = jwtTokenRepository.findByOwnerIdAndType(memberId, "refresh");
+
+        if(accessTokenEntity == null) {
+            accessTokenEntity = JwtToken.builder()
+                .tokenId(RandomUUIDGenerator.generate())
+                .ownerId(JWT.decode(generatedAccessToken).getClaim("memberId").asString())
+                .type(JWT.decode(generatedAccessToken).getClaim("type").asString())
+                .value(generatedAccessToken)
+                .expiredAt(DateConverter.convertDateToLocalDateTime(JWT.decode(generatedAccessToken).getExpiresAt()))
+                .build();
+        }else{
+            // update accessTokenEntity
+            accessTokenEntity.value = generatedAccessToken;
+            accessTokenEntity.expiredAt =
+                    DateConverter.convertDateToLocalDateTime(JWT.decode(generatedAccessToken).getExpiresAt());
+        }
+
+        if(refreshTokenEntity == null) {
+            refreshTokenEntity = JwtToken.builder()
+                .tokenId(RandomUUIDGenerator.generate())
+                .ownerId(JWT.decode(generatedRefreshToken).getClaim("memberId").asString())
+                .type(JWT.decode(generatedRefreshToken).getClaim("type").asString())
+                .value(generatedRefreshToken)
+                .expiredAt(DateConverter.convertDateToLocalDateTime(JWT.decode(generatedRefreshToken).getExpiresAt()))
+                .build();
+        }else{
+            // update refreshTokenEntity
+            refreshTokenEntity.value = generatedRefreshToken;
+            refreshTokenEntity.expiredAt = DateConverter.convertDateToLocalDateTime(JWT.decode(generatedRefreshToken).getExpiresAt());
+        }
+
+        jwtTokenRepository.save(accessTokenEntity);
+        jwtTokenRepository.save(refreshTokenEntity);
 
         // return logged-in member's memberId and JWT Token
         Map<String, Object> serviceResultData = new HashMap<>();
@@ -309,13 +346,13 @@ public class OAuthService {
         /* Not response Member info(Token contains MemberId) */
         // serviceResultData.put("member", memberDto);
         serviceResultData.put("tokenType", "Bearer");
-        serviceResultData.put("accessToken", accessToken);
-        serviceResultData.put("refreshToken", refreshToken);
+        serviceResultData.put("accessToken", generatedAccessToken);
+        serviceResultData.put("refreshToken", generatedRefreshToken);
 
         log.trace("* Service result of KakaoOauthLogin\n");
         log.trace("\tmember: {}\n", memberDto,
-                "\taccessToken: {}\n", accessToken,
-                "\trefreshToken: {}\n", refreshToken);
+                "\taccessToken: {}\n", generatedAccessToken,
+                "\trefreshToken: {}\n", generatedRefreshToken);
 
         if(kakaoOauthLoginServiceResultMessage == ""){
             kakaoOauthLoginServiceResultMessage = "Logged in successfully";
@@ -329,4 +366,150 @@ public class OAuthService {
                 .build();
     }
 
+    @Transactional
+    /* TODO: need to clean up */
+    /* WARN: 현재 try catch 구문에서 리턴이 안되서, 토큰이 만료 되었음에도 불구하고 unlink를 진행하는 문제가 있음 */
+    // authorization: 로그아웃 시도하는 사용자의 Access Token
+    public ServiceResult kakaoOauthLogout(String authorization){
+        String accessToken = authorization.replace("Bearer ", "");
+
+        // find if this token exists in DB
+        JwtToken tmpAccessTokenEntity = jwtTokenRepository.findByValueAndType
+                (accessToken,"access");
+
+        if(tmpAccessTokenEntity == null){
+            return ServiceResult.fail("Access token is not valid");
+        }
+
+        // if exists, verify token
+        ServiceResult tokenVerfiyResult = JwtManager.verifyAccessToken(authorization);
+        if (tokenVerfiyResult.isFailed()) // if failed
+            return ServiceResult.fail(tokenVerfiyResult.getMessage());
+
+        log.trace("delete access token from DB");
+
+        // if verified, do logout
+        String memberId = JWT.decode(accessToken).getClaim("memberId").asString();
+        log.trace("memberId: {}", memberId);
+        // delete token from DB( delete access, refresh token of this user)
+        jwtTokenRepository.deleteAllByOwnerIdAndType(memberId, JwtManager.TYPE_ACCESS_TOKEN());
+        jwtTokenRepository.deleteAllByOwnerIdAndType(memberId, JwtManager.TYPE_REFRESH_TOKEN());
+
+        return ServiceResult.of(ServiceResult.SUCCESS, "Logged out successfully");
+    }
+
+    /* TODO: Implement Later */
+    public ServiceResult refreshAccessToken(String refreshToken){
+        // refresh token null 체크
+        if(refreshToken == null) return ServiceResult.fail("Refresh token is null");
+        // refresh 토큰이 유효한지 db에서 확인, findByValueAndType(refreshToken, "refresh")
+        JwtToken tmpRefreshTokenEntity = jwtTokenRepository.findByValueAndType(refreshToken, "refresh");
+        if(tmpRefreshTokenEntity == null) return ServiceResult.fail("Refresh token is not valid");
+
+        // 유효하면 토큰 verfiy를 통해 만료된 토큰인지 확인
+        ServiceResult verifyRefreshTokenResult = JwtManager.verifyRefreshToken(refreshToken);
+        if(verifyRefreshTokenResult.isFailed())
+            return ServiceResult.fail(verifyRefreshTokenResult.getMessage());
+
+        String memberId = JWT.decode(refreshToken).getClaim("memberId").asString();
+        String userId = JWT.decode(refreshToken).getClaim("userId").asString();
+        String memberRole = JWT.decode(refreshToken).getClaim("role").asString();
+
+        // 토큰 검증에 성공한 경우 새로운 access token 발급 및 데이터베이스 저장 후 리턴
+        String generatedAccessToken = JwtManager.generateAccessToken(memberId, userId, memberRole);
+
+        // check if there's already Access Token of this member in DB
+        JwtToken tmpAccessTokenEntity = jwtTokenRepository.findByOwnerIdAndType(memberId,JwtManager.TYPE_ACCESS_TOKEN());
+
+        if(tmpAccessTokenEntity == null){
+            tmpAccessTokenEntity = JwtToken.builder()
+                    .tokenId(RandomUUIDGenerator.generate())
+                    .ownerId(JWT.decode(generatedAccessToken).getClaim("memberId").asString())
+                    .type(JWT.decode(generatedAccessToken).getClaim("type").asString())
+                    .value(generatedAccessToken)
+                    .expiredAt(DateConverter.convertDateToLocalDateTime(JWT.decode(generatedAccessToken).getExpiresAt()))
+                    .build();
+        }else{
+            tmpAccessTokenEntity.value = generatedAccessToken;
+            tmpAccessTokenEntity.expiredAt =
+                    DateConverter.convertDateToLocalDateTime(JWT.decode(generatedAccessToken).getExpiresAt());
+        }
+        jwtTokenRepository.save(tmpAccessTokenEntity);
+
+
+        return ServiceResult.of(ServiceResult.SUCCESS, "Refreshed successfully", generatedAccessToken);
+    }
+
+    /* TODO: Implement Later */
+    // 회원 탈퇴시 카카오에서도 연결을 끊어주기 위한 method
+    /* Kakao Rest API Reference:
+        https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#unlink */
+
+    /* Request URI: https://kapi.kakao.com/v1/user/unlink */
+    public ServiceResult unlinkMember(String authorization){
+        if(authorization == null)
+            return ServiceResult.fail("Authorization is null");
+
+        String accessToken = authorization.replace("Bearer ", "");
+        Boolean expired = false;
+        // find if this token exists in DB
+        JwtToken tmpAccessTokenEntity = jwtTokenRepository.findByValueAndType
+                (accessToken,"access");
+
+        if(tmpAccessTokenEntity == null){
+            return ServiceResult.fail("Access token is not valid");
+        }
+
+        // if exists, verifiy token
+        ServiceResult tokenVerfiyResult = JwtManager.verifyAccessToken(authorization);
+        if (tokenVerfiyResult.isFailed()) // if failed
+            return ServiceResult.fail(tokenVerfiyResult.getMessage());
+
+        // 유효한 토큰일 경우 access token으로부터 userId를 가져옴
+        String userId = JWT.decode(accessToken).getClaim("userId").asString();
+        log.trace("userId: {}", userId);
+        // userId에서 providerType와 provider측에서 사용하는 id(식별자)를 분리
+        String providerType = userId.split("_")[0];
+        Long kakaoMemberIdentifier = Long.parseLong(userId.split("_")[1]);
+
+        // providerType 이 "KAKAO" 인지 확인
+        if(!providerType.equals(OAuth2ProviderType.KAKAO)){
+            return ServiceResult.fail("Not a Kakao member");
+        }
+
+        try {
+            // 카카오 연결 끊기
+            String reqURL = "https://kapi.kakao.com/v1/user/unlink";
+            URL url = new URL(reqURL);
+
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Authorization", "KakaoAK " + "3ed2be45d9d3ae9cfde98441da761b47"); // put kakaoAccessToken to header
+
+            conn.setDoOutput(true); // for POST
+
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream()));
+            StringBuilder sb = new StringBuilder();
+            sb.append("target_id_type=user_id"); // user_id로 고정
+            sb.append("&target_id=" + kakaoMemberIdentifier);
+            bw.write(sb.toString());
+            bw.flush();
+
+            log.trace("* Send unlink request to Kakao(POST, {})", reqURL);
+
+            // response code == 200 ? success : fail
+            int responseCode = conn.getResponseCode();
+            log.trace("* responseCode : " + responseCode);
+
+            if (responseCode != 200) {
+                log.error("Failed to Unlik Kakao member");
+                return ServiceResult.fail("Failed to Unlik Kakao member");
+            }
+        } catch(Exception e){
+            e.printStackTrace();
+            return ServiceResult.fail("Failed to unlink Kakao member");
+        }
+
+        return ServiceResult.success("Unlinked successfully");
+    }
 }

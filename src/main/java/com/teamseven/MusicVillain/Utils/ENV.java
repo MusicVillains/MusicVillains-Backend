@@ -19,10 +19,10 @@ public class ENV{
             //"https://team7-frontend-git-main-beside-team7.vercel.app/"; // temporary
 
     /* For JWT and Secure */
-    public final static Boolean AUTHORIZE_MODE = false;
+    public final static Boolean AUTHORIZE_MODE = true;
     public static  String JWT_SECRET_KEY;
-    public static int JWT_ACCESS_TOKEN_EXPIRE_TIME;
-    public static int JWT_REFRESH_TOKEN_EXPIRE_TIME;
+    public static Long JWT_ACCESS_TOKEN_EXPIRE_TIME;
+    public static Long JWT_REFRESH_TOKEN_EXPIRE_TIME;
     public static String JWT_TOKEN_SUBJECT;
     public static final String JWT_TOKEN_PREFIX = "Bearer "; // 토큰 앞에 붙는 prefix
     public static String LOGGIN_SUCCESS_REDIRECT_URL(){
@@ -39,7 +39,7 @@ public class ENV{
         return JWT_SECRET_KEY;
     }
 
-    public static int JWT_TOKEN_EXPIRE_TIME(){
+    public static Long JWT_TOKEN_EXPIRE_TIME(){
         return JWT_ACCESS_TOKEN_EXPIRE_TIME;
     }
 
@@ -58,12 +58,12 @@ public class ENV{
     }
 
     @Value("${env.secret.jwt.access-token-expire-time}")
-    public void SET_JWT_ACCESS_TOKEN_EXPIRE_TIME(int accessTokenExpireTime){
+    public void SET_JWT_ACCESS_TOKEN_EXPIRE_TIME(Long accessTokenExpireTime){
         this.JWT_ACCESS_TOKEN_EXPIRE_TIME = accessTokenExpireTime;
     }
 
     @Value("${env.secret.jwt.refresh-token-expire-time}")
-    public void SET_JWT_REFRESH_TOKEN_EXPIRE_TIME(int refreshTokenExpireTime){
+    public void SET_JWT_REFRESH_TOKEN_EXPIRE_TIME(Long refreshTokenExpireTime){
         this.JWT_REFRESH_TOKEN_EXPIRE_TIME = refreshTokenExpireTime;
     }
 
