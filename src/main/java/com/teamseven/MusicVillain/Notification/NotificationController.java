@@ -3,22 +3,23 @@ package com.teamseven.MusicVillain.Notification;
 import com.teamseven.MusicVillain.Dto.ResponseBody.ResponseObject;
 import com.teamseven.MusicVillain.Dto.ResponseBody.Status;
 import com.teamseven.MusicVillain.Dto.ServiceResult;
+import com.teamseven.MusicVillain.Security.JWT.AuthorizationResult;
+import com.teamseven.MusicVillain.Security.JWT.MemberJwtAuthorizationManager;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+import org.springframework.http.HttpHeaders;
+
 @Hidden
 @RestController
+@RequiredArgsConstructor
 public class NotificationController {
     private final NotificationService notificationService;
+    private final MemberJwtAuthorizationManager memberAuthManager;
+    private final NotificaitonRepository notificaitonRepository;
 
-    @Autowired
-    public NotificationController(NotificationService notificationService){
-        this.notificationService = notificationService;
-    }
 
     /**
      * 멤버별 알림 조회 | GET | /notifications?memberId=memberId
@@ -35,7 +36,14 @@ public class NotificationController {
     @GetMapping("/notifications")
     @Operation(summary = "멤버별 알림 조회", description = "멤버 별로 모든 알림을 조회합니다.")
     // url : /notifications?memberId=memberId
-    public ResponseObject getNotificationsByMemberId(@RequestParam("memberId") String memberId){
+    public ResponseObject getNotificationsByMemberId(@RequestParam("memberId") String memberId,
+                                                     @RequestHeader HttpHeaders headers){
+
+        AuthorizationResult authResult = memberAuthManager.authorize(headers, memberId);
+        if(authResult.isFailed()){
+            return ResponseObject.of(Status.UNAUTHORIZED, authResult.getMessage());
+        }
+
         ServiceResult serviceResult = notificationService.getNotificaitonsByOwnerMemberID(memberId);
         return serviceResult.isFailed() ? ResponseObject.BAD_REQUEST(serviceResult.getData())
                 : ResponseObject.OK(serviceResult.getData());
@@ -55,7 +63,19 @@ public class NotificationController {
      */
     @PostMapping("/notifications/read")
     @Operation(summary = "알림 읽음 처리", description = "알림을 읽음 처리합니다.")
-    public ResponseObject readNotification(@RequestParam("notificationId") String notificationId){
+    public ResponseObject readNotification(
+            @RequestParam("notificationId") String notificationId,
+            @RequestHeader HttpHeaders headers){
+        /* TODO: Refactoring later */
+        if(notificationId == null) return ResponseObject.BAD_REQUEST("notificationId is null");
+
+        Notification notification = notificaitonRepository.findByNotificationId(notificationId);
+        AuthorizationResult authResult = memberAuthManager.authorize(headers, notification.getOwner().memberId);
+        
+        if(authResult.isFailed()){
+            return ResponseObject.of(Status.UNAUTHORIZED, authResult.getMessage());
+        }
+
         ServiceResult serviceResult = notificationService.readNotification(notificationId);
         return serviceResult.isFailed() ? ResponseObject.BAD_REQUEST(serviceResult.getMessage())
                 : ResponseObject.OK(serviceResult.getData());

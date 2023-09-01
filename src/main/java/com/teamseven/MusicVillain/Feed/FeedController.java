@@ -123,7 +123,9 @@ public class FeedController {
             @RequestParam("feedType") String feedType,
             @RequestParam("description") String feedDescription,
             @RequestParam("recordDuration") int recordDuration,
-            @RequestParam("recordFile") MultipartFile recordFile) throws IOException {
+            @RequestParam("recordFile") MultipartFile recordFile,
+            @RequestHeader HttpHeaders headers) throws IOException {
+
         log.trace("─> [FeedController] createFeed() called");
         log.trace("- Parameters:");
         log.trace("  - feedType: {}", feedType);
@@ -133,6 +135,10 @@ public class FeedController {
         log.trace("  - feedDescription: {}", feedDescription);
         log.trace("  - recordDuration: {}", recordDuration);
         log.trace("  - recordFile: {}",  recordFile);
+
+        AuthorizationResult authResult = memberAuthManager.authorize(headers, ownerId);
+        if(authResult.isFailed())
+            return ResponseObject.UNAUTHORIZED(authResult.getMessage());
 
         ServiceResult result = feedService.insertFeed(ownerId, feedType,feedDescription, recordDuration, recordFile,musicName,musicianName);
         if (result.isFailed()) return ResponseObject.CREATION_FAIL(result.getData());
