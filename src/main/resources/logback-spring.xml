@@ -13,7 +13,7 @@
     <logger name ="com.teamseven.MusicVillain.Security.OAuth.OAuthService" level="TRACE" />
     <logger name ="com.teamseven.MusicVillain.Security.JWT" level="TRACE" />
 
-    <logger name ="com.teamseven.MusicVillain.Member.MemberService" level="TRACE" />
+    <logger name ="com.teamseven.MusicVillain.Member" level="TRACE" />
     <root level="INFO">
         <appender-ref ref="CONSOLE" />
     </root>

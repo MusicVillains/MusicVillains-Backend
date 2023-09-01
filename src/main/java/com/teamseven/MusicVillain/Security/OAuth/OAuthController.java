@@ -57,11 +57,9 @@ public class OAuthController {
         ServiceResult kakaoOauthLoginResult = oAuthService.kakaoOauthLogin(kakaoOAuthLoginRequestBody.code);
 
         // if failed to login
-        if(kakaoOauthLoginResult.isFailed()) return ResponseObject.of(
+        if(kakaoOauthLoginResult.isFailed()) return ResponseObject.onlyData(
                 Status.AUTHENTICATION_FAIL,
-                //kakaoOauthLoginResult.getMessage(),
-                Status.AUTHENTICATION_FAIL.getMessage(),
-                null);
+                Status.AUTHENTICATION_FAIL.getMessage());
 
         // get ServiceResult's data and casting to Map
         Map serviceResultData = (Map)kakaoOauthLoginResult.getData();
@@ -108,4 +106,33 @@ public class OAuthController {
         return ResponseObject.onlyData(Status.OK,
                 kakaoLogoutServiceResult.getMessage());
     }
+
+    @PostMapping("/oauth2/kakao/unlink")
+    public ResponseObject kakaoUnlink(@RequestHeader HttpHeaders requestHeader) {
+        log.trace("> Enter kakaoUnlink()");
+        String authorization = JwtManager.getAuthorizationFieldFromHttpHeaders(requestHeader);
+        ServiceResult kakaoUnlinkServiceResult =
+                oAuthService.unlinkMember(authorization);
+
+        if(kakaoUnlinkServiceResult.isFailed())
+            return ResponseObject.onlyData(Status.AUTHENTICATION_FAIL,
+                    kakaoUnlinkServiceResult.getMessage());
+
+        return ResponseObject.onlyData(Status.OK, kakaoUnlinkServiceResult.getMessage());
+
+    }
+    @PostMapping("/token/refresh")
+    public ResponseObject kakaoUnlink(@RequestBody AccessTokenRefreshRequestBody accessTokenRefreshRequestBody) {
+        String refreshToken = accessTokenRefreshRequestBody.refreshToken;
+        ServiceResult result = oAuthService.refreshAccessToken(refreshToken);
+        if(result.isFailed())
+            return ResponseObject.onlyData(Status.UNAUTHORIZED,
+                    "Refresh failed");
+
+        String refreshedAccessToken = result.getData().toString();
+        Map responseDataMap = Map.of("accessToken", refreshedAccessToken);
+        return ResponseObject.onlyData(Status.OK, responseDataMap);
+    }
+
+
 }

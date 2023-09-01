@@ -112,7 +112,37 @@ public class JwtManager {
         }
 
         return ServiceResult.of(ServiceResult.SUCCESS,
-                "verifyToken() succeeded.",
+                "verifyToken succeeded.",
+                tmpMemberId);
+
+    }
+
+    public static ServiceResult verifyRefreshToken(String refreshToken){
+
+        if(refreshToken == null) return ServiceResult.fail("refreshToken is null");
+
+        String tmpMemberId = "";
+        try {
+            tmpMemberId = JWT.require(Algorithm.HMAC512(ENV.JWT_SECRET_KEY())).build() // 토큰 생성 시 사용했던 암호화 방식을 적용
+                    .verify(refreshToken) // 토큰 검증
+                    .getClaim("memberId").asString(); // memberId claim을 가져옴
+        }
+        catch(ExpiredJwtException e){
+            // occurs when jwt token is expired
+            e.printStackTrace();
+            return ServiceResult.of(ServiceResult.FAIL,
+                    "Expired Jwt Token",
+                    null);
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+            return ServiceResult.of(ServiceResult.FAIL,
+                    "Invalid Jwt Token",
+                    null);
+        }
+
+        return ServiceResult.of(ServiceResult.SUCCESS,
+                "verifyToken succeeded.",
                 tmpMemberId);
 
     }
