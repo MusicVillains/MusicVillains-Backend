@@ -55,6 +55,7 @@ public class MemberService {
      * @return 멤버 정보 리스트
      */
     public List<DataTransferObject> getAllMembers(){
+
         List<DataTransferObject> dtoList =
                 dtoConverter.convertToDtoList(memberRepository.findAll());
         return dtoList;
@@ -70,13 +71,17 @@ public class MemberService {
      * @return ServiceResult 객체. 멤버 정보 또는 실패 메시지를 포함.
      */
     public ServiceResult getMemberById(String memberId) {
+        // Parameter null check
+        if(memberId == null) return ServiceResult.fail("Member id is null");
 
-        DataTransferObject dto =
+
+        DataTransferObject nullableDto =
                 dtoConverter.convertToDto(memberRepository.findByMemberId(memberId));
 
-        if(dto == null) return ServiceResult.fail("Member not found");
+        if(nullableDto == null)
+            return ServiceResult.fail("Member not found");
 
-        return ServiceResult.success(dto);
+        return ServiceResult.success(nullableDto);
     }
 
     /**
@@ -135,10 +140,23 @@ public class MemberService {
      * @return ServiceResult 객체. 성공 또는 실패 메시지를 포함.
      */
     public ServiceResult modifyMemberNickname(String memberId, String nickname) {
-        Member member = memberRepository.findByMemberId(memberId);
-        if (member == null) return ServiceResult.fail("Member not found");
-        member.setName(nickname);
-        memberRepository.save(member);
+        // Parameter null check
+        if(memberId == null || nickname == null) {
+            return ServiceResult.fail("Bad Request, Given memberId or nickname is null");
+        }
+
+        Member nullableMember = memberRepository.findByMemberId(memberId);
+
+        // check if Member exists in DB
+        if (nullableMember == null) return ServiceResult.fail("Member not found");
+
+        // check if nickname(to modify) is same with current nickname
+        if(nullableMember.getName().equals(nickname)){
+            return ServiceResult.fail("Nickname is same with current nickname");
+        }
+
+        nullableMember.setName(nickname);
+        memberRepository.save(nullableMember);
 
         return ServiceResult.success("nickname changed");
     }
@@ -155,8 +173,12 @@ public class MemberService {
      */
     @Transactional
     public ServiceResult deleteMemberByMemberId(String memberId){
-        // 멤버가 존재하는지 확인
-        if(isExistMember(memberId) == false){
+        // Parameter null check
+        if(memberId == null)
+            return ServiceResult.fail("Member id is null");
+
+        // Check Member Exist in DB
+        if(!isExistMember(memberId)){
             log.trace("Member does not exist");
             return ServiceResult.fail("member does not exist");
         }
@@ -165,6 +187,8 @@ public class MemberService {
         interactionRepository.deleteByInteractionMemberMemberId(memberId);
 
         // 멤버가 보유한 피드를 리스트로 받아온 후 해당 피드와 피드와 관련된 인터렉션 삭제
+
+        // 멤버가 보유한 피드 리스트 받아오기
         List<Feed> memberFeedList = feedRepository.findAllByOwnerMemberId(memberId);
 
         for (Feed f : memberFeedList){

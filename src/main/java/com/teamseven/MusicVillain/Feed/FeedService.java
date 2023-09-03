@@ -250,19 +250,21 @@ public class FeedService {
      */
     @Transactional
     public ServiceResult deleteFeedByFeedId(String feedId){
+        // parameter null check
+        if(feedId == null)
+            return ServiceResult.fail("Bad request, feedId is null");
+
         System.out.println("Enter FeedService.deleteFeedByFeedId()");
-        Feed feedToDelete = feedRepository.findByFeedId(feedId);
+        Feed nullableFeedToDelete = feedRepository.findByFeedId(feedId);
         // 존재하는 피드인지 확인
-        if(feedToDelete == null){
+        if(nullableFeedToDelete == null){
             return ServiceResult.of(ServiceResult.FAIL, "Feed Not Found");}
 
-        // 피드에 대한 Interaction을 삭제하기 전에 해당 인터렉션에 대한 Notification 먼저 삭제
+        /* interactionService.deleteInterationsByFeedId에서
+        내부적으로 각 인터렉션과 관련된 Notification도 삭제됨 */
+        interactionService.deleteInterationsByFeedId(feedId);
 
-        // 피드에 대한 Interaciton 삭제,
-        //interactionRepository.deleteByInteractionFeedFeedId(feedToDelete.feedId);
-        interactionService.deleteInterationsByFeedId(feedId); // 여기서 내부적으로 각 인터렉션과 관련된 Notification도 삭제됨
-
-        // Feed 삭제, Record는 Feed쪽에서 CASCADE로 자동 삭제됨
+        // Feed 삭제, Record는 Feed가 삭제되면 CASCADE로 자동 삭제됨
         feedRepository.deleteByFeedId(feedId);
         System.out.println("Exit FeedService.deleteFeedByFeedId()");
         return ServiceResult.of(ServiceResult.SUCCESS, "Feed Deleted", feedId);
@@ -279,6 +281,7 @@ public class FeedService {
      * @return boolean. 유효한 멤버 ID인 경우 true, 그렇지 않은 경우 false.
      */
     public boolean checkIsValidMemberId(String memberId){
+        if (memberId == null) return false;
         return memberRepository.findByMemberId(memberId) != null;
     }
 
@@ -291,10 +294,20 @@ public class FeedService {
      * @param feedId 정보를 가져올 피드의 ID
      * @return FeedDto 객체. 해당 피드의 정보를 포함.
      */
-    public FeedDto getFeedByFeedId(String feedId) {
-        Feed feed = feedRepository.findByFeedId(feedId);
-        FeedDto feedDtoInstance = new FeedDto();
-        return feedDtoInstance.toDto(feed);
+    public ServiceResult getFeedByFeedId(String feedId) {
+        // parameter null check
+        if(feedId == null) return ServiceResult.fail("Bad request, feedId is null");
+
+        // find feed by feedId
+        Feed nullableFeed = feedRepository.findByFeedId(feedId);
+
+        // check if feed not found
+        if(nullableFeed == null) return ServiceResult.fail("Feed Not Found");
+
+        // convert to FeedDto
+        DataTransferObject feedDto = feedDtoDtoConverter.convertToDto(nullableFeed);
+
+        return ServiceResult.success(feedDto);
     }
 
     /**
@@ -307,11 +320,17 @@ public class FeedService {
      * @return ServiceResult 객체. 성공시 해당 멤버가 상호 작용한 모든 FeedDto 객체의 리스트를 포함.
      */
     public ServiceResult getInteractionFeedsByMemberId(String memberId) {
-        Member member = memberRepository.findByMemberId(memberId);
-        if(member == null){
-            return ServiceResult.of(ServiceResult.FAIL, "Member Not Found");
-        }
-        List<Interaction> interactionList = interactionRepository.findAllByInteractionMemberMemberId(memberId);
+        // parameter null check
+        if(memberId == null) return ServiceResult.fail("Bad request, memberId is null");
+
+        // get Member from DB
+        Member nullableMember = memberRepository.findByMemberId(memberId);
+        // check if member is null
+        if(nullableMember == null) return ServiceResult.of(ServiceResult.FAIL, "Member Not Found");
+
+        // get Interaction List of this Member from DB
+        List<Interaction> interactionList =
+                interactionRepository.findAllByInteractionMemberMemberId(memberId);
 
         List<Feed> interactionFeedList = new ArrayList<>();
 
@@ -334,10 +353,12 @@ public class FeedService {
      * @return ServiceResult 객체. 성공시 해당 피드의 소유자 멤버 ID를 포함.
      */
     public ServiceResult getFeedOwnerMemberIdByFeedId(String feedId) {
+        // check if
 
-        Feed tmpFeed = feedRepository.findByFeedId(feedId);
-        if(tmpFeed == null) return ServiceResult.fail("Feed Not Found");
-        return ServiceResult.success(tmpFeed.getOwner().getMemberId());
+        Feed nullableFeed = feedRepository.findByFeedId(feedId);
+        if(nullableFeed == null) return ServiceResult.fail("Feed Not Found");
+
+        return ServiceResult.success(nullableFeed.getOwner().getMemberId());
 
     }
 }
