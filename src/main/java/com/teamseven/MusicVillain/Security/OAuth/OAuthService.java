@@ -68,9 +68,9 @@ public class OAuthService {
             StringBuilder sb = new StringBuilder();
             sb.append("grant_type=authorization_code");
             sb.append("&client_id=" + ENV.KAKAO_CLIENT_ID); // client_id = REST API Key
-            // sb.append("&redirect_uri=http://localhost:3000/kakaoredirect"); // 인가코드를 받은 redirect URI
+            sb.append("&redirect_uri=http://localhost:3000/kakaoredirect"); // 인가코드를 받은 redirect URI
             /* WARN: Change after test */
-            sb.append("&redirect_uri=http://localhost:8080/oauth2/kakao/callback"); // when test in local
+            //sb.append("&redirect_uri=http://localhost:8080/oauth2/kakao/callback"); // when test in local
 
             sb.append("&code=" + kakaoAuthorizationCode);
             bw.write(sb.toString());
