@@ -12,3 +12,12 @@ git clone --recurse-submodules https://github.com/MusicVillains/Team7-Backend
 git clone --recurse-submodules https://<USERNAME>:<TOKEN>@github.com/MusicVillains/Team7-Backend
 ```
 - `USERNAME`,`TOKEN` for private submodules
+
+<br>  
+
+### ✔️ Update
+
+```
+git pull origin `branch`
+git submodule update --recursive 
+```
