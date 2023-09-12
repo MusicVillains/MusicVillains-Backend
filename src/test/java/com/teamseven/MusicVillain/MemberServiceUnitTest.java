@@ -5,11 +5,13 @@ import com.sun.source.tree.ModuleTree;
 import com.teamseven.MusicVillain.Dto.DataTransferObject;
 import com.teamseven.MusicVillain.Dto.MemberDto;
 import com.teamseven.MusicVillain.Dto.ServiceResult;
+import com.teamseven.MusicVillain.Feed.FeedRepository;
+import com.teamseven.MusicVillain.Interaction.InteractionRepository;
 import com.teamseven.MusicVillain.Member.Member;
 import com.teamseven.MusicVillain.Member.MemberRepository;
 import com.teamseven.MusicVillain.Member.MemberService;
+import com.teamseven.MusicVillain.Security.JWT.JwtTokenRepository;
 import com.teamseven.MusicVillain.Utils.RandomUUIDGenerator;
-import jdk.jfr.Description;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.mockito.InjectMocks;
@@ -30,6 +32,15 @@ public class MemberServiceUnitTest {
     MemberRepository mockMemberRepository;
 
     @Mock
+    InteractionRepository mockInteractionRepository;
+
+    @Mock
+    FeedRepository mockFeedRepository;
+
+    @Mock
+    JwtTokenRepository mockJwtTokenRepository;
+
+    @Mock
     BCryptPasswordEncoder mockBCryptPasswordEncoder;
     String mockEncryptedPassword = "mockEncryptedPassword";
 
@@ -41,7 +52,7 @@ public class MemberServiceUnitTest {
     @Nested
     @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-    @DisplayName("멤버 생성 테스트")
+    @DisplayName("Create 테스트")
     class CreateTest{
         @BeforeEach
         void setUp(){
@@ -199,8 +210,9 @@ public class MemberServiceUnitTest {
     }
 
     @Nested
+    @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-    @DisplayName("멤버 조회 테스트")
+    @DisplayName("Read 테스트")
     class ReadTest{
         int mockMemberListSize;
         @BeforeEach
@@ -223,6 +235,7 @@ public class MemberServiceUnitTest {
 
 
         @Test
+        @Order(1)
         @DisplayName("존재하는 모든 멤버를 조회할 수 있다.")
         void getAllMembersTest(){
             // given
@@ -313,7 +326,6 @@ public class MemberServiceUnitTest {
             ServiceResult serviceResult = memberService.getMemberById(memberId);
 
             // then
-
             Mockito.verify(mockMemberRepository, Mockito.times(0))
                     .findByMemberId(Mockito.anyString());
             Assertions.assertEquals(ServiceResult.FAIL,serviceResult.getResult());
@@ -324,21 +336,190 @@ public class MemberServiceUnitTest {
         @Test
         @DisplayName("`memberId`로 조회 - 멤버 식별자가 유효하지 않은 형식일 경우 조회할 수 없다.")
         void getMemberByMemberIdTestWithInvalidFormatMemberId(){
-            Assertions.fail();
+            // given
+            String invalidFormatMemberId = "invalidFormatMemberId";
+
+            // when
+            ServiceResult serviceResult = memberService.getMemberById(invalidFormatMemberId);
+
+            // then
+            Mockito.verify(mockMemberRepository, Mockito.times(0))
+                    .findByMemberId(Mockito.anyString());
+
+            Assertions.assertEquals(ServiceResult.FAIL,serviceResult.getResult());
+        }
+
+    }
+
+    @Nested
+    @DisplayName("Update 테스트")
+    class UpdateTest{
+        @Test
+        @DisplayName("`닉네임 수정` - 정상적인 요청의 경우 닉네임이 수정되어야 한다.")
+        void updateNicknameTest(){
+            // given
+            String originalNickname = "originalNickname";
+            String nicknameToModify = "nicknameModified";
+            String memberId = RandomUUIDGenerator.generate();
+
+            Mockito.when(mockMemberRepository.findByMemberId(memberId))
+                    .thenReturn(Member.builder().memberId(memberId).name(originalNickname).build());
+
+            Mockito.when(mockMemberRepository.save(Mockito.any(Member.class)))
+                    .thenReturn(null);
+
+            // when
+            ServiceResult serviceResult = memberService.modifyMemberNickname(memberId, nicknameToModify);
+
+            // then
+            Assertions.assertEquals(ServiceResult.SUCCESS, serviceResult.getResult());
+        }
+
+        @Test
+        @DisplayName("`닉네임 수정` - 수정하고자 하는 닉네임과 현재 사용중인 닉네임인 경우 별도로 수정하지 않는다.")
+        void modifyNicknameTestWithSameNickname(){
+            // given
+            String originalNickname = "originalNickname";
+            String nicknameToModify = originalNickname;
+            String memberId = RandomUUIDGenerator.generate();
+
+            Mockito.when(mockMemberRepository.findByMemberId(memberId))
+                    .thenReturn(Member.builder().memberId(memberId).name(originalNickname).build());
+
+            Mockito.when(mockMemberRepository.save(Mockito.any(Member.class)))
+                    .thenReturn(null);
+
+            // when
+            ServiceResult serviceResult = memberService.modifyMemberNickname(memberId, nicknameToModify);
+            log.info("{}",serviceResult.getMessage());
+
+            // then
+            Mockito.verify(mockMemberRepository, Mockito.times(1))
+                    .findByMemberId(Mockito.anyString());
+
+            Mockito.verify(mockMemberRepository, Mockito.times(0))
+                    .save(Mockito.any(Member.class));
+
+            Assertions.assertEquals(ServiceResult.FAIL, serviceResult.getResult());
+        }
+
+        @Test
+        @DisplayName("`닉네임 수정` - 수정하고자 하는 닉네임이 허용되지 않는 형식인 경우 수정되지 않아야 한다.")
+        void modifyNicknameTestWithInvalidNicknameFormat(){
+            // given
+            String originalNickname = "originalNickname";
+            String nicknameToModify = "1invalidFormatNickname";
+            String memberId = RandomUUIDGenerator.generate();
+
+            Mockito.when(mockMemberRepository.findByMemberId(memberId))
+                    .thenReturn(Member.builder().memberId(memberId).name(originalNickname).build());
+
+            Mockito.when(mockMemberRepository.save(Mockito.any(Member.class)))
+                    .thenReturn(null);
+
+            // when
+            ServiceResult serviceResult = memberService.modifyMemberNickname(memberId, nicknameToModify);
+            log.info("{}",serviceResult.getMessage());
+
+            // then
+            Mockito.verify(mockMemberRepository, Mockito.times(1))
+                    .findByMemberId(Mockito.anyString());
+
+            Mockito.verify(mockMemberRepository, Mockito.times(0))
+                    .save(Mockito.any(Member.class));
+
+            Assertions.assertEquals(ServiceResult.FAIL, serviceResult.getResult());
+        }
+    }
+
+    @Nested
+    @DisplayName("Delete 테스트")
+    class DeleteTest{
+        @Test
+        @DisplayName("`memberId`로 멤버 삭제 - 정상적인 요청의 경우 멤버를 삭제한다.")
+        void deleteMemberTest(){
+            // given
+            String memberId = RandomUUIDGenerator.generate();
+            Mockito.when(mockMemberRepository.findByMemberId(memberId))
+                    .thenReturn(Member.builder().memberId(memberId).build());
+
+            //interactionRepository.deleteByInteractionMemberMemberId(memberId)
+
+//            Mockito.doNothing()
+//                    .when(mockInteractionRepository).deleteByInteractionMemberMemberId(Mockito.anyString());
+
+
+            // when
+            ServiceResult serviceResult = memberService.deleteMemberByMemberId(memberId);
+            log.info("{}",serviceResult.getMessage());
+
+            // then
+            Mockito.verify(mockMemberRepository, Mockito.times(1)).deleteByMemberId(Mockito.anyString());
+            Mockito.verify(mockFeedRepository, Mockito.times(1)).findAllByOwnerMemberId(Mockito.anyString());
+            Assertions.assertEquals(ServiceResult.SUCCESS, serviceResult.getResult());
+
+        }
+
+        @Test
+        @DisplayName("`memberId`로 멤버 삭제 - 요청하는 `memberId`가 존재하지 않는 멤버인 경우 서비스 결과가 실패를 리턴해야 한다.")
+        void deleteMemberTestWithNotExistsMemberId(){
+            // given
+            Mockito.doNothing()
+                    .when(mockMemberRepository).deleteByMemberId(Mockito.anyString());
+            Mockito.when(mockMemberRepository.findByMemberId(Mockito.anyString()))
+                    .thenReturn(null);
+
+            String memberId = RandomUUIDGenerator.generate();
+
+            // when
+            ServiceResult serviceResult = memberService.deleteMemberByMemberId(memberId);
+            log.info("{}",serviceResult.getMessage());
+
+            // then
+            Mockito.verify(mockMemberRepository, Mockito.times(0)).deleteByMemberId(Mockito.anyString());
+            Assertions.assertEquals(ServiceResult.FAIL, serviceResult.getResult());
+        }
+
+        @Test
+        @DisplayName("`memberId`로 멤버 삭제 - 요청에 `memberId`가 누락된 경우 서비스 결과가 실패를 리턴해야 한다.")
+        void deleteMemberTestWithNullMemberId(){
+            // given
+            Mockito.doNothing()
+                    .when(mockMemberRepository).deleteByMemberId(Mockito.anyString());
+
+            String nullMemberId = null;
+
+            // when
+            ServiceResult serviceResult = memberService.deleteMemberByMemberId(nullMemberId);
+            log.info("{}",serviceResult.getMessage());
+
+            // then
+            Mockito.verify(mockMemberRepository, Mockito.times(0)).deleteByMemberId(Mockito.anyString());
+            Assertions.assertEquals(ServiceResult.FAIL, serviceResult.getResult());
+        }
+
+        @Test
+        @DisplayName("`memberId`로 멤버 삭제 " +
+                "- 요청하는 `memberId`의 형태가 유효하지 않은 경우 서비스 결과가 실패를 리턴해야 한다.")
+        void deleteMemberTestWithInvalidMemberIdFormat(){
+            // given
+            Mockito.doNothing()
+                    .when(mockMemberRepository).deleteByMemberId(Mockito.anyString());
+
+            String invalidMemberIdFormat = "invalidMemberIdFormat";
+
+            // when
+            ServiceResult serviceResult = memberService.deleteMemberByMemberId(invalidMemberIdFormat);
+            log.info("{}",serviceResult.getMessage());
+
+            // then
+            Mockito.verify(mockMemberRepository, Mockito.times(0)).deleteByMemberId(Mockito.anyString());
+            Assertions.assertEquals(ServiceResult.FAIL, serviceResult.getResult());
         }
 
 
 
 
-    }
-
-    @Nested
-    class UpdateTest{
-
-    }
-
-    @Nested
-    class DeleteTest{
 
     }
 

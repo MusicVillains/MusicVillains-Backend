@@ -13,6 +13,7 @@ import com.teamseven.MusicVillain.Utils.RandomUUIDGenerator;
 import com.teamseven.MusicVillain.Dto.Converter.DtoConverter;
 import com.teamseven.MusicVillain.Dto.Converter.DtoConverterFactory;
 import com.teamseven.MusicVillain.Dto.MemberDto;
+import com.teamseven.MusicVillain.Utils.Utility;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -74,6 +75,8 @@ public class MemberService {
         // Parameter null check
         if(memberId == null) return ServiceResult.fail("Member id is null");
 
+        // check it's valid id format
+        if(!Utility.isValidUUID(memberId)) return ServiceResult.fail("Invalid member id format");
 
         DataTransferObject nullableDto =
                 dtoConverter.convertToDto(memberRepository.findByMemberId(memberId));
@@ -151,10 +154,17 @@ public class MemberService {
         // check if Member exists in DB
         if (nullableMember == null) return ServiceResult.fail("Member not found");
 
+        // check if it's valid nickname format
+        if(!this.isValidUserIdPattern(nickname)){
+            return ServiceResult.fail("Invalid nickname format");
+        }
+
         // check if nickname(to modify) is same with current nickname
         if(nullableMember.getName().equals(nickname)){
             return ServiceResult.fail("Nickname is same with current nickname");
         }
+
+
 
         nullableMember.setName(nickname);
         memberRepository.save(nullableMember);
@@ -177,6 +187,9 @@ public class MemberService {
         // Parameter null check
         if(memberId == null)
             return ServiceResult.fail("Member id is null");
+
+        if(!Utility.isValidUUID(memberId))
+            return ServiceResult.fail("Invalid member id format");
 
         // Check Member Exist in DB
         if(!isExistMember(memberId)){
