@@ -93,9 +93,10 @@ public class MemberController {
 
     @Hidden
     @PostMapping("/members")
-    public ResponseObject insertMember(@RequestBody MemberCreationRequestBody memberCreationRequestBody){
+    public ResponseObject insertMember(@RequestBody MemberCreationRequestBody reqbody){
         log.debug("insertMember() called - @PostMapping(\"/members\")");
-        ServiceResult result = memberService.insertMember(memberCreationRequestBody);
+        ServiceResult result = memberService.insertMember
+                (reqbody.userId, reqbody.userInfo, reqbody.name, reqbody.email);
         return result.isFailed() ? ResponseObject.CREATION_FAIL(result.getData())
                 : ResponseObject.CREATED(result.getData());
     }

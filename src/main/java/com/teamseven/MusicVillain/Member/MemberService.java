@@ -13,6 +13,7 @@ import com.teamseven.MusicVillain.Utils.RandomUUIDGenerator;
 import com.teamseven.MusicVillain.Dto.Converter.DtoConverter;
 import com.teamseven.MusicVillain.Dto.Converter.DtoConverterFactory;
 import com.teamseven.MusicVillain.Dto.MemberDto;
+import com.teamseven.MusicVillain.Utils.Utility;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -74,6 +75,8 @@ public class MemberService {
         // Parameter null check
         if(memberId == null) return ServiceResult.fail("Member id is null");
 
+        // check it's valid id format
+        if(!Utility.isValidUUID(memberId)) return ServiceResult.fail("Invalid member id format");
 
         DataTransferObject nullableDto =
                 dtoConverter.convertToDto(memberRepository.findByMemberId(memberId));
@@ -93,29 +96,30 @@ public class MemberService {
      * @param memberCreationRequestBody 새 멤버 생성에 필요한 데이터
      * @return ServiceResult 객체. 생성된 멤버의 ID 또는 실패 메시지를 포함.
      */
-    public ServiceResult insertMember(MemberCreationRequestBody memberCreationRequestBody){
-        // 이미 존재하는 멤버인지 확인
-        if(memberRepository.findByUserId(memberCreationRequestBody.getUserId()) != null){
-            return ServiceResult.fail("Member already exists");
-        }
+    public ServiceResult insertMember(String userId, String userInfo, String name, String email){
 
         // memberRequestDto 필드 값중 하나라도 null인 것이 있는지 확인
-        if(memberCreationRequestBody.hasNullField()){
+        if(userId == null || userInfo == null || name == null || email == null){
             return ServiceResult.fail("Member field is null");
         }
 
+        // 이미 존재하는 멤버인지 확인
+        if(memberRepository.findByUserId(userId) != null){
+            return ServiceResult.fail("Member already exists");
+        }
+
         // 사용자 아이디에 특수문자가 들어가거나 숫자로 시작하는지 검사
-        if (!isValidUserIdPattern(memberCreationRequestBody.getUserId())) {
+        if (!isValidUserIdPattern(userId)) {
             return ServiceResult.fail("Invalid user id pattern");
         }
         String generatedMemberId = RandomUUIDGenerator.generate();
         // 새로운 멤버 생성
         Member member = Member.builder()
                 .memberId(generatedMemberId)
-                .userId(memberCreationRequestBody.getUserId())
-                .userInfo(bCryptPasswordEncoder.encode(memberCreationRequestBody.getUserInfo()))
-                .name(memberCreationRequestBody.getName())
-                .email(memberCreationRequestBody.getEmail())
+                .userId(userId)
+                .userInfo(bCryptPasswordEncoder.encode(userInfo))
+                .name(name)
+                .email(email)
                 .providerType("LOCAL")
                 .role("USER")
                 .createdAt(LocalDateTime.now())
@@ -125,7 +129,7 @@ public class MemberService {
         System.out.println(member);
 
         memberRepository.save(member);
-        return ServiceResult.success(generatedMemberId);
+        return ServiceResult.success(member);
 
     }
 
@@ -150,10 +154,17 @@ public class MemberService {
         // check if Member exists in DB
         if (nullableMember == null) return ServiceResult.fail("Member not found");
 
+        // check if it's valid nickname format
+        if(!this.isValidUserIdPattern(nickname)){
+            return ServiceResult.fail("Invalid nickname format");
+        }
+
         // check if nickname(to modify) is same with current nickname
         if(nullableMember.getName().equals(nickname)){
             return ServiceResult.fail("Nickname is same with current nickname");
         }
+
+
 
         nullableMember.setName(nickname);
         memberRepository.save(nullableMember);
@@ -176,6 +187,9 @@ public class MemberService {
         // Parameter null check
         if(memberId == null)
             return ServiceResult.fail("Member id is null");
+
+        if(!Utility.isValidUUID(memberId))
+            return ServiceResult.fail("Invalid member id format");
 
         // Check Member Exist in DB
         if(!isExistMember(memberId)){
