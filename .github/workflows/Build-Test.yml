@@ -24,4 +24,4 @@ jobs:
     - name: Build with Gradle without using action
       run: |
         ./gradlew copyApplicationYml
-        ./gradlew bootJar    
+        ./gradlew build    
