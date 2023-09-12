@@ -1,0 +1,28 @@
+name: Run Tests
+
+on:
+  push:
+    branches-ignore:
+      - main
+      - develop
+  
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout source code
+      uses: actions/checkout@v3
+      with:
+          submodules: true
+          token: ${{ secrets.ACTION_KEY }}
+          
+    - name: Install JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Build with Gradle without using action
+      run: |
+        ./gradlew copyApplicationYml
+        ./gradlew test    
