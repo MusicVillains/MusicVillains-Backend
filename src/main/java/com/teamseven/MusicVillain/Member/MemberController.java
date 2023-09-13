@@ -55,8 +55,12 @@ public class MemberController {
             })
     public ResponseObject members(){
         log.debug("members() called - @GetMapping(\"/members\")");
-        List<DataTransferObject> resultDtoList = memberService.getAllMembers();
-        return ResponseObject.OK(resultDtoList);
+        ServiceResult serviceResult = memberService.getAllMembers();
+
+        return serviceResult.isSuccessful()
+                ? ResponseObject.OK(serviceResult.getData())
+                : ResponseObject.BAD_REQUEST();
+
     }
 
     /**
