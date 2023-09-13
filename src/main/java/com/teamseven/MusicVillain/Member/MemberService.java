@@ -55,11 +55,13 @@ public class MemberService {
      *
      * @return 멤버 정보 리스트
      */
-    public List<DataTransferObject> getAllMembers(){
+    public ServiceResult getAllMembers(){
 
         List<DataTransferObject> dtoList =
                 dtoConverter.convertToDtoList(memberRepository.findAll());
-        return dtoList;
+
+        return ServiceResult.of(ServiceResult.SUCCESS,"Success",dtoList);
+
     }
 
     /**
@@ -129,7 +131,11 @@ public class MemberService {
         System.out.println(member);
 
         memberRepository.save(member);
-        return ServiceResult.success(member);
+
+        DataTransferObject dto = dtoConverter.convertToDto(member);
+
+
+        return ServiceResult.success(dto);
 
     }
 
