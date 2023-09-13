@@ -4,12 +4,15 @@ import com.teamseven.MusicVillain.Dto.ResponseBody.ResponseObject;
 import com.teamseven.MusicVillain.Dto.ResponseBody.Status;
 import com.teamseven.MusicVillain.Dto.ServiceResult;
 import com.teamseven.MusicVillain.Security.JWT.JwtManager;
+import com.teamseven.MusicVillain.Utils.ENV;
 import io.swagger.v3.oas.annotations.Hidden;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.view.RedirectView;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Hidden
@@ -43,6 +46,17 @@ public class OAuthController {
         return this.kakaoLogin(body);
     }
 
+    /* TODO: just for test */
+    @GetMapping("/kakaoLoginPage")
+    public RedirectView kakaoLoginPage(){
+        RedirectView redirectView = new RedirectView();
+        // return code;
+        redirectView.setUrl("https://kauth.kakao.com/oauth/authorize?response_type=code&" +
+                "client_id=" + ENV.KAKAO_CLIENT_ID +
+                "&redirect_uri=http://localhost:8080/oauth2/kakao/callback");
+        return redirectView;
+    }
+
     /* TODO: Test needed */
     @PostMapping("/oauth2/kakao/login")
     public ResponseObject kakaoLogin(@RequestBody KakaoOAuthLoginRequestBody kakaoOAuthLoginRequestBody){
@@ -62,7 +76,12 @@ public class OAuthController {
                 Status.AUTHENTICATION_FAIL.getMessage());
 
         // get ServiceResult's data and casting to Map
-        Map serviceResultData = (Map)kakaoOauthLoginResult.getData();
+        HashMap serviceResultData = (HashMap)kakaoOauthLoginResult.getData();
+
+        LoginSuccessResponseBody loginSuccessResponseBody = new LoginSuccessResponseBody();
+        loginSuccessResponseBody.memberId = serviceResultData.get("memberId").toString();
+        loginSuccessResponseBody.accessToken = serviceResultData.get("accessToken").toString();
+        loginSuccessResponseBody.refreshToken = serviceResultData.get("refreshToken").toString();
 
         /* Not use header
 
@@ -85,7 +104,7 @@ public class OAuthController {
 
         return ResponseObject.of(Status.OK,
                  kakaoOauthLoginResult.getMessage(),
-                serviceResultData);
+                loginSuccessResponseBody);
     }
 
     @PostMapping("/oauth2/kakao/logout")
