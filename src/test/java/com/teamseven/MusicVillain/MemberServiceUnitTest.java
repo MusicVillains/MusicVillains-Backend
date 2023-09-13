@@ -1,7 +1,5 @@
 package com.teamseven.MusicVillain;
 
-
-import com.sun.source.tree.ModuleTree;
 import com.teamseven.MusicVillain.Dto.DataTransferObject;
 import com.teamseven.MusicVillain.Dto.MemberDto;
 import com.teamseven.MusicVillain.Dto.ServiceResult;
@@ -24,6 +22,7 @@ import java.util.List;
 
 @SpringBootTest
 @DisplayName("MemberService 단위 테스트")
+@TestClassOrder(ClassOrderer.OrderAnnotation.class)
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 @Slf4j
 public class MemberServiceUnitTest {
@@ -50,6 +49,7 @@ public class MemberServiceUnitTest {
 
 
     @Nested
+    @Order(1)
     @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     @DisplayName("Create 테스트")
@@ -82,7 +82,7 @@ public class MemberServiceUnitTest {
             ServiceResult serviceResult = memberService.insertMember(mockUserId, mockUserInfo, mockName, mockEmail);
 
             //then
-            Member createdMember = (Member)serviceResult.getData();
+            MemberDto createdMember = (MemberDto)serviceResult.getData();
 
             log.info("[expect / actual]\n" +
                     "- Mockito.verify(mockBCryptPasswordEncoder..).encode(..): " + "1" + " / " + Mockito.mockingDetails(mockBCryptPasswordEncoder).getInvocations().size() + "\n" +
@@ -210,6 +210,7 @@ public class MemberServiceUnitTest {
     }
 
     @Nested
+    @Order(2)
     @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     @DisplayName("Read 테스트")
@@ -241,7 +242,8 @@ public class MemberServiceUnitTest {
             // given
 
             // when
-            List<DataTransferObject> dataTransferObjectList = memberService.getAllMembers();
+            List<DataTransferObject> dataTransferObjectList
+                    = (List<DataTransferObject>)memberService.getAllMembers().getData();
 
             // then
             Mockito.verify(mockMemberRepository, Mockito.times(1)).findAll();
@@ -352,6 +354,7 @@ public class MemberServiceUnitTest {
     }
 
     @Nested
+    @Order(3)
     @DisplayName("Update 테스트")
     class UpdateTest{
         @Test
@@ -433,6 +436,7 @@ public class MemberServiceUnitTest {
     }
 
     @Nested
+    @Order(4)
     @DisplayName("Delete 테스트")
     class DeleteTest{
         @Test
