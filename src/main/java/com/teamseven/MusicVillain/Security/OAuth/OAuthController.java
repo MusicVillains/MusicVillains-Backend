@@ -43,11 +43,27 @@ public class OAuthController {
         KakaoOAuthLoginRequestBody body = new KakaoOAuthLoginRequestBody();
         body.code = code;
 
-        return this.kakaoLogin(body);
+        ServiceResult kakaoOauthLoginResult = oAuthService.kakaoOauthLogin_TestOnly(body.code);
+
+        if(kakaoOauthLoginResult.isFailed()) return ResponseObject.onlyData(
+                Status.AUTHENTICATION_FAIL,
+                kakaoOauthLoginResult.getMessage());
+
+        HashMap serviceResultData = (HashMap)kakaoOauthLoginResult.getData();
+
+        LoginSuccessResponseBody loginSuccessResponseBody = new LoginSuccessResponseBody();
+        loginSuccessResponseBody.memberId = serviceResultData.get("memberId").toString();
+        loginSuccessResponseBody.tokenType = serviceResultData.get("tokenType").toString();
+        loginSuccessResponseBody.accessToken = serviceResultData.get("accessToken").toString();
+        loginSuccessResponseBody.refreshToken = serviceResultData.get("refreshToken").toString();
+
+        return ResponseObject.of(Status.OK,
+                kakaoOauthLoginResult.getMessage(),
+                loginSuccessResponseBody);
     }
 
     /* TODO: just for test */
-    @GetMapping("/kakaoLoginPage")
+    @GetMapping("/kakaoLoginTest")
     public RedirectView kakaoLoginPage(){
         RedirectView redirectView = new RedirectView();
         // return code;
@@ -80,6 +96,7 @@ public class OAuthController {
 
         LoginSuccessResponseBody loginSuccessResponseBody = new LoginSuccessResponseBody();
         loginSuccessResponseBody.memberId = serviceResultData.get("memberId").toString();
+        loginSuccessResponseBody.tokenType = serviceResultData.get("tokenType").toString();
         loginSuccessResponseBody.accessToken = serviceResultData.get("accessToken").toString();
         loginSuccessResponseBody.refreshToken = serviceResultData.get("refreshToken").toString();
 
