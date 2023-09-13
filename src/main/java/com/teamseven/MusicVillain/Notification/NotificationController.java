@@ -70,8 +70,9 @@ public class NotificationController {
         if(notificationId == null) return ResponseObject.BAD_REQUEST("notificationId is null");
 
         Notification notification = notificaitonRepository.findByNotificationId(notificationId);
+        if(notification == null) return ResponseObject.BAD_REQUEST("notification not found");
         AuthorizationResult authResult = memberAuthManager.authorize(headers, notification.getOwner().memberId);
-        
+
         if(authResult.isFailed()){
             return ResponseObject.of(Status.UNAUTHORIZED, authResult.getMessage());
         }

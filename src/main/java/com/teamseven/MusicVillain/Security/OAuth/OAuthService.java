@@ -345,6 +345,8 @@ public class OAuthService {
 
         /* Not response Member info(Token contains MemberId) */
         // serviceResultData.put("member", memberDto);
+
+        serviceResultData.put("memberId", memberDto.getMemberId()); // just for convenienc
         serviceResultData.put("tokenType", "Bearer");
         serviceResultData.put("accessToken", generatedAccessToken);
         serviceResultData.put("refreshToken", generatedRefreshToken);

@@ -13,6 +13,7 @@ import com.teamseven.MusicVillain.Utils.RandomUUIDGenerator;
 import com.teamseven.MusicVillain.Dto.Converter.DtoConverter;
 import com.teamseven.MusicVillain.Dto.Converter.DtoConverterFactory;
 import com.teamseven.MusicVillain.Dto.MemberDto;
+import com.teamseven.MusicVillain.Utils.Utility;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -54,10 +55,13 @@ public class MemberService {
      *
      * @return 멤버 정보 리스트
      */
-    public List<DataTransferObject> getAllMembers(){
+    public ServiceResult getAllMembers(){
+
         List<DataTransferObject> dtoList =
                 dtoConverter.convertToDtoList(memberRepository.findAll());
-        return dtoList;
+
+        return ServiceResult.of(ServiceResult.SUCCESS,"Success",dtoList);
+
     }
 
     /**
@@ -70,13 +74,19 @@ public class MemberService {
      * @return ServiceResult 객체. 멤버 정보 또는 실패 메시지를 포함.
      */
     public ServiceResult getMemberById(String memberId) {
+        // Parameter null check
+        if(memberId == null) return ServiceResult.fail("Member id is null");
 
-        DataTransferObject dto =
+        // check it's valid id format
+        if(!Utility.isValidUUID(memberId)) return ServiceResult.fail("Invalid member id format");
+
+        DataTransferObject nullableDto =
                 dtoConverter.convertToDto(memberRepository.findByMemberId(memberId));
 
-        if(dto == null) return ServiceResult.fail("Member not found");
+        if(nullableDto == null)
+            return ServiceResult.fail("Member not found");
 
-        return ServiceResult.success(dto);
+        return ServiceResult.success(nullableDto);
     }
 
     /**
@@ -88,29 +98,30 @@ public class MemberService {
      * @param memberCreationRequestBody 새 멤버 생성에 필요한 데이터
      * @return ServiceResult 객체. 생성된 멤버의 ID 또는 실패 메시지를 포함.
      */
-    public ServiceResult insertMember(MemberCreationRequestBody memberCreationRequestBody){
-        // 이미 존재하는 멤버인지 확인
-        if(memberRepository.findByUserId(memberCreationRequestBody.getUserId()) != null){
-            return ServiceResult.fail("Member already exists");
-        }
+    public ServiceResult insertMember(String userId, String userInfo, String name, String email){
 
         // memberRequestDto 필드 값중 하나라도 null인 것이 있는지 확인
-        if(memberCreationRequestBody.hasNullField()){
+        if(userId == null || userInfo == null || name == null || email == null){
             return ServiceResult.fail("Member field is null");
         }
 
+        // 이미 존재하는 멤버인지 확인
+        if(memberRepository.findByUserId(userId) != null){
+            return ServiceResult.fail("Member already exists");
+        }
+
         // 사용자 아이디에 특수문자가 들어가거나 숫자로 시작하는지 검사
-        if (!isValidUserIdPattern(memberCreationRequestBody.getUserId())) {
+        if (!isValidUserIdPattern(userId)) {
             return ServiceResult.fail("Invalid user id pattern");
         }
         String generatedMemberId = RandomUUIDGenerator.generate();
         // 새로운 멤버 생성
         Member member = Member.builder()
                 .memberId(generatedMemberId)
-                .userId(memberCreationRequestBody.getUserId())
-                .userInfo(bCryptPasswordEncoder.encode(memberCreationRequestBody.getUserInfo()))
-                .name(memberCreationRequestBody.getName())
-                .email(memberCreationRequestBody.getEmail())
+                .userId(userId)
+                .userInfo(bCryptPasswordEncoder.encode(userInfo))
+                .name(name)
+                .email(email)
                 .providerType("LOCAL")
                 .role("USER")
                 .createdAt(LocalDateTime.now())
@@ -120,7 +131,11 @@ public class MemberService {
         System.out.println(member);
 
         memberRepository.save(member);
-        return ServiceResult.success(generatedMemberId);
+
+        DataTransferObject dto = dtoConverter.convertToDto(member);
+
+
+        return ServiceResult.success(dto);
 
     }
 
@@ -135,10 +150,30 @@ public class MemberService {
      * @return ServiceResult 객체. 성공 또는 실패 메시지를 포함.
      */
     public ServiceResult modifyMemberNickname(String memberId, String nickname) {
-        Member member = memberRepository.findByMemberId(memberId);
-        if (member == null) return ServiceResult.fail("Member not found");
-        member.setName(nickname);
-        memberRepository.save(member);
+        // Parameter null check
+        if(memberId == null || nickname == null) {
+            return ServiceResult.fail("Bad Request, Given memberId or nickname is null");
+        }
+
+        Member nullableMember = memberRepository.findByMemberId(memberId);
+
+        // check if Member exists in DB
+        if (nullableMember == null) return ServiceResult.fail("Member not found");
+
+        // check if it's valid nickname format
+        if(!this.isValidUserIdPattern(nickname)){
+            return ServiceResult.fail("Invalid nickname format");
+        }
+
+        // check if nickname(to modify) is same with current nickname
+        if(nullableMember.getName().equals(nickname)){
+            return ServiceResult.fail("Nickname is same with current nickname");
+        }
+
+
+
+        nullableMember.setName(nickname);
+        memberRepository.save(nullableMember);
 
         return ServiceResult.success("nickname changed");
     }
@@ -155,8 +190,15 @@ public class MemberService {
      */
     @Transactional
     public ServiceResult deleteMemberByMemberId(String memberId){
-        // 멤버가 존재하는지 확인
-        if(isExistMember(memberId) == false){
+        // Parameter null check
+        if(memberId == null)
+            return ServiceResult.fail("Member id is null");
+
+        if(!Utility.isValidUUID(memberId))
+            return ServiceResult.fail("Invalid member id format");
+
+        // Check Member Exist in DB
+        if(!isExistMember(memberId)){
             log.trace("Member does not exist");
             return ServiceResult.fail("member does not exist");
         }
@@ -165,6 +207,8 @@ public class MemberService {
         interactionRepository.deleteByInteractionMemberMemberId(memberId);
 
         // 멤버가 보유한 피드를 리스트로 받아온 후 해당 피드와 피드와 관련된 인터렉션 삭제
+
+        // 멤버가 보유한 피드 리스트 받아오기
         List<Feed> memberFeedList = feedRepository.findAllByOwnerMemberId(memberId);
 
         for (Feed f : memberFeedList){

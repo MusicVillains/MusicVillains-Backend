@@ -55,8 +55,12 @@ public class MemberController {
             })
     public ResponseObject members(){
         log.debug("members() called - @GetMapping(\"/members\")");
-        List<DataTransferObject> resultDtoList = memberService.getAllMembers();
-        return ResponseObject.OK(resultDtoList);
+        ServiceResult serviceResult = memberService.getAllMembers();
+
+        return serviceResult.isSuccessful()
+                ? ResponseObject.OK(serviceResult.getData())
+                : ResponseObject.BAD_REQUEST();
+
     }
 
     /**
@@ -93,9 +97,10 @@ public class MemberController {
 
     @Hidden
     @PostMapping("/members")
-    public ResponseObject insertMember(@RequestBody MemberCreationRequestBody memberCreationRequestBody){
+    public ResponseObject insertMember(@RequestBody MemberCreationRequestBody reqbody){
         log.debug("insertMember() called - @PostMapping(\"/members\")");
-        ServiceResult result = memberService.insertMember(memberCreationRequestBody);
+        ServiceResult result = memberService.insertMember
+                (reqbody.userId, reqbody.userInfo, reqbody.name, reqbody.email);
         return result.isFailed() ? ResponseObject.CREATION_FAIL(result.getData())
                 : ResponseObject.CREATED(result.getData());
     }

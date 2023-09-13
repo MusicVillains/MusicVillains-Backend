@@ -8,9 +8,19 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.regex.Pattern;
 
 public class Utility {
 
+    public static boolean isValidUUID(String uuidStrWithoutHyphen){
+        if(uuidStrWithoutHyphen == null) return false;
+
+        // 입력 문자열이 null이거나 32자리가 아니면 false
+        String uuidPattern = "^[0-9a-fA-F]{32}$";
+
+        // 입력 문자열이 UUID 패턴과 일치하는지 확인
+        return Pattern.matches(uuidPattern, uuidStrWithoutHyphen);
+    }
     public byte[] AudioCutter(MultipartFile audioFile, int startTime, int endTime) throws IOException {
         try {
             AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(audioFile.getInputStream());
