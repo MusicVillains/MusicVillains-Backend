@@ -109,7 +109,8 @@ public class FeedService {
      * @return ServiceResult 객체. 성공시 생성된 피드 ID를 포함.
      * @throws IOException 파일 처리 중 발생할 수 있는 예외
      */
-    public ServiceResult insertFeed( String ownerId, String feedType, String feedDescription, int recordDuration, MultipartFile recordFile,
+   @Transactional
+    public ServiceResult insertFeed(String ownerId, String feedType, String feedDescription, int recordDuration, MultipartFile recordFile,
                                     String musicName, String musicianName
     ) throws IOException {
         log.debug("insertFeed() called");
@@ -180,6 +181,79 @@ public class FeedService {
     }
 
     /**
+     * 피드를 수정합니다.<br>
+     * 수정할 피드의 식별자를 제외한 모든 매개변수는 null일 수 있습니다.<br>
+     * null인 매개변수는 수정되지 않습니다.<br>
+     * @author Woody K
+     * @since JDK 17
+     * @param feedId 수정할 피드의 식별자
+     * @param feedType 수정할 피드 타입
+     * @param feedDescription 수정할 피드 설명
+     * @param recordDuration 수정할 레코드 시간
+     * @param recordFile 수정할 레코드 파일
+     * @param musicName 수정할 음원 이름
+     * @param musicianName 수정할 음악가 이름
+     * @return ServiceResult<br><b>* 성공</b> - 수정된 피드 정보 반환<br><b>* 실패</b> - 실패 메시지 반환
+     */
+    @Transactional
+    public ServiceResult modifyFeed(String feedId, String feedType, String feedDescription,
+                                    String musicName, String musicianName, MultipartFile recordFile){
+        log.debug("modifyFeed() called");
+
+        // feedId null check
+        if(feedId == null){
+            log.debug("[!] modifyFeed() failed: feedId is null");
+            log.debug("─> [FeedService] Exit modifyFeed() with exception");
+            return ServiceResult.fail("feedId is null");
+        }
+
+        // feedId로 Feed 찾기
+        Feed nullableFeed = feedRepository.findByFeedId(feedId);
+
+        // feedId로 Feed가 존재하는지 확인
+        if(nullableFeed == null){
+            log.debug("[!] modifyFeed() failed: Feed Not Found");
+            log.debug("─> [FeedService] Exit modifyFeed() with exception");
+            return ServiceResult.fail("Feed Not Found");
+        }
+
+        // null이 아닌 매개변수만 수정
+        if(feedType != null && !feedType.isEmpty()) nullableFeed.setFeedType(feedType);
+        if(feedDescription != null && !feedDescription.isEmpty()) nullableFeed.setDescription(feedDescription);
+        if(musicName != null && !musicName.isEmpty()) nullableFeed.setMusicName(musicName);
+        if(musicianName != null && !musicianName.isEmpty()) nullableFeed.setMusicianName(musicianName);
+
+        // recordFile이 null이 아닌 경우에만 수정
+        if(recordFile != null && !recordFile.isEmpty()){
+            log.info("recordFile is not null");
+            Record feedRecord = nullableFeed.getRecord();
+            if(feedRecord == null){
+                log.debug("[!] modifyFeed() failed: Original Record Not Found");
+                log.debug("─> [FeedService] Exit modifyFeed() with exception");
+                return ServiceResult.fail("Original Record Not Found");
+            }
+            try {
+                // 기존 Record 갱신
+                feedRecord.setRecordRawData(recordFile.getBytes());
+                feedRecord.setRecordFileSize(recordFile.getBytes().length);
+                feedRecord.setRecordFileType(recordFile.getContentType());
+                recordRepository.save(feedRecord);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        else {
+            log.info("recordFile is null, not modified");
+
+        }
+
+        feedRepository.save(nullableFeed);
+
+        return ServiceResult.success(
+                feedDtoDtoConverter.convertToDto(nullableFeed));
+    }
+
+    /**
      * 지정된 멤버 ID의 모든 피드를 반환합니다.
      *
      * @author Woody K
@@ -203,7 +277,6 @@ public class FeedService {
      * @param feedType 조회할 피드의 타입
      * @return ServiceResult 객체. 성공시 해당 타입의 모든 FeedDto 객체의 리스트를 포함.
      */
-    /* WARN: test needed */
     public ServiceResult getAllFeedsByFeedType(String feedType){
         if (feedType == null){
             return ServiceResult.fail("feedType is null");
