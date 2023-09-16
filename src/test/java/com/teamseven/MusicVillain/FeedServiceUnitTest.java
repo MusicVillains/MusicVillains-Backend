@@ -694,4 +694,58 @@ public class FeedServiceUnitTest {
 
         }
     }
+
+    @Nested
+    @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    @DisplayName("기타 테스트")
+    class AdditionalTest {
+        @Nested
+        @DisplayName("checkIsValidMemberId")
+        class CheckIsValidMemberId {
+            @Test
+            @DisplayName("유효한 멤버 식별자인 경우 true를 반환한다.")
+            void checkIsValidMemberIdTest() {
+                // given
+                String mockMemberId = RandomUUIDGenerator.generate();
+                Mockito.when(mockMemberRepository.findByMemberId(mockMemberId)).thenReturn(Member.builder().memberId(mockMemberId).build());
+
+                // when
+                boolean result = mockFeedService.checkIsValidMemberId(mockMemberId);
+
+                // then
+                Mockito.verify(mockMemberRepository, Mockito.times(1)).findByMemberId(mockMemberId);
+                Assertions.assertTrue(result);
+            }
+
+            @Test
+            @DisplayName("존재하지 않는 멤버 식별자인 경우 false를 반환한다.")
+            void checkIsValidMemberIdTestWithNotExistsMemberId() {
+                // given
+                String mockMemberId = RandomUUIDGenerator.generate();
+                Mockito.when(mockMemberRepository.findByMemberId(mockMemberId)).thenReturn(null);
+
+                // when
+                boolean result = mockFeedService.checkIsValidMemberId(mockMemberId);
+
+                // then
+                Mockito.verify(mockMemberRepository, Mockito.times(1)).findByMemberId(mockMemberId);
+                Assertions.assertFalse(result);
+            }
+
+            @Test
+            @DisplayName("멤버 식별자가 누락된 경우 false를 반환한다.")
+            void checkIsValidMemberIdTestWithMemberIdNull() {
+                // given
+                String mockMemberId = null;
+
+                // when
+                boolean result = mockFeedService.checkIsValidMemberId(mockMemberId);
+
+                // then
+                Mockito.verify(mockMemberRepository, Mockito.times(0)).findByMemberId(mockMemberId);
+                Assertions.assertFalse(result);
+            }
+        }
+    }
 }
