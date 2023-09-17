@@ -93,7 +93,7 @@ public class FeedController {
     }
 
     /**
-     * 피드 생성 | POST | /feeds?ownerId={ownerId}&musicName={musicName}&musicianName={musicianName}&feedType={feedType}&description={description}&recordDuration={recordDuration}&recordFile={recordFile}
+     * 피드 생성 | POST | /feeds
      * @apiNote 피드를 생성합니다.
      *
      * @author Woody K
@@ -143,6 +143,51 @@ public class FeedController {
         if (result.isFailed()) return ResponseObject.CREATION_FAIL(result.getData());
         log.trace("─> [FeedController] createFeed() finished");
         return ResponseObject.CREATED(result.getData());
+    }
+
+    /**
+     * 피드 내용 수정 | PUT | /feeds<br>
+     * @apiNote 피드 내용을 수정합니다.<br>
+     * - 수정하고자 하는 필드와 수정하려는 값(value)를 `form-data` 형태로 요청합니다.<br>
+     * - 피드 식별자(`feedId`)를 제외한 나머지 필드는 모두 선택적으로 수정할 수 있습니다.<br>
+     * - 수정하지 않는 필드의 경우 생략하여 `null`로 요청합니다.
+     * @see FeedService#modifyFeed(String, String, String, String, String, MultipartFile)
+     * @author Woody K
+     * @since JDK 17
+     * @param feedId 피드 식별자(수정 대상)
+     * @param feedType 수정하려는 피드 타입
+     * @param feedDescription 수정하려는 피드 설명
+     * @param musicName 수정하려는 음원명
+     * @param musicianName 수정하려는 가수명
+     * @param recordFile 수정하려는 파일 데이터
+     * @param headers JWT 토큰을 포함한 헤더
+     * @return [성공] 수정된 피드 정보 반환<br>[실패] 실패 메시지 반환
+     */
+    @PutMapping("/feeds")
+    public ResponseObject modifyFeed(@RequestParam(name = "feedId", required = true) String feedId,
+                                     @RequestParam(name = "feedType", required = false) String feedType,
+                                     @RequestParam(name = "description", required = false) String feedDescription,
+                                     @RequestParam(name = "musicName", required = false) String musicName,
+                                     @RequestParam(name = "musicianName", required = false) String musicianName,
+                                     @RequestParam(name = "recordFile",  required = false) MultipartFile recordFile,
+                                     @RequestHeader HttpHeaders headers){
+
+        AuthorizationResult authResult = feedAuthManager.authorize(headers, feedId);
+        if(authResult.isFailed())
+            return ResponseObject.UNAUTHORIZED(authResult.getMessage());
+
+        log.info("feedType: {}", feedType);
+        if(recordFile != null) {
+            log.info("recordFile.getSize(): {}", recordFile.getSize());
+            log.info("recordFile.getName(): {}", recordFile.getName());
+            log.info("recordFile.isEmpty(): {}", recordFile.isEmpty());
+        }
+
+        ServiceResult result = feedService.
+                modifyFeed(feedId, feedType, feedDescription, musicName, musicianName, recordFile);
+
+        return result.isFailed() ? ResponseObject.BAD_REQUEST(result.getData())
+                : ResponseObject.OK(result.getData());
     }
 
     /**
