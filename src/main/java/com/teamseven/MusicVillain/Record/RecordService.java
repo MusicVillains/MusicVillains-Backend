@@ -1,16 +1,13 @@
 package com.teamseven.MusicVillain.Record;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
 @Service
+@RequiredArgsConstructor
 public class RecordService {
     private final RecordRepository recordRepository;
-
-    @Autowired
-    public RecordService(RecordRepository recordRepository){
-        this.recordRepository = recordRepository;
-    }
 
     /**
      * 모든 Record 객체를 반환합니다.
@@ -33,6 +30,9 @@ public class RecordService {
      * @param recordId 삭제할 Record의 아이디
      */
     public void DeleteRecordByRecordId(String recordId){
+        if (recordRepository.findByRecordId(recordId) == null) {
+            throw new IllegalArgumentException("Record Not Found.");
+        }
         recordRepository.deleteByRecordId(recordId);
     }
 }
