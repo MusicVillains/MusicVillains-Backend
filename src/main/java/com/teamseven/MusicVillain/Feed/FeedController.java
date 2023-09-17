@@ -24,7 +24,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-@Hidden
 @Slf4j
 @RestController
 @Tag(name = "피드 관련 API")
