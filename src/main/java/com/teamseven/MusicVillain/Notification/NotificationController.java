@@ -6,6 +6,7 @@ import com.teamseven.MusicVillain.Dto.ServiceResult;
 import com.teamseven.MusicVillain.Security.JWT.AuthorizationResult;
 import com.teamseven.MusicVillain.Security.JWT.MemberJwtAuthorizationManager;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,6 +14,7 @@ import org.springframework.http.HttpHeaders;
 
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "알림 관련 API")
 public class NotificationController {
     private final NotificationService notificationService;
     private final MemberJwtAuthorizationManager memberAuthManager;

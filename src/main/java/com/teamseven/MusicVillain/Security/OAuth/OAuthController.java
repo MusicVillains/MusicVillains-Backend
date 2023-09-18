@@ -6,6 +6,7 @@ import com.teamseven.MusicVillain.Dto.ServiceResult;
 import com.teamseven.MusicVillain.Security.JWT.JwtManager;
 import com.teamseven.MusicVillain.Utils.ENV;
 import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -15,8 +16,8 @@ import org.springframework.web.servlet.view.RedirectView;
 import java.util.HashMap;
 import java.util.Map;
 
-@Hidden
 @RestController
+@Tag(name = "간편 로그인 API", description = "간편 로그인 관련 API 입니다.")
 @Slf4j
 public class OAuthController {
 
@@ -34,6 +35,7 @@ public class OAuthController {
             * after test, need to change Kakao's redirect URI in com.teamseven.MusicVillain.Security.OAuth.OAuthService
          - see:
             * kakao developer's setting: https://developers.kakao.com*/
+    @Hidden
     @GetMapping("/oauth2/kakao/callback")
     public Object catchKakaoAuthenticationCodeCallBack(@RequestParam("code") String code){
         log.trace("> Enter catchKakaoAuthenticationCodeCallBack()");
@@ -63,6 +65,7 @@ public class OAuthController {
     }
 
     /* TODO: just for test */
+    @Hidden
     @GetMapping("/kakaoLoginTest")
     public RedirectView kakaoLoginPage(){
         RedirectView redirectView = new RedirectView();

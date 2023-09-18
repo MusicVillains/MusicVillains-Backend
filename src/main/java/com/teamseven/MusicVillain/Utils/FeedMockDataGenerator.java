@@ -1,6 +1,7 @@
 package com.teamseven.MusicVillain.Utils;
 
 import com.teamseven.MusicVillain.Feed.FeedService;
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -63,6 +64,7 @@ public class FeedMockDataGenerator {
 
 }
 
+@Hidden
 @RestController
 class TestController{
 
