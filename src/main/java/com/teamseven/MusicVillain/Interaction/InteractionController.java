@@ -6,17 +6,16 @@ import com.teamseven.MusicVillain.Dto.ServiceResult;
 import com.teamseven.MusicVillain.Dto.ResponseBody.Status;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 @RestController
+@RequiredArgsConstructor
+@Tag(name = "인터렉션 관련 API")
 public class InteractionController {
-
+    
     private final InteractionService interactionService;
-
-    @Autowired
-    public InteractionController(InteractionService interactionService) {
-        this.interactionService = interactionService;
-    }
 
     /**
      * 상호작용 생성 | POST | /interactions
