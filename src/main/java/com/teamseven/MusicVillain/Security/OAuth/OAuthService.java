@@ -41,7 +41,7 @@ public class OAuthService {
     private final JwtTokenRepository jwtTokenRepository;
 
     /* Kakao REST API reference: https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api */
-    public ServiceResult getKakaoAccessTokenByKakaoAuthorizationCode(String kakaoAuthorizationCode) {
+    public ServiceResult getKakaoAccessTokenByKakaoAuthorizationCode(String kakaoAuthorizationCode, String redirectUri) {
         log.trace("> Enter getKakaoAccessTokenByKakaoAuthorizationCode()\n"+
                 "\t-with kakaoAuthorizationCode: {}",kakaoAuthorizationCode);
 
@@ -68,7 +68,7 @@ public class OAuthService {
             StringBuilder sb = new StringBuilder();
             sb.append("grant_type=authorization_code");
             sb.append("&client_id=" + ENV.KAKAO_CLIENT_ID); // client_id = REST API Key
-            sb.append("&redirect_uri=http://localhost:3000/kakaoredirect"); // 인가코드를 받은 redirect URI
+            sb.append("&redirect_uri=" + redirectUri); // 인가코드를 받은 redirect URI
             sb.append("&code=" + kakaoAuthorizationCode);
             bw.write(sb.toString());
             bw.flush();
@@ -321,14 +321,15 @@ public class OAuthService {
     }
 
     /* WARN: test needed */
-    public ServiceResult kakaoOauthLogin(String kakaoAuthorizationCode){
+    public ServiceResult kakaoOauthLogin(String kakaoAuthorizationCode, String redirectUri){
         log.trace("> Enter KakaoOauthLogin()\n"
                 +"\t-with kakaoAuthorizationCode: {}", kakaoAuthorizationCode);
 
         log.trace("kakaoOauthLogin -> get kakaoAccessToken using kakaoAuthorizationCode");
         // get kakaoAccessToken using kakaoAuthorizationCode
         ServiceResult accessTokenServiceResult
-                = this.getKakaoAccessTokenByKakaoAuthorizationCode(kakaoAuthorizationCode);
+                = this.getKakaoAccessTokenByKakaoAuthorizationCode
+                (kakaoAuthorizationCode,redirectUri);
 
         // check if kakaoMemberIdServiceResult is failed
         if (accessTokenServiceResult.isFailed()){

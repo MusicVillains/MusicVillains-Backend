@@ -4,7 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface NotificaitonRepository extends JpaRepository<Notification, String> {
+public interface NotificationRepository extends JpaRepository<Notification, String> {
 
     List<Notification> findAll();;
     Notification findByNotificationId(String notificationId);

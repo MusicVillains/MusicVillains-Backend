@@ -4,23 +4,17 @@ import com.teamseven.MusicVillain.Dto.NotificationDto;
 import com.teamseven.MusicVillain.Dto.ServiceResult;
 import com.teamseven.MusicVillain.Member.Member;
 import com.teamseven.MusicVillain.Member.MemberRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class NotificationService {
 
     private final MemberRepository memberRepository;
-    private final NotificaitonRepository notificaitonRepository;
-
-    @Autowired
-    public NotificationService(NotificaitonRepository notificaitonRepository,
-                               MemberRepository memberRepository){
-        this.notificaitonRepository = notificaitonRepository;
-        this.memberRepository = memberRepository;
-    }
+    private final NotificationRepository notificationRepository;
 
     /**
      * 특정 회원의 모든 알림을 가져옵니다.
@@ -34,7 +28,8 @@ public class NotificationService {
     public ServiceResult getNotificaitonsByOwnerMemberID(String memberId){
         Member tmpMember =memberRepository.findByMemberId(memberId);
         if (tmpMember == null) return ServiceResult.fail("Member not found");
-        List<Notification> notifications = notificaitonRepository.findByOwnerMemberId(memberId);
+        List<Notification> notifications = notificationRepository.findByOwnerMemberId(memberId);
+        if (notifications == null || notifications.isEmpty()) return ServiceResult.fail("Notification not found");
         return ServiceResult.success( NotificationDto.toDtoList(notifications));
     }
 
@@ -48,13 +43,13 @@ public class NotificationService {
      * @return ServiceResult 객체. 성공 또는 실패 메시지를 포함.
      */
     public ServiceResult readNotification(String notificationId){
-        Notification tmpNotification = notificaitonRepository.findByNotificationId(notificationId);
+        Notification tmpNotification = notificationRepository.findByNotificationId(notificationId);
         if (tmpNotification == null) return ServiceResult.fail("Notification not found");
         if (tmpNotification.ownerRead.equals(Notification.NOTIFICATION_READ))
             return ServiceResult.fail("Notification already read");
 
         tmpNotification.ownerRead = Notification.NOTIFICATION_READ;
-        notificaitonRepository.save(tmpNotification);
+        notificationRepository.save(tmpNotification);
         return ServiceResult.success("Notification read successfully");
     }
 }

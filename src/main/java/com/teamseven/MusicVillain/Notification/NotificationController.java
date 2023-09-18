@@ -5,20 +5,18 @@ import com.teamseven.MusicVillain.Dto.ResponseBody.Status;
 import com.teamseven.MusicVillain.Dto.ServiceResult;
 import com.teamseven.MusicVillain.Security.JWT.AuthorizationResult;
 import com.teamseven.MusicVillain.Security.JWT.MemberJwtAuthorizationManager;
-import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.http.HttpHeaders;
 
-@Hidden
 @RestController
 @RequiredArgsConstructor
 public class NotificationController {
     private final NotificationService notificationService;
     private final MemberJwtAuthorizationManager memberAuthManager;
-    private final NotificaitonRepository notificaitonRepository;
+    private final NotificationRepository notificationRepository;
 
 
     /**
@@ -69,7 +67,7 @@ public class NotificationController {
         /* TODO: Refactoring later */
         if(notificationId == null) return ResponseObject.BAD_REQUEST("notificationId is null");
 
-        Notification notification = notificaitonRepository.findByNotificationId(notificationId);
+        Notification notification = notificationRepository.findByNotificationId(notificationId);
         if(notification == null) return ResponseObject.BAD_REQUEST("notification not found");
         AuthorizationResult authResult = memberAuthManager.authorize(headers, notification.getOwner().memberId);
 

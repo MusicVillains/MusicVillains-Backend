@@ -6,7 +6,7 @@ import com.teamseven.MusicVillain.Dto.RequestBody.InteractionCreationRequestBody
 import com.teamseven.MusicVillain.Member.Member;
 import com.teamseven.MusicVillain.Member.MemberRepository;
 import com.teamseven.MusicVillain.Dto.ServiceResult;
-import com.teamseven.MusicVillain.Notification.NotificaitonRepository;
+import com.teamseven.MusicVillain.Notification.NotificationRepository;
 import com.teamseven.MusicVillain.Notification.Notification;
 import com.teamseven.MusicVillain.Utils.RandomUUIDGenerator;
 import jakarta.transaction.Transactional;
@@ -24,18 +24,18 @@ public class InteractionService {
     private final InteractionRepository interactionRepository;
     private final MemberRepository memberRepository;
     private final FeedRepository feedRepository;
-    private final NotificaitonRepository notificaitonRepository;
+    private final NotificationRepository notificationRepository;
 
 
     @Autowired
     public InteractionService(InteractionRepository interactionRepository,
                               MemberRepository memberRepository, FeedRepository feedRepository,
-                              NotificaitonRepository notificaitonRepository){
+                              NotificationRepository notificationRepository){
 
         this.interactionRepository = interactionRepository;
         this.memberRepository = memberRepository;
         this.feedRepository = feedRepository;
-        this.notificaitonRepository = notificaitonRepository;
+        this.notificationRepository = notificationRepository;
     }
 
 
@@ -63,8 +63,6 @@ public class InteractionService {
      */
     @Transactional
     public ServiceResult insertInteraction(InteractionCreationRequestBody interactionCreationRequestBody){
-        // feed 테이블의 interaction_count도 증가시켜줘야함
-
         Member tmpMember = memberRepository.findByMemberId(interactionCreationRequestBody.getMemberId());
         Feed tmpFeed = feedRepository.findByFeedId(interactionCreationRequestBody.getFeedId());
         // 해당하는 멤버나 피드가 존재하는지 체크
@@ -94,13 +92,13 @@ public class InteractionService {
                             .ownerRead(Notification.NOTIFICATION_UNREAD)
                             .createdAt(LocalDateTime.now())
                             .build();
-            notificaitonRepository.save(tmpNotification);
+            notificationRepository.save(tmpNotification);
 
             return ServiceResult.of(ServiceResult.SUCCESS, "Interaction created", generatedInteractionId);
         }
         else {
             // 관련 notificaiton 삭제
-            notificaitonRepository.deleteByInteraction(checkInteraction);
+            notificationRepository.deleteByInteraction(checkInteraction);
             // 인터렉션 삭제하여 좋아요 취소로 동작하도록 함.
             // 좋아요 취소로 동작
             interactionRepository.delete(checkInteraction);
@@ -118,11 +116,9 @@ public class InteractionService {
      */
     @Transactional
     public void deleteInteractionByInteractionId(String interactionId){
+        if (interactionId == null) return;
         Interaction targetInteraction = interactionRepository.findByInteractionId(interactionId);
-
-        // 해당 feed 의 interactionCount 를 1 감소시켜줌
-        Feed tmpFeed = feedRepository.findByFeedId(targetInteraction.getInteractionFeed().getFeedId());
-        feedRepository.save(tmpFeed);
+        if (targetInteraction == null) return;
 
         interactionRepository.deleteByInteractionId(interactionId);
     }
@@ -139,15 +135,17 @@ public class InteractionService {
     public void deleteInteractionByMemberId(String memberId){
         // deleteByInteractionMemberMemberId 로 한번에 삭제해버리면 안됨.
         // 각 인터렉션 아이디 얻어온 후, 인터렉션 아이디 하나 하나 삭제해주면서 해당 피드의 interactionCount 1 감소시켜줘야함
-
+        if (memberId == null) return;
+        Member tmpMember = memberRepository.findByMemberId(memberId);
+        if (tmpMember == null) return;
         List<Interaction> interactions = interactionRepository.findAll(); // 모든 Interaction 엔티티 가져오기
+        if (interactions == null) return;
         List<String> interactionIdListToDelete = interactions.stream()
                 .filter(interaction -> interaction.getInteractionMember().getMemberId().equals(memberId)) // memberId에 해당하는 Interaction 필터링
                 .map(Interaction::getInteractionId) // Interaction의 interaction_id 추출
                 .collect(Collectors.toList()); // 리스트에 추가
-
         for (String interactionId : interactionIdListToDelete) {
-           this.deleteInteractionByInteractionId(interactionId);
+            this.deleteInteractionByInteractionId(interactionId);
         }
 
     }
@@ -162,13 +160,15 @@ public class InteractionService {
      */
     @Transactional
     public void deleteInterationsByFeedId(String feedId) {
+        if (feedId == null) return;
+        Feed tmpFeed = feedRepository.findByFeedId(feedId);
+        if (tmpFeed == null) return;
         List<Interaction> interactionList = interactionRepository.findByInteractionFeedFeedId(feedId);
-
+        if (interactionList == null || interactionList.size()==0) return;
         //  notification 삭제
         for(Interaction i: interactionList){
-            notificaitonRepository.deleteByInteraction(i);
+            notificationRepository.deleteByInteraction(i);
         }
-
         // interaction 삭제
         interactionRepository.deleteByInteractionFeedFeedId(feedId);
 
@@ -184,7 +184,10 @@ public class InteractionService {
      * @return ServiceResult 객체. 성공시 피드에 연관된 인터랙션의 개수를 포함.
      */
     public ServiceResult getInteractionCountByFeedId(String feedId) {
-
+        if (feedId == null)
+            return ServiceResult.fail("Feed ID is null");
+        if (feedRepository.findByFeedId(feedId) == null)
+            return ServiceResult.fail("Feed not found");
         return ServiceResult.success(interactionRepository.countByInteractionFeedFeedId(feedId));
     }
 }

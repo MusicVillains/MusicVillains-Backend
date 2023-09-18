@@ -175,7 +175,7 @@ public class MemberService {
         nullableMember.setName(nickname);
         memberRepository.save(nullableMember);
 
-        return ServiceResult.success("nickname changed");
+        return ServiceResult.success("Nickname changed successfully");
     }
 
     /**

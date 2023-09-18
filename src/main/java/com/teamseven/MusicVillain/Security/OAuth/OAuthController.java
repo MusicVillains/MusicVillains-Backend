@@ -84,7 +84,8 @@ public class OAuthController {
                     "Kakao authorization code is null", null);
         }
 
-        ServiceResult kakaoOauthLoginResult = oAuthService.kakaoOauthLogin(kakaoOAuthLoginRequestBody.code);
+        ServiceResult kakaoOauthLoginResult = oAuthService.kakaoOauthLogin(kakaoOAuthLoginRequestBody.code,
+                kakaoOAuthLoginRequestBody.redirectUri);
 
         // if failed to login
         if(kakaoOauthLoginResult.isFailed()) return ResponseObject.onlyData(
