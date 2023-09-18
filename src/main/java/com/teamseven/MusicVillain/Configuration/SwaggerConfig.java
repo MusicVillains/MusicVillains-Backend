@@ -1,20 +1,15 @@
 package com.teamseven.MusicVillain.Configuration;
 
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
 import java.util.Arrays;
 
-//@OpenAPIDefinition(
-//        info = @Info(title = "MusicVillains API",
-//                description = "refrence for MusicVillains API",
-//                version = "v1"))
 @Configuration
 public class SwaggerConfig {
 
@@ -25,6 +20,7 @@ public class SwaggerConfig {
                 .version("v1")
                 .title("MusicVillains API")
                 .description("refrence for MusicVillains API");
+
 
         // SecuritySecheme 이름
         String jwtSchemeName = "Access Token(JWT)";
@@ -41,6 +37,12 @@ public class SwaggerConfig {
                         .bearerFormat("JWT")); // 토큰 형식을 지정하는 임의의 문자(Optional)
 
         return new OpenAPI()
+                .servers(Arrays.asList(
+                        new Server().url("https://musicvillains.run.goorm.io/")
+                                .description("Production Server"),
+                        new Server().url("http://localhost:8080")
+                                .description("Local Server")
+                ))
                 .info(info)
                 .addSecurityItem(securityRequirement)
                 .components(components);
