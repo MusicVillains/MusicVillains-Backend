@@ -169,29 +169,54 @@ public class MemberServiceTest {
         }
 
 
+//        @Test
+//        @Order(2)
+//        @DisplayName("회원 닉네임 수정 - 유효한 닉네임")
+//        void memberNicknameModifyTestWithValidToken() {
+//
+//            String originalNickname = testMember.getName();
+//            log.info("originalNickname: {}", originalNickname);
+//            String nicknameToModify = originalNickname+"Modified";
+//            log.info("nicknameToModify: {}", nicknameToModify);
+//
+//            // when
+//            ServiceResult serviceResult = memberService.modifyMemberNickname(testMember.getMemberId(), nicknameToModify);
+//
+//            // then
+//            Assertions.assertEquals(ServiceResult.SUCCESS, serviceResult.getResult());
+//            Assertions.assertEquals(nicknameToModify,
+//                    memberRepository.findByMemberId(testMember.getMemberId()).getName());
+//
+//            log.info("\n" +
+//                    "\t* expected: {}\n" +
+//                    "\t* actual: {}", nicknameToModify ,memberRepository.findByMemberId(testMember.getMemberId()).getName());
+//
+//
+//        }
+
         @Test
         @Order(2)
         @DisplayName("회원 닉네임 수정 - 유효한 닉네임")
+        @Transactional
         void memberNicknameModifyTestWithValidToken() {
-
+            // Given
             String originalNickname = testMember.getName();
             log.info("originalNickname: {}", originalNickname);
-            String nicknameToModify = originalNickname+"Modified";
+            String nicknameToModify = originalNickname + "Modified";
             log.info("nicknameToModify: {}", nicknameToModify);
 
-            // when
+            // When
             ServiceResult serviceResult = memberService.modifyMemberNickname(testMember.getMemberId(), nicknameToModify);
 
-            // then
+            // Then
             Assertions.assertEquals(ServiceResult.SUCCESS, serviceResult.getResult());
-            Assertions.assertEquals(nicknameToModify,
-                    memberRepository.findByMemberId(testMember.getMemberId()).getName());
-
+            Member updatedMember = memberRepository.findByMemberId(testMember.getMemberId());
+            Assertions.assertNotNull(updatedMember, "Updated member should not be null");
+            Assertions.assertEquals(nicknameToModify, updatedMember.getName(), "Nicknames should match");
+            Assertions.assertEquals("Nickname changed successfully", serviceResult.getData(), "Success message should match");
             log.info("\n" +
                     "\t* expected: {}\n" +
                     "\t* actual: {}", nicknameToModify ,memberRepository.findByMemberId(testMember.getMemberId()).getName());
-
-
         }
         /////////////////////////// 회원정보 수정 테스트 ///////////////////////////
 
