@@ -6,7 +6,7 @@ import com.teamseven.MusicVillain.Dto.RequestBody.InteractionCreationRequestBody
 import com.teamseven.MusicVillain.Member.Member;
 import com.teamseven.MusicVillain.Member.MemberRepository;
 import com.teamseven.MusicVillain.Dto.ServiceResult;
-import com.teamseven.MusicVillain.Notification.NotificaitonRepository;
+import com.teamseven.MusicVillain.Notification.NotificationRepository;
 import com.teamseven.MusicVillain.Notification.Notification;
 import com.teamseven.MusicVillain.Utils.RandomUUIDGenerator;
 import jakarta.transaction.Transactional;
@@ -24,18 +24,18 @@ public class InteractionService {
     private final InteractionRepository interactionRepository;
     private final MemberRepository memberRepository;
     private final FeedRepository feedRepository;
-    private final NotificaitonRepository notificaitonRepository;
+    private final NotificationRepository notificationRepository;
 
 
     @Autowired
     public InteractionService(InteractionRepository interactionRepository,
                               MemberRepository memberRepository, FeedRepository feedRepository,
-                              NotificaitonRepository notificaitonRepository){
+                              NotificationRepository notificationRepository){
 
         this.interactionRepository = interactionRepository;
         this.memberRepository = memberRepository;
         this.feedRepository = feedRepository;
-        this.notificaitonRepository = notificaitonRepository;
+        this.notificationRepository = notificationRepository;
     }
 
 
@@ -92,13 +92,13 @@ public class InteractionService {
                             .ownerRead(Notification.NOTIFICATION_UNREAD)
                             .createdAt(LocalDateTime.now())
                             .build();
-            notificaitonRepository.save(tmpNotification);
+            notificationRepository.save(tmpNotification);
 
             return ServiceResult.of(ServiceResult.SUCCESS, "Interaction created", generatedInteractionId);
         }
         else {
             // 관련 notificaiton 삭제
-            notificaitonRepository.deleteByInteraction(checkInteraction);
+            notificationRepository.deleteByInteraction(checkInteraction);
             // 인터렉션 삭제하여 좋아요 취소로 동작하도록 함.
             // 좋아요 취소로 동작
             interactionRepository.delete(checkInteraction);
@@ -167,7 +167,7 @@ public class InteractionService {
         if (interactionList == null || interactionList.size()==0) return;
         //  notification 삭제
         for(Interaction i: interactionList){
-            notificaitonRepository.deleteByInteraction(i);
+            notificationRepository.deleteByInteraction(i);
         }
         // interaction 삭제
         interactionRepository.deleteByInteractionFeedFeedId(feedId);

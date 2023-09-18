@@ -8,7 +8,7 @@ import com.teamseven.MusicVillain.Interaction.InteractionService;
 import com.teamseven.MusicVillain.Member.Member;
 import com.teamseven.MusicVillain.Member.MemberRepository;
 import com.teamseven.MusicVillain.Member.MemberService;
-import com.teamseven.MusicVillain.Notification.NotificaitonRepository;
+import com.teamseven.MusicVillain.Notification.NotificationRepository;
 import com.teamseven.MusicVillain.Notification.Notification;
 import com.teamseven.MusicVillain.Record.Record;
 import com.teamseven.MusicVillain.Record.RecordService;
@@ -27,19 +27,19 @@ public class DatabaseViewContorller {
     private final FeedRepository feedRepository;
     private final RecordService recordService;
     private final InteractionService interactionService;
-    private final NotificaitonRepository notificaitonRepository;
+    private final NotificationRepository notificationRepository;
 
     @Autowired
     public DatabaseViewContorller(MemberService memberService, FeedService feedService,
                                   RecordService recordService, InteractionService interactionService,
-                                  FeedRepository feedRepository, NotificaitonRepository notificaitonRepository,
+                                  FeedRepository feedRepository, NotificationRepository notificationRepository,
                                   MemberRepository memberRepository) {
         this.memberService = memberService;
         this.feedService = feedService;
         this.recordService = recordService;
         this.interactionService = interactionService;
         this.feedRepository = feedRepository;
-        this.notificaitonRepository = notificaitonRepository;
+        this.notificationRepository = notificationRepository;
         this.memberRepository = memberRepository;
 
     }
@@ -73,7 +73,7 @@ public class DatabaseViewContorller {
     }
     @GetMapping("/view/notifications")
     public String notificationsView(Model model){
-        List<Notification> notificationList = notificaitonRepository.findAll();
+        List<Notification> notificationList = notificationRepository.findAll();
         model.addAttribute("notificationList", notificationList);
         return "notification_view";
     }
