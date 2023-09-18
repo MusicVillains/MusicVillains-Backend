@@ -11,10 +11,12 @@ import com.teamseven.MusicVillain.Member.Member;
 import com.teamseven.MusicVillain.Dto.DtoTest;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -112,7 +114,7 @@ public class FeedController {
      *         [실패] 실패 메시지 반환
      * @throws IOException 파일 입출력 예외
      */
-    @PostMapping("/feeds")
+    @PostMapping(value = "/feeds", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "피드 생성", description = "새로운 피드를 생성합니다.")
     public ResponseObject createFeed(
             // MultipartFile 받으려면 @RequestParam 사용해야하므로 다음과 같이 form-data로 받도록 함.
@@ -122,7 +124,11 @@ public class FeedController {
             @RequestParam("feedType") String feedType,
             @RequestParam("description") String feedDescription,
             @RequestParam("recordDuration") int recordDuration,
-            @RequestParam("recordFile") MultipartFile recordFile,
+//            @RequestParam("recordFile") MultipartFile recordFile,
+            @Parameter(
+                    description = "음원 파일(`MultiPartFile`)",
+                    content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE)
+            ) @RequestPart("recordFile") MultipartFile recordFile,
             @RequestHeader HttpHeaders headers) throws IOException {
 
         log.trace("─> [FeedController] createFeed() called");
@@ -163,13 +169,26 @@ public class FeedController {
      * @param headers JWT 토큰을 포함한 헤더
      * @return [성공] 수정된 피드 정보 반환<br>[실패] 실패 메시지 반환
      */
-    @PutMapping("/feeds")
+    @Operation(summary = "피드 수정", description =
+            "<b>Requirements</b><br>" +
+            "- `Authorization Header`에 수정하려는 피드에 대해 권한을 가진 `Access Token(JWT)`을 포함합니다.<br>"+
+            "<br>" +
+            "<b>피드 내용을 수정합니다.</b><br>" +
+            "- 수정하고자 하는 필드와 수정하려는 값(value)를 `form-data` 형태로 요청합니다.<br>" +
+            "- 피드 식별자(`feedId`)를 제외한 나머지 필드는 모두 선택적으로 수정할 수 있습니다.<br>" +
+            "- 수정하지 않는 필드의 경우 생략하여 `null`로 요청합니다.")
+    @PutMapping(value = "/feeds", consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseObject modifyFeed(@RequestParam(name = "feedId", required = true) String feedId,
                                      @RequestParam(name = "feedType", required = false) String feedType,
                                      @RequestParam(name = "description", required = false) String feedDescription,
                                      @RequestParam(name = "musicName", required = false) String musicName,
                                      @RequestParam(name = "musicianName", required = false) String musicianName,
-                                     @RequestParam(name = "recordFile",  required = false) MultipartFile recordFile,
+//                                     @RequestParam(name = "recordFile",  required = false) MultipartFile recordFile,
+                                     @Parameter(
+                                             description = "음원 파일(MultiPartFile)",
+                                             content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE)
+                                     ) @RequestPart("recordFile") MultipartFile recordFile,
                                      @RequestHeader HttpHeaders headers){
 
         AuthorizationResult authResult = feedAuthManager.authorize(headers, feedId);
