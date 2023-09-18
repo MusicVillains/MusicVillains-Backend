@@ -128,14 +128,20 @@ public class NotificationServiceUnitTest {
                 Notification mockNotification = Notification.builder().notificationId(notificationId).ownerRead(Notification.NOTIFICATION_UNREAD).build();
 
                 Mockito.when(mockNotificationRepository.findByNotificationId(notificationId)).thenReturn(mockNotification);
+                Mockito.when(mockNotificationRepository.save(Mockito.any(Notification.class)))
+                        .thenAnswer(invocation -> invocation.getArgument(0));
 
                 // when
                 var result = mockNotificationService.readNotification(notificationId);
+                System.out.println("Result: " + result);  // 로깅
 
                 // then
+                Mockito.verify(mockNotificationRepository, Mockito.times(1)).save(mockNotification);
+
+                Assertions.assertNotNull(result, "Result should not be null");
                 Assertions.assertEquals(ServiceResult.SUCCESS, result.getResult());
                 Assertions.assertEquals(Notification.NOTIFICATION_READ, mockNotification.ownerRead);
-                Assertions.assertEquals("Notification read successfully", result.getMessage());
+                Assertions.assertEquals("Notification read successfully", result.getData());
             }
 
             @Test
@@ -143,7 +149,6 @@ public class NotificationServiceUnitTest {
             void readNotificationTestWithNotExistsNotificationId(){
                 // given
                 String notificationId = RandomUUIDGenerator.generate();
-                Notification mockNotification = Notification.builder().notificationId(notificationId).ownerRead(Notification.NOTIFICATION_UNREAD).build();
 
                 Mockito.when(mockNotificationRepository.findByNotificationId(notificationId)).thenReturn(null);
 
