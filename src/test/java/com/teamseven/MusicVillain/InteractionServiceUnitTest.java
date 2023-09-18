@@ -9,7 +9,7 @@ import com.teamseven.MusicVillain.Interaction.InteractionRepository;
 import com.teamseven.MusicVillain.Interaction.InteractionService;
 import com.teamseven.MusicVillain.Member.Member;
 import com.teamseven.MusicVillain.Member.MemberRepository;
-import com.teamseven.MusicVillain.Notification.NotificaitonRepository;
+import com.teamseven.MusicVillain.Notification.NotificationRepository;
 import com.teamseven.MusicVillain.Notification.Notification;
 import com.teamseven.MusicVillain.Utils.RandomUUIDGenerator;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +41,7 @@ public class InteractionServiceUnitTest {
     FeedRepository mockFeedRepository;
 
     @Mock
-    NotificaitonRepository mockNotificaitonRepository;
+    NotificationRepository mockNotificationRepository;
 
     @InjectMocks
     InteractionService mockInteractionService;
@@ -82,7 +82,7 @@ public class InteractionServiceUnitTest {
                         .ownerRead(Notification.NOTIFICATION_UNREAD)
                         .createdAt(LocalDateTime.now())
                         .build();
-                Mockito.when(mockNotificaitonRepository.save(mockNotification)).thenReturn(mockNotification);
+                Mockito.when(mockNotificationRepository.save(mockNotification)).thenReturn(mockNotification);
 
                 // when
                 ServiceResult serviceResult = mockInteractionService.insertInteraction(mockInteractionCreationRequestBody);
@@ -97,7 +97,7 @@ public class InteractionServiceUnitTest {
                 Assertions.assertEquals(mockMember, capturedInteraction.getInteractionMember());
 
                 ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
-                Mockito.verify(mockNotificaitonRepository, Mockito.times(1)).save(notificationCaptor.capture());
+                Mockito.verify(mockNotificationRepository, Mockito.times(1)).save(notificationCaptor.capture());
                 Notification capturedNotification = notificationCaptor.getValue();
                 Assertions.assertEquals(mockFeed.getOwner(), capturedNotification.getOwner());
                 Assertions.assertEquals(Notification.NOTIFICATION_UNREAD, capturedNotification.getOwnerRead());
@@ -133,7 +133,7 @@ public class InteractionServiceUnitTest {
                 Assertions.assertEquals(mockFeed, capturedInteraction.getInteractionFeed());
                 Assertions.assertEquals(mockMember, capturedInteraction.getInteractionMember());
 
-                Mockito.verify(mockNotificaitonRepository, Mockito.times(1)).deleteByInteraction(capturedInteraction);
+                Mockito.verify(mockNotificationRepository, Mockito.times(1)).deleteByInteraction(capturedInteraction);
 
                 Assertions.assertEquals(ServiceResult.SUCCESS, serviceResult.getResult());
                 Assertions.assertEquals("Interaction deleted", serviceResult.getMessage());
@@ -160,7 +160,7 @@ public class InteractionServiceUnitTest {
                 // then
                 Mockito.verify(mockInteractionRepository, Mockito.times(0)).findByInteractionMemberAndInteractionFeed(mockMember, mockFeed);
                 Mockito.verify(mockInteractionRepository, Mockito.times(0)).save(Mockito.any(Interaction.class));
-                Mockito.verify(mockNotificaitonRepository, Mockito.times(0)).save(Mockito.any(Notification.class));
+                Mockito.verify(mockNotificationRepository, Mockito.times(0)).save(Mockito.any(Notification.class));
 
                 Assertions.assertEquals(ServiceResult.FAIL, serviceResult.getResult());
                 Assertions.assertEquals("Member or Feed not found", serviceResult.getMessage());
@@ -419,9 +419,9 @@ public class InteractionServiceUnitTest {
 
                 // then
                 Mockito.verify(mockInteractionRepository, Mockito.times(1)).findByInteractionFeedFeedId(mockFeedId);
-                Mockito.verify(mockNotificaitonRepository, Mockito.times(1)).deleteByInteraction(mockInteractionList.get(0));
-                Mockito.verify(mockNotificaitonRepository, Mockito.times(1)).deleteByInteraction(mockInteractionList.get(1));
-                Mockito.verify(mockNotificaitonRepository, Mockito.times(1)).deleteByInteraction(mockInteractionList.get(2));
+                Mockito.verify(mockNotificationRepository, Mockito.times(1)).deleteByInteraction(mockInteractionList.get(0));
+                Mockito.verify(mockNotificationRepository, Mockito.times(1)).deleteByInteraction(mockInteractionList.get(1));
+                Mockito.verify(mockNotificationRepository, Mockito.times(1)).deleteByInteraction(mockInteractionList.get(2));
                 Mockito.verify(mockInteractionRepository, Mockito.times(1)).deleteByInteractionFeedFeedId(mockFeedId);
             }
 
@@ -438,7 +438,7 @@ public class InteractionServiceUnitTest {
 
                 // then
                 Mockito.verify(mockInteractionRepository, Mockito.times(0)).findByInteractionFeedFeedId(mockFeedId);
-                Mockito.verify(mockNotificaitonRepository, Mockito.times(0)).deleteByInteraction(Mockito.any(Interaction.class));
+                Mockito.verify(mockNotificationRepository, Mockito.times(0)).deleteByInteraction(Mockito.any(Interaction.class));
                 Mockito.verify(mockInteractionRepository, Mockito.times(0)).deleteByInteractionFeedFeedId(mockFeedId);
             }
 
@@ -457,7 +457,7 @@ public class InteractionServiceUnitTest {
 
                 // then
                 Mockito.verify(mockInteractionRepository, Mockito.times(1)).findByInteractionFeedFeedId(mockFeedId);
-                Mockito.verify(mockNotificaitonRepository, Mockito.times(0)).deleteByInteraction(Mockito.any(Interaction.class));
+                Mockito.verify(mockNotificationRepository, Mockito.times(0)).deleteByInteraction(Mockito.any(Interaction.class));
                 Mockito.verify(mockInteractionRepository, Mockito.times(0)).deleteByInteractionFeedFeedId(mockFeedId);
             }
 
@@ -472,7 +472,7 @@ public class InteractionServiceUnitTest {
 
                 // then
                 Mockito.verify(mockInteractionRepository, Mockito.times(0)).findByInteractionFeedFeedId(mockFeedId);
-                Mockito.verify(mockNotificaitonRepository, Mockito.times(0)).deleteByInteraction(Mockito.any(Interaction.class));
+                Mockito.verify(mockNotificationRepository, Mockito.times(0)).deleteByInteraction(Mockito.any(Interaction.class));
                 Mockito.verify(mockInteractionRepository, Mockito.times(0)).deleteByInteractionFeedFeedId(mockFeedId);
             }
         }

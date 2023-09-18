@@ -8,7 +8,7 @@ import com.teamseven.MusicVillain.Interaction.InteractionRepository;
 import com.teamseven.MusicVillain.Interaction.InteractionService;
 import com.teamseven.MusicVillain.Member.Member;
 import com.teamseven.MusicVillain.Member.MemberRepository;
-import com.teamseven.MusicVillain.Notification.NotificaitonRepository;
+import com.teamseven.MusicVillain.Notification.NotificationRepository;
 import com.teamseven.MusicVillain.Record.RecordRepository;
 import com.teamseven.MusicVillain.Dto.ResponseBody.RecordResponseBody;
 import com.teamseven.MusicVillain.Dto.ResponseBody.Status;
@@ -33,18 +33,18 @@ public class FeedService {
     private final InteractionRepository interactionRepository;
     private final RecordRepository recordRepository;
     private final MemberRepository memberRepository;
-    private final NotificaitonRepository notificaitonRepository;
+    private final NotificationRepository notificationRepository;
     private final InteractionService interactionService;
 
     @Autowired
     public FeedService(FeedRepository feedRepository, RecordRepository recordRepository,
                        MemberRepository memberRepository, InteractionRepository interactionRepository,
-                       NotificaitonRepository notificaitonRepository, InteractionService interactionService) {
+                       NotificationRepository notificationRepository, InteractionService interactionService) {
         this.feedRepository = feedRepository;
         this.recordRepository = recordRepository;
         this.memberRepository = memberRepository;
         this.interactionRepository = interactionRepository;
-        this.notificaitonRepository = notificaitonRepository;
+        this.notificationRepository = notificationRepository;
         this.interactionService = interactionService;
     }
 
