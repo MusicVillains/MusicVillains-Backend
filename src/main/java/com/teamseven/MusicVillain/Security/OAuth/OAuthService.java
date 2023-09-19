@@ -596,7 +596,12 @@ public class OAuthService {
     /* TODO: need to clean up */
     /* WARN: 현재 try catch 구문에서 리턴이 안되서, 토큰이 만료 되었음에도 불구하고 unlink를 진행하는 문제가 있음 */
     // authorization: 로그아웃 시도하는 사용자의 Access Token
-    public ServiceResult kakaoOauthLogout(String authorization){
+    public ServiceResult kakaoOauthLogout(String memberId
+//            ,String authorization
+    ){
+        /* ──────────────────────────────────────────────────────────────────────── */
+        /* WARN: 프론트엔드 요청으로 일시적으로 인가처리 비활성화, Token Refresh가 잘 안된다고 함 */
+        /*
         String accessToken = authorization.replace("Bearer ", "");
 
         // find if this token exists in DB
@@ -611,11 +616,31 @@ public class OAuthService {
         ServiceResult tokenVerfiyResult = JwtManager.verifyAccessToken(authorization);
         if (tokenVerfiyResult.isFailed()) // if failed
             return ServiceResult.fail(tokenVerfiyResult.getMessage());
+        */
+        /* ──────────────────────────────────────────────────────────────────────── */
 
-        log.trace("delete access token from DB");
+
+        /* ──────────────────────────────────────────────────────────────────────── */
+        /*  WARN: 문제 확인전까지 memberId 직접 받아서 로그아웃 처리하도록 수정 */
+        // check if it's exists Member
+        Member tmpMember = memberRepository.findByMemberId(memberId);
+
+        // if not exists, return fail
+        if(tmpMember == null){
+            return ServiceResult.fail("Member not exists");
+        }
+        /* ──────────────────────────────────────────────────────────────────────── */
+
+
 
         // if verified, do logout
-        String memberId = JWT.decode(accessToken).getClaim("memberId").asString();
+        log.trace("delete access token from DB");
+
+        /* ──────────────────────────────────────────────────────────────────────── */
+        /* WARN: 프론트엔드 요청으로 일시적으로 인가처리 비활성화, Token Refresh가 잘 안된다고 함 */
+        /* String memberId = JWT.decode(accessToken).getClaim("memberId").asString(); */
+        /* ──────────────────────────────────────────────────────────────────────── */
+
         log.trace("memberId: {}", memberId);
         // delete token from DB( delete access, refresh token of this user)
         jwtTokenRepository.deleteAllByOwnerIdAndType(memberId, JwtManager.TYPE_ACCESS_TOKEN());

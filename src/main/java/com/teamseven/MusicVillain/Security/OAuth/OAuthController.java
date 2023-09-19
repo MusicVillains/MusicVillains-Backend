@@ -129,7 +129,13 @@ public class OAuthController {
     }
 
     @PostMapping("/oauth2/kakao/logout")
-    public ResponseObject kakaoLogout(@RequestHeader HttpHeaders requestHeader){
+
+    public ResponseObject kakaoLogout(String memberId
+//                                      ,@RequestHeader HttpHeaders requestHeader
+    ){
+        /* ──────────────────────────────────────────────────────────────────────── */
+        /* WARN: 프론트엔드 요청으로 일시적으로 인가처리 비활성화, Token Refresh가 잘 안된다고 함 */
+        /*
         String authorization = JwtManager.getAuthorizationFieldFromHttpHeaders(requestHeader);
 
         log.trace(authorization);
@@ -143,8 +149,23 @@ public class OAuthController {
                 Status.AUTHENTICATION_FAIL,
                 kakaoLogoutServiceResult.getMessage());
 
+        */
+        /* ──────────────────────────────────────────────────────────────────────── */
+        // WARN: temp
+        ServiceResult kakaoLogoutServiceResult =
+                oAuthService.kakaoOauthLogout(memberId);
+
+        /* WARN: 프론트엔드 요청으로 일시적으로 인가처리 비활성화, Token Refresh가 잘 안된다고 함 */
+        /*
         return ResponseObject.onlyData(Status.OK,
                 kakaoLogoutServiceResult.getMessage());
+         */
+
+        // WARN: temp
+        return kakaoLogoutServiceResult.isSuccessful() ? ResponseObject.onlyData(Status.OK,
+                kakaoLogoutServiceResult.getMessage()) : ResponseObject.onlyData(Status.BAD_REQUEST,
+                kakaoLogoutServiceResult.getMessage());
+
     }
 
     @PostMapping("/oauth2/kakao/unlink")
