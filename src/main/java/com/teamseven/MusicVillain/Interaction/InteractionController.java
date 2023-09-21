@@ -10,6 +10,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "인터렉션 관련 API")
@@ -32,10 +36,9 @@ public class InteractionController {
     @PostMapping("/interactions")
     @Operation(summary = "상호작용 생성", description = "상호작용을 생성합니다.")
     public ResponseObject doInteraction(@RequestBody InteractionCreationRequestBody requestBody){
-
         ServiceResult result =  interactionService.insertInteraction(requestBody);
-        return result.isFailed() ? ResponseObject.BAD_REQUEST(result.getData())
-                : ResponseObject.OK(result.getData());
+        return result.isFailed() ? ResponseObject.BAD_REQUEST(result.getMessage())
+                : ResponseObject.OK(result.getMessage() + " - " + result.getData());
     }
 
     /**
