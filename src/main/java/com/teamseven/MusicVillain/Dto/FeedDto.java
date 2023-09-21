@@ -21,9 +21,11 @@ public class FeedDto implements DataTransferObject<Feed, FeedDto>{
     public String ownerId;
     public String ownerName;
     public String recordId;
+    public byte[] recordRawData;
     public String musicName;
     public String musicianName;
     public int viewCount;
+    public int interactionCount;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     LocalDateTime createdAt;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")

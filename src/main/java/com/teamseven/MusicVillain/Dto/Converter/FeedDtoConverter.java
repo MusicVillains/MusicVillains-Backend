@@ -6,7 +6,7 @@ import com.teamseven.MusicVillain.Feed.Feed;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class FeedDtoDtoConverter implements DtoConverter<Feed, FeedDto> {
+public class FeedDtoConverter implements DtoConverter<Feed, FeedDto> {
     @Override
     public FeedDto convertToDto(Feed source) {
         FeedDto feedDto = new FeedDto();
@@ -25,6 +25,12 @@ public class FeedDtoDtoConverter implements DtoConverter<Feed, FeedDto> {
         feedDto.setCreatedAt(source.getCreatedAt());
         feedDto.setUpdatedAt(source.getUpdatedAt());
         feedDto.setDescription(source.getDescription());
+        feedDto.setRecordRawData(source.getRecord().getRecordRawData());
+        if(source.getInteractionList() != null)
+            /* WARN 테스트 코드에서 Feed.getInteractionList()가 null 인 경우가 있어서 확인될 때까지 임시로 null 체크 */
+            feedDto.setInteractionCount(source.getInteractionList().size());
+            else feedDto.setInteractionCount(0);
+
         return feedDto;
     }
 

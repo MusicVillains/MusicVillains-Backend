@@ -12,7 +12,7 @@ public class DtoConverterFactory {
     public static <S, T extends DataTransferObject> DtoConverter<S, T> getConverter(Class<S> sourceClass, Class<? extends T> targetClass) {
 
         if (sourceClass == Feed.class && targetClass == FeedDto.class) {
-            return (DtoConverter<S, T>) new FeedDtoDtoConverter();
+            return (DtoConverter<S, T>) new FeedDtoConverter();
         } else if (sourceClass == Member.class && targetClass == MemberDto.class) {
             return (DtoConverter<S, T>) new MemberDtoConverter();
         } else if (sourceClass == Withdrawal.class && targetClass == WithdrawalDto.class) {
