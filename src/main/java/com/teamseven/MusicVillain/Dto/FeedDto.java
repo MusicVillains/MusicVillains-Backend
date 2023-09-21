@@ -21,6 +21,7 @@ public class FeedDto implements DataTransferObject<Feed, FeedDto>{
     public String ownerId;
     public String ownerName;
     public String recordId;
+    public byte[] recordRawData;
     public String musicName;
     public String musicianName;
     public int viewCount;
