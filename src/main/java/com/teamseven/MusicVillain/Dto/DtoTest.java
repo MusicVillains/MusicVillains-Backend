@@ -1,6 +1,6 @@
 package com.teamseven.MusicVillain.Dto;
 import com.teamseven.MusicVillain.Feed.Feed;
-import com.teamseven.MusicVillain.Dto.Converter.FeedDtoDtoConverter;
+import com.teamseven.MusicVillain.Dto.Converter.FeedDtoConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import com.teamseven.MusicVillain.Member.Member;
@@ -16,7 +16,7 @@ public class DtoTest {
     public static Feed feed;
     public static FeedDto feedDto;
     static {
-        FeedDtoDtoConverter converter = new FeedDtoDtoConverter();
+        FeedDtoConverter converter = new FeedDtoConverter();
 
         feed = new Feed();
         feed.setFeedId("feedId-Test");
@@ -40,7 +40,7 @@ public class DtoTest {
 
     @Test
     public void testFeedDto() {
-        FeedDtoDtoConverter converter = new FeedDtoDtoConverter();
+        FeedDtoConverter converter = new FeedDtoConverter();
 
         FeedDto feedDto = converter.convertToDto(feed);
         log.info(feedDto.toString());

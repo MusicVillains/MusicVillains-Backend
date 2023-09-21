@@ -6,7 +6,7 @@ import com.teamseven.MusicVillain.Feed.Feed;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class FeedDtoDtoConverter implements DtoConverter<Feed, FeedDto> {
+public class FeedDtoConverter implements DtoConverter<Feed, FeedDto> {
     @Override
     public FeedDto convertToDto(Feed source) {
         FeedDto feedDto = new FeedDto();
