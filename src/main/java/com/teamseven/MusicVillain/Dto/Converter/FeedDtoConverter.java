@@ -25,6 +25,11 @@ public class FeedDtoConverter implements DtoConverter<Feed, FeedDto> {
         feedDto.setCreatedAt(source.getCreatedAt());
         feedDto.setUpdatedAt(source.getUpdatedAt());
         feedDto.setDescription(source.getDescription());
+        if(source.getInteractionList() != null)
+            /* WARN 테스트 코드에서 Feed.getInteractionList()가 null 인 경우가 있어서 확인될 때까지 임시로 null 체크 */
+            feedDto.setInteractionCount(source.getInteractionList().size());
+            else feedDto.setInteractionCount(0);
+
         return feedDto;
     }
 
