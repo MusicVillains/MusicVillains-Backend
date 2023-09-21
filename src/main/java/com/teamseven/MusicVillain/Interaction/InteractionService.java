@@ -102,7 +102,7 @@ public class InteractionService {
             // 인터렉션 삭제하여 좋아요 취소로 동작하도록 함.
             // 좋아요 취소로 동작
             interactionRepository.delete(checkInteraction);
-            return ServiceResult.of(ServiceResult.SUCCESS, "Interaction deleted", null);
+            return ServiceResult.of(ServiceResult.SUCCESS, "Interaction deleted", checkInteraction.interactionId);
         }
     }
 
