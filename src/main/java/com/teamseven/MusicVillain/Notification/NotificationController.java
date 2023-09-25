@@ -38,11 +38,11 @@ public class NotificationController {
     // url : /notifications?memberId=memberId
     public ResponseObject getNotificationsByMemberId(@RequestParam("memberId") String memberId,
                                                      @RequestHeader HttpHeaders headers){
-//
-//        AuthorizationResult authResult = memberAuthManager.authorize(headers, memberId);
-//        if(authResult.isFailed()){
-//            return ResponseObject.of(Status.UNAUTHORIZED, authResult.getMessage());
-//        }
+
+        AuthorizationResult authResult = memberAuthManager.authorize(headers, memberId);
+        if(authResult.isFailed()){
+            return ResponseObject.of(Status.UNAUTHORIZED, authResult.getMessage());
+        }
 
         ServiceResult serviceResult = notificationService.getNotificaitonsByOwnerMemberID(memberId);
         return serviceResult.isFailed() ? ResponseObject.BAD_REQUEST(serviceResult.getData())
