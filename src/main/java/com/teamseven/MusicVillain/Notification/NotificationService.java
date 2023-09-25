@@ -1,5 +1,7 @@
 package com.teamseven.MusicVillain.Notification;
 
+import com.teamseven.MusicVillain.Dto.Converter.DtoConverter;
+import com.teamseven.MusicVillain.Dto.Converter.NotificationDtoConverter;
 import com.teamseven.MusicVillain.Dto.NotificationDto;
 import com.teamseven.MusicVillain.Dto.ServiceResult;
 import com.teamseven.MusicVillain.Member.Member;
@@ -12,7 +14,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class NotificationService {
-
+    private DtoConverter<Notification, NotificationDto> dtoConverter = new NotificationDtoConverter();
     private final MemberRepository memberRepository;
     private final NotificationRepository notificationRepository;
 
@@ -30,7 +32,8 @@ public class NotificationService {
         if (tmpMember == null) return ServiceResult.fail("Member not found");
         List<Notification> notifications = notificationRepository.findByOwnerMemberId(memberId);
         if (notifications == null || notifications.isEmpty()) return ServiceResult.fail("Notification not found");
-        return ServiceResult.success( NotificationDto.toDtoList(notifications));
+        List<NotificationDto> notificationDto = dtoConverter.convertToDtoList(notifications);
+        return ServiceResult.success(notificationDto);
     }
 
     /**
