@@ -21,18 +21,11 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Build with Gradle without using action
+    - name: Build using Gradle
       run: |
         ./gradlew copyApplicationYml
         ./gradlew bootJar
       
-    # - name: Build with Gradle
-    #   uses: gradle/gradle-build-action@v2
-    #   with:
-    #     arguments: | 
-    #       copyApplicationYml
-    #       build
-          
     - name: Upload Jars
       uses: actions/upload-artifact@v3.1.2
       with:
@@ -64,8 +57,6 @@ jobs:
     - name: Execute remote commands
       run: |
         sshpass -p ${{ secrets.SSH_KEY }} ssh -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_TARGET_IP }} "sudo fuser -k 8080/tcp || true"
-        sshpass -p ${{ secrets.SSH_KEY }} ssh -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_TARGET_IP }} "sudo nohup java -jar ~/deploy/*.jar > ~/nohup.log 2>&1 &"
+        sshpass -p ${{ secrets.SSH_KEY }} ssh -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_TARGET_IP }} "sudo nohup java -jar -Duser.timezone=Asia/Seoul ~/deploy/*.jar > ~/nohup.log 2>&1 &"
         sshpass -p ${{ secrets.SSH_KEY }} ssh -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_TARGET_IP }} "sudo echo "[$(date)] Deploy done" >> deploy_log.txt"
-
-  
-    
+        
