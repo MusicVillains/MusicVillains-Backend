@@ -81,8 +81,14 @@ public class JwtManager {
     }
 
     public static ServiceResult verifyAccessToken(String authorizationHeader){
+        log.debug("verifyAccessToken(String authorizationHeader) called\n"+
+                "\t* params\n"
+                + "\t\t- authorizationHeader:\n" +
+                "\t\t\t{}\n"
+                , authorizationHeader);
 
         if (!isValidJwtHeaderFormat(authorizationHeader)) {
+            log.warn("Invalid Jwt Format");
             return ServiceResult.of(ServiceResult.FAIL,
                     "Invalid Jwt Format",
                     null);
@@ -91,8 +97,11 @@ public class JwtManager {
         String jwtToken = authorizationHeader.replace
                 ("Bearer ", ""); // remove "Bearer " from authorization header
 
+        log.debug("jwtToken: {}", jwtToken);
+
         String tmpMemberId = "";
         try {
+            log.debug("try to verify jwtToken");
             tmpMemberId = JWT.require(Algorithm.HMAC512(ENV.JWT_SECRET_KEY())).build() // 토큰 생성 시 사용했던 암호화 방식을 적용
                     .verify(jwtToken) // 토큰 검증
                     .getClaim("memberId").asString(); // memberId claim을 가져옴
@@ -100,16 +109,20 @@ public class JwtManager {
         catch(ExpiredJwtException e){
             // occurs when jwt token is expired
             e.printStackTrace();
+            log.warn("Expired Jwt Token, {}" , e.getMessage());
             return ServiceResult.of(ServiceResult.FAIL,
                     "Expired Jwt Token",
                     null);
         }
         catch(Exception e) {
             e.printStackTrace();
+            log.warn("Invalid Jwt Token, {}", e.getMessage());
             return ServiceResult.of(ServiceResult.FAIL,
                     "Invalid Jwt Token",
                     null);
         }
+
+        log.debug("verifyAccessToken() succeeded - memberId: {}", tmpMemberId);
 
         return ServiceResult.of(ServiceResult.SUCCESS,
                 "verifyToken succeeded.",
