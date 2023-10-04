@@ -11,8 +11,9 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class TimerAspect {
 
-    @Around("execution(* com.teamseven.MusicVillain.*.*Controller.*(..))")
-    public Object loggingTest(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
+    // @Around("execution(* com.teamseven.MusicVillain.*.*Controller.*(..))")
+    @Around("@annotation(Timer)")
+    public Object timeCheck(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
 
         long startTime = System.currentTimeMillis();
         Object result = proceedingJoinPoint.proceed();
