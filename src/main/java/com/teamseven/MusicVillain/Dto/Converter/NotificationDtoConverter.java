@@ -12,17 +12,35 @@ public class NotificationDtoConverter implements DtoConverter<Notification, Noti
 
     @Override
     public NotificationDto convertToDto(Notification notification) {
-        return NotificationDto.builder()
-                .notificationId(notification.getNotificationId())
-                .ownerId(notification.getOwner().getMemberId())
-                .ownerName(notification.getOwner().getName())
-                .interactionId(notification.getInteraction().getInteractionId())
-                .musicName(notification.getInteraction().getInteractionFeed().getMusicName())
-                .musicianName(notification.getInteraction().getInteractionFeed().getMusicianName())
-                .interactionCount(notification.getInteraction().getInteractionFeed().getInteractionList().size())
-                .ownerRead(notification.getOwnerRead())
-                .createdAt(notification.getCreatedAt())
-                .build();
+        NotificationDto notificationDto = new NotificationDto();
+
+        if(notification.getNotificationId() != null)
+            notificationDto.setNotificationId(notification.getNotificationId());
+
+        if(notification.getOwner() != null) {
+            notificationDto.setOwnerId(notification.getOwner().getMemberId());
+            notificationDto.setOwnerName(notification.getOwner().getName());
+        }
+
+        if(notification.getInteraction() != null) {
+            notificationDto.setInteractionId(notification.getInteraction().getInteractionId());
+
+            if(notification.getInteraction().getInteractionFeed() != null) {
+                notificationDto.setMusicName(notification.getInteraction().getInteractionFeed().getMusicName());
+                notificationDto.setMusicianName(notification.getInteraction().getInteractionFeed().getMusicianName());
+                notificationDto.setInteractionCount(notification.getInteraction().getInteractionFeed().getInteractionList().size());
+            }
+        }
+
+        if(notification.getOwnerRead() != null){
+            notificationDto.setOwnerRead(notification.getOwnerRead());
+        }
+
+        if(notification.getCreatedAt() != null){
+            notificationDto.setCreatedAt(notification.getCreatedAt());
+        }
+
+        return notificationDto;
     }
 
     @Override
