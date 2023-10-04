@@ -57,7 +57,7 @@ public class MemberController {
         log.debug("members() called - @GetMapping(\"/members\")");
         ServiceResult serviceResult = memberService.getAllMembers();
 
-        return serviceResult.isSuccessful()
+        return  serviceResult.isSuccessful()
                 ? ResponseObject.OK(serviceResult.getData())
                 : ResponseObject.BAD_REQUEST();
 
