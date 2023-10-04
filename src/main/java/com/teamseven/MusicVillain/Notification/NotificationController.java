@@ -8,10 +8,12 @@ import com.teamseven.MusicVillain.Security.JWT.MemberJwtAuthorizationManager;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.http.HttpHeaders;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "알림 관련 API")
@@ -39,14 +41,43 @@ public class NotificationController {
     public ResponseObject getNotificationsByMemberId(@RequestParam("memberId") String memberId,
                                                      @RequestHeader HttpHeaders headers){
 
+        /* For Debug */
+        String authorization = "";
+        if(headers.get("Authorization") != null) {authorization = headers.get("Authorization").get(0);}
+
+        log.debug("getNotificationsByMemberId(..) called - @GetMapping(\"/notifications\")\n" +
+                        "\t* params\n"
+                        + "\t\t- memberId:\n" +
+                        "\t\t\t{}\n"
+                        + "\t\t- authorization:\n" +
+                        "\t\t\t{}\n"
+                , memberId, authorization);
+
         AuthorizationResult authResult = memberAuthManager.authorize(headers, memberId);
+
         if(authResult.isFailed()){
+            log.warn("Authorization failed - {}", authResult.getMessage());
             return ResponseObject.of(Status.UNAUTHORIZED, authResult.getMessage());
         }
+        log.debug("Authorization succeeded - {}", authResult.getMessage());
 
         ServiceResult serviceResult = notificationService.getNotificaitonsByOwnerMemberID(memberId);
-        return serviceResult.isFailed() ? ResponseObject.BAD_REQUEST(serviceResult.getData())
-                : ResponseObject.OK(serviceResult.getData());
+        log.debug("serviceResult : {}", serviceResult);
+
+        ResponseObject responseObject;
+
+        if(serviceResult.isFailed()){
+            log.debug("GET /notifications Failed");
+            responseObject = ResponseObject.BAD_REQUEST(serviceResult.getMessage());
+            log.debug("Return ResponseObject: {}", responseObject );
+
+        } else {
+            log.debug("GET /notifications Success");
+            responseObject = ResponseObject.OK(serviceResult.getData());
+            log.debug("Return ResponseObject: {}", responseObject );
+        }
+
+        return responseObject;
     }
 
     /**
