@@ -44,8 +44,11 @@ jobs:
       with:
         name: jars
         
-    - name: Deliver Jars using SCP
+    - name: Deliver Jars to Goorm Server using SCP
       run: sshpass -p ${{ secrets.SSH_KEY }} scp -o StrictHostKeyChecking=no -P ${{ secrets.SSH_PORT }} *.jar ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_TARGET_IP }}:~/deploy/
+
+    - name: Deliver Jars to NCP Server using SCP
+      run: sshpass -p ${{ secrets.SSH_KEY_NCP }} scp -o StrictHostKeyChecking=no -P ${{ secrets.SSH_PORT_NCP }} *.jar ${{ secrets.SSH_USERNAME_NCP }}@${{ secrets.SSH_TARGET_IP_NCP }}:~/deploy/
 
   Deploy:
     runs-on: ubuntu-latest
@@ -54,9 +57,16 @@ jobs:
     - name: Install sshpass   
       run: sudo apt install sshpass
       
-    - name: Execute remote commands
+    - name: Deploy - Goorm Server
       run: |
         sshpass -p ${{ secrets.SSH_KEY }} ssh -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_TARGET_IP }} "sudo fuser -k 8080/tcp || true"
         sshpass -p ${{ secrets.SSH_KEY }} ssh -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_TARGET_IP }} "sudo nohup java -jar -Duser.timezone=Asia/Seoul ~/deploy/*.jar > ~/nohup.log 2>&1 &"
         sshpass -p ${{ secrets.SSH_KEY }} ssh -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_TARGET_IP }} "sudo echo "[$(date)] Deploy done" >> deploy_log.txt"
+      
+    - name: Deploy - NCP Server
+      run: |
+        sshpass -p ${{ secrets.SSH_KEY_NCP }} ssh -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT_NCP }} ${{ secrets.SSH_USERNAME_NCP }}@${{ secrets.SSH_TARGET_IP_NCP }} "sudo fuser -k 8080/tcp || true"
+        sshpass -p ${{ secrets.SSH_KEY_NCP }} ssh -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT_NCP }} ${{ secrets.SSH_USERNAME_NCP }}@${{ secrets.SSH_TARGET_IP_NCP }} "sudo nohup java -jar -Duser.timezone=Asia/Seoul ~/deploy/*.jar > ~/nohup.log 2>&1 &"
+        sshpass -p ${{ secrets.SSH_KEY_NCP }} ssh -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT_NCP }} ${{ secrets.SSH_USERNAME_NCP }}@${{ secrets.SSH_TARGET_IP_NCP }} "sudo echo "[$(date)] Deploy done" >> deploy_log.txt"
+        
         
