@@ -93,7 +93,7 @@ public class NotificationServiceUnitTest {
             }
 
             @Test
-            @DisplayName("알림이 없는 멤버의 알림을 조회하면 fail을 반환한다.")
+            @DisplayName("알림이 없는 멤버의 알림을 조회하면 서비스 성공을 반환하고 해당 멤버에 대한 알림이 없다는 메시지를 반환한다.")
             void getNotificationsByOwnerMemberIDTestWithNotExistsNotification(){
                 // given
                 String memberId = "someMemberId";
@@ -106,8 +106,8 @@ public class NotificationServiceUnitTest {
                 var result = mockNotificationService.getNotificaitonsByOwnerMemberID(memberId);
 
                 // then
-                Assertions.assertEquals(ServiceResult.FAIL, result.getResult());
-                Assertions.assertEquals("Notification not found", result.getMessage());
+                Assertions.assertEquals(ServiceResult.SUCCESS, result.getResult());
+                Assertions.assertEquals("There are no notifications", result.getMessage());
             }
         }
     }
@@ -161,7 +161,7 @@ public class NotificationServiceUnitTest {
             }
 
             @Test
-            @DisplayName("이미 읽음 상태인 알림을 다시 읽음 상태로 변경할 수 없다.")
+            @DisplayName("이미 읽음 상태인 알림에 대해 읽음처리를 시도할 경우 서비스 성공을 반환하고 별도로 처리하지 않는다.")
             void readNotificationTestWithAlreadyReadNotification(){
                 // given
                 String notificationId = RandomUUIDGenerator.generate();
@@ -173,7 +173,7 @@ public class NotificationServiceUnitTest {
                 var result = mockNotificationService.readNotification(notificationId);
 
                 // then
-                Assertions.assertEquals(ServiceResult.FAIL, result.getResult());
+                Assertions.assertEquals(ServiceResult.SUCCESS, result.getResult());
                 Assertions.assertEquals("Notification already read", result.getMessage());
             }
         }

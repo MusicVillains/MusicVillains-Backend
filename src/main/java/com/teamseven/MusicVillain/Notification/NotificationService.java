@@ -35,7 +35,7 @@ public class NotificationService {
         List<Notification> notifications = notificationRepository.findByOwnerMemberId(memberId);
 
         if (notifications == null || notifications.isEmpty())
-            return ServiceResult.success("There are no notifications.");
+            return ServiceResult.of(ServiceResult.SUCCESS, "There are no notifications");
 
         List<NotificationDto> notificationDto = dtoConverter.convertToDtoList(notifications);
         return ServiceResult.success(notificationDto);
@@ -54,7 +54,7 @@ public class NotificationService {
         Notification tmpNotification = notificationRepository.findByNotificationId(notificationId);
         if (tmpNotification == null) return ServiceResult.fail("Notification not found");
         if (tmpNotification.ownerRead.equals(Notification.NOTIFICATION_READ))
-            return ServiceResult.success("Notification already read");
+            return ServiceResult.of(ServiceResult.SUCCESS, "Notification already read");
 
         tmpNotification.ownerRead = Notification.NOTIFICATION_READ;
         notificationRepository.save(tmpNotification);
