@@ -28,10 +28,15 @@ public class NotificationService {
      * @return ServiceResult 객체. 성공 또는 실패 메시지를 포함.
      */
     public ServiceResult getNotificaitonsByOwnerMemberID(String memberId){
+
         Member tmpMember =memberRepository.findByMemberId(memberId);
+
         if (tmpMember == null) return ServiceResult.fail("Member not found");
         List<Notification> notifications = notificationRepository.findByOwnerMemberId(memberId);
-        if (notifications == null || notifications.isEmpty()) return ServiceResult.fail("Notification not found");
+
+        if (notifications == null || notifications.isEmpty())
+            return ServiceResult.of(ServiceResult.SUCCESS, "There are no notifications");
+
         List<NotificationDto> notificationDto = dtoConverter.convertToDtoList(notifications);
         return ServiceResult.success(notificationDto);
     }
@@ -49,7 +54,7 @@ public class NotificationService {
         Notification tmpNotification = notificationRepository.findByNotificationId(notificationId);
         if (tmpNotification == null) return ServiceResult.fail("Notification not found");
         if (tmpNotification.ownerRead.equals(Notification.NOTIFICATION_READ))
-            return ServiceResult.fail("Notification already read");
+            return ServiceResult.of(ServiceResult.SUCCESS, "Notification already read");
 
         tmpNotification.ownerRead = Notification.NOTIFICATION_READ;
         notificationRepository.save(tmpNotification);
