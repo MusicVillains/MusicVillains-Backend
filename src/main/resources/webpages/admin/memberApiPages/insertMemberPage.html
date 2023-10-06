@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>InsertMember API Page</title>
+  <style>
+
+        h2 {
+            text-align: center;
+            background-color: #f2f2f2;
+            padding: 10px;
+            margin: 0;
+        }
+        table {
+            width: 100%;
+            height: 100vh;
+        }
+
+        td {
+            padding: 20px;
+            vertical-align: top;
+        }
+
+        .headerRow {
+            height: 50px; /* Adjust this value as needed */
+        }
+
+        textarea {
+            width: 100%;
+            resize: none;
+        }
+
+        .paramTable {
+            width: 100%;
+            height: 30vh;
+            border-collapse: collapse;
+        }
+
+        .paramTable tr:nth-child(odd) {
+            background-color: #f2f2f2;  /* 연한색 */
+        }
+
+        .paramTable tr:nth-child(even) {
+            background-color: #d9d9d9;  /* 진한색 */
+        }
+
+        .paramTable span {
+            color: red;
+        }
+        .paramTable td {
+            padding: 5px 10px;
+            vertical-align: middle;
+        }
+
+    </style>
+  <script>
+        const BASE_URL = "http://musicvillains.run.goorm.io";  // Base URL
+
+        function copyToClipboard() {
+            const textToCopy = document.getElementById("responseBody");
+            textToCopy.select();
+            document.execCommand('copy');
+        }
+
+        function sendRequest(event) {
+            event.preventDefault();
+
+            const endpoint = document.getElementById("requestUrl").value;
+            const userId = document.getElementById("userId").value;
+            const userInfo = document.getElementById("userInfo").value;
+            const name = document.getElementById("name").value;
+            const email = document.getElementById("email").value;
+            const requestUrl =`${BASE_URL}${endpoint}${userId ? `?userId=${userId}` : ""}${userInfo ? `&userInfo=${userInfo}` : ""}${name ? `&name=${name}` : ""}${email ? `&email=${email}` : ""}`;
+
+            const responseStatus = document.getElementById("responseStatus");
+            const responseBody = document.getElementById("responseBody");
+            const responseTimeField = document.getElementById("responseTime");
+
+            const startTime = new Date().getTime();  // Record the start time
+
+            fetch(requestUrl, {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    userId: userId,
+                    userInfo: userInfo,
+                    name: name,
+                    email: email
+                })
+            })
+            .then(response => {
+                const endTime = new Date().getTime();  // Record the end time
+                const responseTime = endTime - startTime;  // Calculate the response time
+
+                responseTimeField.value = responseTime + " ms";  // Set the response time
+
+                responseStatus.value = response.status;
+                return response.json();
+            })
+            .then(data => {
+                responseBody.value = JSON.stringify(data, null, 2);
+            })
+            .catch(error => {
+                console.error("Error fetching data:", error);
+                responseBody.value = "Error fetching data.";
+            });
+        }
+    </script>
+</head>
+<body>
+<h2>InsertMember API Page</h2>
+
+<table>
+  <tr class="headerRow">
+    <td>
+      <h2>Response</h2>
+    </td>
+    <td>
+      <h2>Request</h2>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <form id="apiRequestForm" onsubmit="sendRequest(event)">
+        <label for="requestMethod">Request Method</label>
+        <input type="text" id="requestMethod" name="requestMethod" value="POST" style="border: none;" readonly>
+        <br>
+        <label for="requestUrl">Request URL</label>
+        <input type="text" id="requestUrl" name="requestUrl" value="/members" style="border: none;" readonly>
+        <br>
+        <h3>Body Params</h3>
+        <table class="paramTable">
+          <tr>
+            <td><label for="userId"><b><span>*</span>userId</b></label></td>
+            <td>String</td>
+            <td><input type="text" id="userId" placeholder="userId" required></td>
+          </tr>
+          <tr>
+            <td><label for="userInfo"><b><span>*</span>userInfo</b></label></td>
+            <td>String</td>
+            <td><input type="text" id="userInfo" placeholder="userInfo" required></td>
+          </tr>
+          <tr>
+            <td><label for="name"><b><span>*</span>name</b></label></td>
+            <td>String</td>
+            <td><input type="text" id="name" placeholder="name" required></td>
+          </tr>
+          <tr>
+            <td><label for="email"><b><span>*</span>email</b></label></td>
+            <td>String</td>
+            <td><input type="text" id="email" placeholder="email" required></td>
+          </tr>
+        </table>
+        <br><br>
+        <button type="submit">Send Request</button>
+        <br>
+      </form>
+    </td>
+    <td>
+      <div>
+        <label for="responseStatus">Status</label>
+        <input type="text" id="responseStatus" name="responseStatus" style="border: none;" readonly>
+        <br>
+        <label for="responseTime">Response Time</label>
+        <input type="text" id="responseTime" name="responseTime" style="border: none;" readonly>
+        <br>
+        <textarea id="responseBody" name="responseBody" placeholder="JSON Body" rows="10" readonly></textarea>
+        <br>
+        <button type="button" onclick="copyToClipboard()">Copy</button>
+      </div>
+    </td>
+  </tr>
+</table>
+
+</body>
+</html>
