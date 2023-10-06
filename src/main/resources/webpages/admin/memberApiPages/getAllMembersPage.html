@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>GetAllMembers API Page</title>
+    <style>
+
+        h2 {
+            text-align: center;
+            background-color: #f2f2f2;
+            padding: 10px;
+            margin: 0;
+        }
+        table {
+            width: 100%;
+            height: 100vh;
+        }
+
+        td {
+            padding: 20px;
+            vertical-align: top;
+        }
+
+        .headerRow {
+            height: 50px; /* Adjust this value as needed */
+        }
+
+        textarea {
+            width: 100%;
+            resize: none;
+        }
+
+    </style>
+    <script>
+        const BASE_URL = "http://musicvillains.run.goorm.io";  // Base URL
+
+        function copyToClipboard() {
+            const textToCopy = document.getElementById("responseBody");
+            textToCopy.select();
+            document.execCommand('copy');
+        }
+
+        function sendRequest(event) {
+            event.preventDefault();
+
+            const endpoint = document.getElementById("requestUrl").value;
+            const requestUrl = BASE_URL + endpoint;
+            const responseStatus = document.getElementById("responseStatus");
+            const responseBody = document.getElementById("responseBody");
+            const responseTimeField = document.getElementById("responseTime");
+
+            const startTime = new Date().getTime();  // Record the start time
+
+            fetch(requestUrl, {
+                method: "GET"
+            })
+            .then(response => {
+                const endTime = new Date().getTime();  // Record the end time
+                const responseTime = endTime - startTime;  // Calculate the response time
+
+                responseTimeField.value = responseTime + " ms";  // Set the response time
+
+                responseStatus.value = response.status;
+                return response.json();
+            })
+            .then(data => {
+                responseBody.value = JSON.stringify(data, null, 2);
+            })
+            .catch(error => {
+                console.error("Error fetching data:", error);
+                responseBody.value = "Error fetching data.";
+            });
+        }
+    </script>
+</head>
+<body>
+<h2>GetAllMembers API Page</h2>
+
+<table>
+    <tr class="headerRow">
+        <td>
+            <h2>Response</h2>
+        </td>
+        <td>
+            <h2>Request</h2>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <form id="apiRequestForm" onsubmit="sendRequest(event)">
+                <label for="requestMethod">Request Method</label>
+                <input type="text" id="requestMethod" name="requestMethod" value="GET" style="border: none;" readonly>
+                <br>
+                <label for="requestUrl">Request URL</label>
+                <input type="text" id="requestUrl" name="requestUrl" value="/members" style="border: none;" readonly>
+                <br><br>
+                <button type="submit">Send Request</button>
+                <br>
+            </form>
+        </td>
+        <td>
+            <div>
+                <label for="responseStatus">Status</label>
+                <input type="text" id="responseStatus" name="responseStatus" style="border: none;" readonly>
+                <br>
+                <label for="responseTime">Response Time</label>
+                <input type="text" id="responseTime" name="responseTime" style="border: none;" readonly>
+                <br><br>
+                <textarea id="responseBody" name="responseBody" placeholder="JSON Body" rows="10" readonly></textarea>
+                <br>
+                <button type="button" onclick="copyToClipboard()">Copy</button>
+            </div>
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>
