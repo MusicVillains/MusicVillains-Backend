@@ -3,34 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title>GetMemberById API Page</title>
-    <style>
-
-        h2 {
-            text-align: center;
-            background-color: #f2f2f2;
-            padding: 10px;
-            margin: 0;
-        }
-        table {
-            width: 100%;
-            height: 100vh;
-        }
-
-        td {
-            padding: 20px;
-            vertical-align: top;
-        }
-
-        .headerRow {
-            height: 50px; /* Adjust this value as needed */
-        }
-
-        textarea {
-            width: 100%;
-            resize: none;
-        }
-
-    </style>
+    <link rel="stylesheet" type="text/css" href="styles.css">
     <script>
         const BASE_URL = "http://musicvillains.run.goorm.io";  // Base URL
 
@@ -97,8 +70,13 @@
                 <input type="text" id="requestUrl" name="requestUrl" value="/members/" style="border: none;" readonly>
                 <br>
                 <h3>Query Params</h3>
-                <label for="memberId"><b>memberId</b> String</label>
-                <input type="text" id="memberId" placeholder="memberId" required>
+                <table class="paramTable">
+                    <tr>
+                        <td><label for="memberId"><b><span>*</span>memberId</b></label></td>
+                        <td>String</td>
+                        <td><input type="text" id="memberId" placeholder="memberId" required></td>
+                    </tr>
+                </table>
                 <br><br>
                 <button type="submit">Send Request</button>
                 <br>
