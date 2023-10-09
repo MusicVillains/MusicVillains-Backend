@@ -47,10 +47,6 @@ textarea {
     border-collapse: collapse;
 }
 
-.paramTable tr {
-    height: 30px;
-}
-
 .paramTable tr:nth-child(odd) {
     background-color: #f2f2f2;  /* 연한색 */
 }
@@ -69,17 +65,19 @@ textarea {
 }
 
 .paramTable td:nth-child(1) {
-    width: 110px;
+    min-width: 130px;
+    width: 22%;
 }
 
 .paramTable td:nth-child(2) {
-    width: 50px;
+    min-width: 50px;
+    width: 20%;
 }
 
 .paramTable td:nth-child(3) {
-    width: auto;
+    width: 50%;
 }
 
-.paramTable td:nth-child(3) input[type="text"] {
+.paramTable td:nth-child(3) input[type="text"]{
     width: 95%;
 }
