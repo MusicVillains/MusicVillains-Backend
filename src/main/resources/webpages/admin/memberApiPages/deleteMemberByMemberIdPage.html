@@ -1,17 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>InsertMember API Page</title>
-    <link rel="stylesheet" type="text/css" href="styles.css">
-    <script>
-        const BASE_URL = "https://musicvillains.run.goorm.io";
+  <meta charset="utf-8">
+  <title>Delete Member by MemberId API Page</title>
+  <link rel="stylesheet" type="text/css" href="styles.css">
+  <script>
+<!--        const BASE_URL = "https://musicvillains.run.goorm.io";  // Base URL-->
+        const BASE_URL = "http://localhost:8080";
         const ENDPOINT_URL = "/members";
 
         function updateRequestUrl() {
+            const memberId = document.getElementById("memberId").value || "{memberId}";
             const requestUrlElement = document.getElementById("requestUrl");
-            requestUrlElement.textContent = `${BASE_URL}${ENDPOINT_URL}`;
-            requestUrlElement.innerHTML = `${BASE_URL}${ENDPOINT_URL}`;
+            requestUrlElement.textContent = `${BASE_URL}${ENDPOINT_URL}/${memberId}`;
+            requestUrlElement.innerHTML = `${BASE_URL}${ENDPOINT_URL}<span style="color: gray;">/${memberId}</span>`;
         }
 
         function copyToClipboard() {
@@ -23,11 +25,10 @@
         function sendRequest(event) {
             event.preventDefault();
 
-            const userId = document.getElementById("userId").value;
-            const userInfo = document.getElementById("userInfo").value;
-            const name = document.getElementById("name").value;
-            const email = document.getElementById("email").value;
-            const requestUrl = `${BASE_URL}${ENDPOINT_URL}`;
+            const memberId = document.getElementById("memberId").value;
+            const requestUrl = `${BASE_URL}${ENDPOINT_URL}/${memberId}`;
+
+            const token = document.getElementById("Authorization").value;
 
             const responseStatus = document.getElementById("responseStatus");
             const responseBody = document.getElementById("responseBody");
@@ -36,16 +37,10 @@
             const startTime = new Date().getTime();
 
             fetch(requestUrl, {
-                method: "POST",
+                method: "DELETE",
                 headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    userId: userId,
-                    userInfo: userInfo,
-                    name: name,
-                    email: email
-                })
+                    'Authorization': `Bearer ${token}`
+                }
             })
             .then(response => {
                 const endTime = new Date().getTime();
@@ -53,7 +48,12 @@
 
                 responseTimeField.value = responseTime + " ms";
                 responseStatus.value = response.status;
-                return response.json();
+
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error("Server responded with an error");
+                }
             })
             .then(data => {
                 responseBody.value = JSON.stringify(data, null, 2);
@@ -66,7 +66,7 @@
     </script>
 </head>
 <body onload="updateRequestUrl()">
-<h2>InsertMember API Page</h2>
+<h2>Delete Member by MemberId API Page</h2>
 
 <table>
   <tr class="headerRow">
@@ -82,34 +82,27 @@
       <form id="apiRequestForm" onsubmit="sendRequest(event)">
         <div class="flex-container">
           <label for="requestMethod">Request Method</label>
-          <div id="requestMethod" style="flex-grow: 1;" contenteditable="false">POST</div>
+          <div id="requestMethod" style="flex-grow: 1;" contenteditable="false">DELETE</div>
         </div>
         <div class="flex-container">
           <label for="requestUrl">Request URL</label>
           <div id="requestUrl" style="flex-grow: 1;" contenteditable="false"></div>
         </div>
         <br>
-        <h3>Body Params</h3>
+        <h3>Headers</h3>
         <table class="paramTable">
           <tr>
-            <td><label for="userId"><b><span>*</span>userId</b></label></td>
+            <td><label for="Authorization"><b><span>*</span>Authorization</b></label></td>
             <td>String</td>
-            <td><input type="text" id="userId" placeholder="userId" required></td>
+            <td><input type="text" id="Authorization" placeholder="YOUR_AUTH_TOKEN" required></td>
           </tr>
+        </table>
+        <h3>Path Params</h3>
+        <table class="paramTable">
           <tr>
-            <td><label for="userInfo"><b><span>*</span>userInfo</b></label></td>
+            <td><label for="memberId"><b><span>*</span>memberId</b></label></td>
             <td>String</td>
-            <td><input type="text" id="userInfo" placeholder="userInfo" required></td>
-          </tr>
-          <tr>
-            <td><label for="name"><b><span>*</span>name</b></label></td>
-            <td>String</td>
-            <td><input type="text" id="name" placeholder="name" required></td>
-          </tr>
-          <tr>
-            <td><label for="email"><b><span>*</span>email</b></label></td>
-            <td>String</td>
-            <td><input type="text" id="email" placeholder="email" required></td>
+            <td><input type="text" id="memberId" placeholder="memberId" required></td>
           </tr>
         </table>
         <br><br>
@@ -122,6 +115,7 @@
         <label for="responseStatus">Status</label>
         <input type="text" id="responseStatus" name="responseStatus" style="border: none;" readonly>
         <br>
+        <label for="responseTime">Response Time</label>
         <input type="text" id="responseTime" name="responseTime" style="border: none;" readonly>
         <br>
         <textarea id="responseBody" name="responseBody" placeholder="JSON Body" rows="10" readonly></textarea>
