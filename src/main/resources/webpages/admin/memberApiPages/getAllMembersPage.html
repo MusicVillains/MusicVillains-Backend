@@ -5,7 +5,12 @@
     <title>GetAllMembers API Page</title>
     <link rel="stylesheet" type="text/css" href="styles.css">
     <script>
-        const BASE_URL = "http://musicvillains.run.goorm.io";  // Base URL
+        const BASE_URL = "https://musicvillains.run.goorm.io";
+        const ENDPOINT_URL = "/members";
+
+        function updateRequestUrl() {
+            document.getElementById("requestUrl").innerHTML = `${BASE_URL}${ENDPOINT_URL}`;
+        }
 
         function copyToClipboard() {
             const textToCopy = document.getElementById("responseBody");
@@ -15,25 +20,21 @@
 
         function sendRequest(event) {
             event.preventDefault();
-
-            const endpoint = document.getElementById("requestUrl").value;
-            const requestUrl = BASE_URL + endpoint;
+            const requestUrl = BASE_URL + ENDPOINT_URL;
 
             const responseStatus = document.getElementById("responseStatus");
             const responseBody = document.getElementById("responseBody");
             const responseTimeField = document.getElementById("responseTime");
 
-            const startTime = new Date().getTime();  // Record the start time
+            const startTime = new Date().getTime();
 
             fetch(requestUrl, {
                 method: "GET"
             })
             .then(response => {
-                const endTime = new Date().getTime();  // Record the end time
-                const responseTime = endTime - startTime;  // Calculate the response time
-
-                responseTimeField.value = responseTime + " ms";  // Set the response time
-
+                const endTime = new Date().getTime();
+                const responseTime = endTime - startTime;
+                responseTimeField.value = responseTime + " ms";
                 responseStatus.value = response.status;
                 return response.json();
             })
@@ -47,7 +48,7 @@
         }
     </script>
 </head>
-<body>
+<body onload="updateRequestUrl()">
 <h2>GetAllMembers API Page</h2>
 
 <table>
@@ -62,11 +63,14 @@
     <tr>
         <td>
             <form id="apiRequestForm" onsubmit="sendRequest(event)">
-                <label for="requestMethod">Request Method</label>
-                <input type="text" id="requestMethod" name="requestMethod" value="GET" style="border: none;" readonly>
-                <br>
-                <label for="requestUrl">Request URL</label>
-                <input type="text" id="requestUrl" name="requestUrl" value="/members" style="border: none;" readonly>
+                <div class="flex-container">
+                    <label for="requestMethod">Request Method</label>
+                    <div id="requestMethod" style="flex-grow: 1;" contenteditable="false">GET</div>
+                </div>
+                <div class="flex-container">
+                    <label for="requestUrl">Request URL</label>
+                    <div id="requestUrl" style="flex-grow: 1;" contenteditable="false"></div>
+                </div>
                 <br><br>
                 <button type="submit">Send Request</button>
                 <br>

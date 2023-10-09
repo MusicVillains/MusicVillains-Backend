@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>InsertMember API Page</title>
-    <link rel="stylesheet" type="text/css" href="styles.css">
-    <script>
-        const BASE_URL = "https://musicvillains.run.goorm.io";
+  <meta charset="utf-8">
+  <title>ModifyMemberNickname API Page</title>
+  <link rel="stylesheet" type="text/css" href="styles.css">
+  <script>
+        const BASE_URL = "https://musicvillains.run.goorm.io";  // Base URL
         const ENDPOINT_URL = "/members";
 
         function updateRequestUrl() {
+            const memberId = document.getElementById("memberId").value || "{memberId}";
             const requestUrlElement = document.getElementById("requestUrl");
-            requestUrlElement.textContent = `${BASE_URL}${ENDPOINT_URL}`;
-            requestUrlElement.innerHTML = `${BASE_URL}${ENDPOINT_URL}`;
+            requestUrlElement.textContent = `${BASE_URL}${ENDPOINT_URL}/${memberId}`;
+            requestUrlElement.innerHTML = `${BASE_URL}${ENDPOINT_URL}<span style="color: gray;">/${memberId}?name={name}</span>`;
         }
 
         function copyToClipboard() {
@@ -23,11 +24,11 @@
         function sendRequest(event) {
             event.preventDefault();
 
-            const userId = document.getElementById("userId").value;
-            const userInfo = document.getElementById("userInfo").value;
+            const memberId = document.getElementById("memberId").value; // memberId 값을 가져옴
             const name = document.getElementById("name").value;
-            const email = document.getElementById("email").value;
-            const requestUrl = `${BASE_URL}${ENDPOINT_URL}`;
+            const requestUrl = `${BASE_URL}${ENDPOINT_URL}/${memberId}?name=${name}`; // 올바른 URL을 생성
+
+            const token = document.getElementById("Authorization").value;
 
             const responseStatus = document.getElementById("responseStatus");
             const responseBody = document.getElementById("responseBody");
@@ -38,14 +39,9 @@
             fetch(requestUrl, {
                 method: "POST",
                 headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    userId: userId,
-                    userInfo: userInfo,
-                    name: name,
-                    email: email
-                })
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
             })
             .then(response => {
                 const endTime = new Date().getTime();
@@ -53,7 +49,12 @@
 
                 responseTimeField.value = responseTime + " ms";
                 responseStatus.value = response.status;
-                return response.json();
+
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error("Server responded with an error");
+                }
             })
             .then(data => {
                 responseBody.value = JSON.stringify(data, null, 2);
@@ -66,7 +67,7 @@
     </script>
 </head>
 <body onload="updateRequestUrl()">
-<h2>InsertMember API Page</h2>
+<h2>ModifyMemberNickname API Page</h2>
 
 <table>
   <tr class="headerRow">
@@ -89,27 +90,28 @@
           <div id="requestUrl" style="flex-grow: 1;" contenteditable="false"></div>
         </div>
         <br>
-        <h3>Body Params</h3>
+        <h3>Headers</h3>
         <table class="paramTable">
           <tr>
-            <td><label for="userId"><b><span>*</span>userId</b></label></td>
+            <td><label for="Authorization"><b><span>*</span>Authorization</b></label></td>
             <td>String</td>
-            <td><input type="text" id="userId" placeholder="userId" required></td>
+            <td><input type="text" id="Authorization" placeholder="YOUR_AUTH_TOKEN" required></td>
           </tr>
+        </table>
+        <h3>Path Params</h3>
+        <table class="paramTable">
           <tr>
-            <td><label for="userInfo"><b><span>*</span>userInfo</b></label></td>
+            <td><label for="memberId"><b><span>*</span>memberId</b></label></td>
             <td>String</td>
-            <td><input type="text" id="userInfo" placeholder="userInfo" required></td>
+            <td><input type="text" id="memberId" placeholder="memberId" required></td>
           </tr>
+        </table>
+        <h3>Body Params</h3>
+        <table class="paramTable">
           <tr>
             <td><label for="name"><b><span>*</span>name</b></label></td>
             <td>String</td>
             <td><input type="text" id="name" placeholder="name" required></td>
-          </tr>
-          <tr>
-            <td><label for="email"><b><span>*</span>email</b></label></td>
-            <td>String</td>
-            <td><input type="text" id="email" placeholder="email" required></td>
           </tr>
         </table>
         <br><br>
@@ -122,6 +124,7 @@
         <label for="responseStatus">Status</label>
         <input type="text" id="responseStatus" name="responseStatus" style="border: none;" readonly>
         <br>
+        <label for="responseTime">Response Time</label>
         <input type="text" id="responseTime" name="responseTime" style="border: none;" readonly>
         <br>
         <textarea id="responseBody" name="responseBody" placeholder="JSON Body" rows="10" readonly></textarea>

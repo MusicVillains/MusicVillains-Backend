@@ -4,6 +4,24 @@ h2 {
     padding: 10px;
     margin: 0;
 }
+
+.flex-container {
+    display: flex;
+    align-items: center;
+}
+
+#requestUrl, #requestMethod {
+    margin-left: 10px;
+    flex-grow: 1;
+    overflow-wrap: break-word;
+    max-width: 75%;
+}
+
+label[for="requestMethod"], [for="requestUrl"] {
+    text-align: left;
+    min-width: 25%;
+}
+
 table {
     width: 100%;
     height: 100vh;
@@ -48,4 +66,20 @@ textarea {
 .paramTable td {
     padding: 5px 10px;
     vertical-align: middle;
+}
+
+.paramTable td:nth-child(1) {
+    width: 110px;
+}
+
+.paramTable td:nth-child(2) {
+    width: 50px;
+}
+
+.paramTable td:nth-child(3) {
+    width: auto;
+}
+
+.paramTable td:nth-child(3) input[type="text"] {
+    width: 95%;
 }
