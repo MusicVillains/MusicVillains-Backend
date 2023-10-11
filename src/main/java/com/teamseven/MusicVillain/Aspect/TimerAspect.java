@@ -6,6 +6,12 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
 
+/**
+ * @see com.teamseven.MusicVillain.Aspect.Timer
+ * @apiNote
+ * 메서드의 시작과 끝을 기록하여 총 수행 시간을 측정하고 logger로 출력해주는 AspectJ<br>
+ * `@Timer` 어노테이션이 정의된 메서드에 적용된다.
+ */
 @Aspect
 @Component
 @Slf4j
