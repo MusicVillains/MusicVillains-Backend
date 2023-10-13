@@ -8,6 +8,18 @@
         const BASE_URL = "https://musicvillains.run.goorm.io";
         const ENDPOINT_URL = "/feeds";
 
+        function updateRequestUrl() {
+            const requestUrlElement = document.getElementById("requestUrl");
+            requestUrlElement.textContent = `${BASE_URL}${ENDPOINT_URL}`;
+            requestUrlElement.innerHTML = `${BASE_URL}${ENDPOINT_URL}`;
+        }
+
+        function copyToClipboard() {
+            const textToCopy = document.getElementById("responseBody");
+            textToCopy.select();
+            document.execCommand('copy');
+        }
+
         function sendRequest(event) {
             event.preventDefault();
 
