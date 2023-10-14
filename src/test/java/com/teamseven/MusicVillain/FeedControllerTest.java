@@ -53,12 +53,12 @@ public class FeedControllerTest {
     }
 
     @Test
-    @DisplayName("모든 필드 조회하는 테스트")
+    @DisplayName("비회원이 모든 피드를 조회하는 테스트")
     void getAllFeedsTest(){
         // given
         HttpStatusCode expected = HttpStatusCode.valueOf(200);
         // when
-        HttpStatusCode actual = feedController.getAllFeeds().getStatusCode();
+        HttpStatusCode actual = feedController.getAllFeeds(new HttpHeaders()).getStatusCode();
         // then
         assertEquals(expected, actual);
     }
