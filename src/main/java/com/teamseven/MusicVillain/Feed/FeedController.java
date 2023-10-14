@@ -2,6 +2,7 @@ package com.teamseven.MusicVillain.Feed;
 
 import com.teamseven.MusicVillain.Dto.ResponseBody.RecordResponseBody;
 import com.teamseven.MusicVillain.Dto.ResponseBody.ResponseObject;
+import com.teamseven.MusicVillain.Security.JWT.JwtManager;
 import com.teamseven.MusicVillain.Security.JWT.MemberJwtAuthorizationManager;
 import com.teamseven.MusicVillain.Security.JWT.AuthorizationResult;
 import com.teamseven.MusicVillain.Security.JWT.FeedJwtAuthorizationManager;
@@ -43,18 +44,39 @@ public class FeedController {
 
     /**
      * 모든 피드 조회 | GET | /feeds
-     * @apiNote 데이터 베이스에 등록된 모든 피드 정보를 조회합니다.
+     * @apiNote 데이터 베이스에 등록된 모든 피드 정보를 조회한다.<br>
+     * Request Header에 Authorization 포함 여부 확인하여 다음을 수행한다.<br>
+     * - 회원이 아닌 사용자에 대한 모든 피드 조회 메서드(getAllFeeds) 호출<br>
+     * - 회원에 대한 모든 피드 조회 메서드(getAllFeedsForMember) 호출<br>
      *
      * @author Woody K
      * @since JDK 17
      * @see FeedService#getAllFeeds()
-     *
+     * @see FeedService#getAllFeedsForMember(String) 
      * @return 피드 정보 리스트 반환
      */
     @GetMapping("/feeds")
     @Operation(summary = "모든 피드 조회", description = "데이터 베이스에 등록된 모든 피드 정보를 조회합니다.")
-    public ResponseObject getAllFeeds(){
-        ServiceResult result = feedService.getAllFeeds();
+    public ResponseObject getAllFeeds(
+            @RequestHeader HttpHeaders headers){
+        // Request Header에 Authorization 포함 여부 확인
+        if(!headers.containsKey("Authorization"))
+        {
+            // Authorization이 포함되어 있지 않은 경우 회원이 아닌 사용자에 대한 모든 피드 조회 메서드(getAllFeeds) 호출
+            ServiceResult result = feedService.getAllFeeds();
+            return ResponseObject.OK(result.getData());
+        }
+        
+        // Authorization이 포함되어 있는 경우 회원에 대한 모든 피드 조회 메서드(getAllFeedsForMember) 호출
+        // JWT 검증
+        ServiceResult authResult = JwtManager.verifyAccessToken(headers.get("Authorization").get(0));
+        if(authResult.isFailed())
+            return ResponseObject.UNAUTHORIZED(authResult.getMessage());
+        
+        // JWT 검증 성공 시 회원에 대한 모든 피드 조회 메서드(getAllFeedsForMember) 호출
+        String authorizedMemberId = (String) authResult.getData();
+        ServiceResult result = feedService.getAllFeedsForMember(authorizedMemberId);
+        
         return ResponseObject.OK(result.getData());
     }
 
