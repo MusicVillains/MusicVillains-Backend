@@ -26,6 +26,7 @@ public class FeedDto implements DataTransferObject<Feed>{
     public String musicianName;
     public int viewCount;
     public int interactionCount;
+    public InteractionProps interactionProps;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     LocalDateTime createdAt;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")

@@ -8,7 +8,7 @@ import lombok.Data;
  * interactionProps는 프론트쪽의 Interaction 수행을 위한 컴포넌트와 관련된 속성 정보를 담기 위한 객체이다.<br>
  */
 @Data
-public class interactionProps {
+public class InteractionProps {
     String content;
     String backgroundColor;
     String border;
