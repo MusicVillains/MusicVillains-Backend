@@ -26,13 +26,4 @@ public class WithdrawalDto implements DataTransferObject{
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     public LocalDateTime createdAt;
 
-    @Override
-    public Object toDto(Object o) {
-        return null;
-    }
-
-    @Override
-    public List toDtoList(List list) {
-        return null;
-    }
 }

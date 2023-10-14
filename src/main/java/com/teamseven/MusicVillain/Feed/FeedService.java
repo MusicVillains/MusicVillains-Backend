@@ -4,6 +4,7 @@ import com.teamseven.MusicVillain.Aspect.Timer;
 import com.teamseven.MusicVillain.Dto.*;
 import com.teamseven.MusicVillain.Dto.Converter.DtoConverter;
 import com.teamseven.MusicVillain.Dto.Converter.DtoConverterFactory;
+import com.teamseven.MusicVillain.Dto.Converter.FeedDtoConverter;
 import com.teamseven.MusicVillain.Interaction.Interaction;
 import com.teamseven.MusicVillain.Interaction.InteractionRepository;
 import com.teamseven.MusicVillain.Interaction.InteractionService;
@@ -53,7 +54,12 @@ public class FeedService {
             DtoConverterFactory.getConverter(Feed.class, FeedDto.class);
 
     /**
-     * 모든 피드를 생성된 시간의 내림차순으로 반환합니다.
+     * @see com.teamseven.MusicVillain.Dto.FeedDto
+     * @see com.teamseven.MusicVillain.Dto.InteractionProps
+     * @apiNote
+     * 로그인 하지 않은 사용자 들에 대한 피드 조회 요청을 처리한다.<br>
+     * 모든 피드를 생성된 시간의 내림차순으로 반환한다.<br>
+     * 로그인 하지 않은 사용자에 대해서는 FeedDto의 InteractionProps 필드가 Interaction이 수행되지 않은 상태로 반환된다.
      *
      * @author Woody K
      * @since JDK 17
@@ -66,6 +72,24 @@ public class FeedService {
         return ServiceResult.success(feedDtoList);
     }
 
+    /**
+     * @see com.teamseven.MusicVillain.Dto.Converter.FeedDtoConverter#convertToDtoListForMember(List, String)
+     * @see com.teamseven.MusicVillain.Dto.FeedDto
+     * @see com.teamseven.MusicVillain.Dto.InteractionProps
+     *
+     * @apiNote
+     * 로그인 한 멤버에 대한 피드 조회 요청을 처리한다.<br>
+     * 사용자가 Interaction을 수행한 피드와 수행하지 않은 피드를 구분하여 FeedDto의 InteractionProps 필드를 설정하여 반환한다.<br>
+     * @param memberId 조회를 요청한 회원 식별자
+     * @return ServiceResult 객체. 성공시 모든 FeedDto 객체의 리스트를 포함.
+     */
+    public ServiceResult getAllFeedsForMember(String memberId){
+        List<Feed> feeds = feedRepository.findAllByOrderByCreatedAtDesc();
+
+        List<FeedDto> feedDtoList =
+                ((FeedDtoConverter)feedDtoDtoConverter).convertToDtoListForMember(feeds,memberId);
+        return ServiceResult.success(feedDtoList);
+    }
     /**
      * 지정된 피드 ID와 연관된 레코드를 반환합니다.
      *

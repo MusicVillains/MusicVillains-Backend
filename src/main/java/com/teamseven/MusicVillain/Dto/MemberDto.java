@@ -3,6 +3,7 @@ package com.teamseven.MusicVillain.Dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.teamseven.MusicVillain.Member.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -17,7 +18,7 @@ import java.util.List;
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 
-public class MemberDto implements DataTransferObject {
+public class MemberDto implements DataTransferObject<Member> {
     @Schema(example = "uuid.toString()")
     public final String memberId; // PK, uuid.toString(), Never change after initialized
 
@@ -52,13 +53,4 @@ public class MemberDto implements DataTransferObject {
     @Schema(example = "1")
     public String providerType;
 
-    @Override
-    public Object toDto(Object o) {
-        return null;
-    }
-
-    @Override
-    public List toDtoList(List list) {
-        return null;
-    }
 }

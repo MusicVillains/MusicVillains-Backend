@@ -15,7 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class NotificationDto implements DataTransferObject<Notification, NotificationDto> {
+public class NotificationDto implements DataTransferObject<Notification> {
     public String notificationId;
     public String ownerId;
     public String ownerName;
@@ -38,17 +38,4 @@ public class NotificationDto implements DataTransferObject<Notification, Notific
         this.setOwnerRead(notification.getOwnerRead());
         this.setCreatedAt(notification.getCreatedAt());
     }
-
-    public NotificationDto toDto(Notification notification){
-        return new NotificationDto(notification);
-    }
-
-    public List<NotificationDto> toDtoList(List<Notification> notificationList){
-        List<NotificationDto> notificationDtoList = new ArrayList<>();
-        for(Notification notification : notificationList){
-            notificationDtoList.add(new NotificationDto(notification));
-        }
-        return notificationDtoList;
-    }
-
 }
