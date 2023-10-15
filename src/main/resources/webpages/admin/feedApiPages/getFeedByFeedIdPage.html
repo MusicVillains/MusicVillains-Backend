@@ -42,6 +42,7 @@
 
                 responseTimeField.value = responseTime + " ms";
                 responseStatus.value = response.status;
+
                 return response.json();
             })
             .then(data => {

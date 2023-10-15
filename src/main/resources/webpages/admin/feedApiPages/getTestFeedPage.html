@@ -41,11 +41,7 @@
                 responseTimeField.value = responseTime + " ms";
                 responseStatus.value = response.status;
 
-                if (response.ok) {
-                    return response.json();
-                } else {
-                    throw new Error("Server responded with an error");
-                }
+                return response.json();
             })
             .then(data => {
                 responseBody.value = JSON.stringify(data, null, 2);

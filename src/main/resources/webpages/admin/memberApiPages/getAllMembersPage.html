@@ -34,8 +34,10 @@
             .then(response => {
                 const endTime = new Date().getTime();
                 const responseTime = endTime - startTime;
+
                 responseTimeField.value = responseTime + " ms";
                 responseStatus.value = response.status;
+
                 return response.json();
             })
             .then(data => {
