@@ -116,7 +116,7 @@ public class JwtManager {
         }
         catch(Exception e) {
             e.printStackTrace();
-            log.warn("Invalid Jwt Token, {}", e.getMessage());
+            log.warn("Invalid Jwt Token, {}",jwtToken);
             return ServiceResult.of(ServiceResult.FAIL,
                     "Invalid Jwt Token",
                     null);
@@ -169,6 +169,11 @@ public class JwtManager {
     }
 
     public static boolean isValidJwtHeaderFormat(String jwtToken){
+        log.info("isValidJwtHeaderFormat(String jwtToken) called\n"+
+                "\t* params\n"
+                + "\t\t- jwtToken:\n" +
+                "\t\t\t{}\n"
+                , jwtToken);
         return jwtToken != null && jwtToken.startsWith(ENV.JWT_TOKEN_PREFIX);
     }
 }

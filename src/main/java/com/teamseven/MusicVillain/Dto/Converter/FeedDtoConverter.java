@@ -60,7 +60,7 @@ public class FeedDtoConverter implements DtoConverter<Feed, FeedDto> {
         return feedDto;
     }
     /**
-     * @see com.teamseven.MusicVillain.Feed.FeedService#getAllFeedsForMember(String)
+     * @see com.teamseven.MusicVillain.Feed.FeedService#serviceAllFeeds(String)
      *
      * @apiNote
      * 로그인한 사용자가 Feed 조회를 요청했을 때 사용된다. 각 피드에 대해 사용자가 해당 피드에<br>
@@ -68,10 +68,10 @@ public class FeedDtoConverter implements DtoConverter<Feed, FeedDto> {
      * 수행한 피드의 경우 -  "interactionProps": { content : "박수", backgroundColor :"#EAED70" }<br>
      * 수행하지 않은 피드의 경우 - "interactionProps": { content : "👏", border : "2px solid #651fff" }<br?
      * @param source FeedDto로 변환하고자하는 Feed 객체
-     * @param memberId 요청하는 회원의 식별자
+     * @param authorizedMemberId 요청하는 회원의 식별자
      * @return 피드 리스트를 DTO로 변환한 결과
      */
-    public FeedDto convertToDtoForMember(Feed source, String memberId){
+    public FeedDto convertToDtoForMember(String authorizedMemberId, Feed source){
         FeedDto feedDto = this.convertToDto(source);
         // check if member has interacted with this feed
 
@@ -81,7 +81,7 @@ public class FeedDtoConverter implements DtoConverter<Feed, FeedDto> {
 
         for (Interaction interaction : source.getInteractionList()){
             // if member has interacted with this feed
-            if (interaction.getInteractionMember().getMemberId().equals(memberId)){
+            if (interaction.getInteractionMember().getMemberId().equals(authorizedMemberId)){
                 interactionProps.setInteracted(true);
                 feedDto.setInteractionProps(interactionProps);
                 return feedDto;
@@ -99,8 +99,8 @@ public class FeedDtoConverter implements DtoConverter<Feed, FeedDto> {
     }
 
     /**
-     * @see com.teamseven.MusicVillain.Feed.FeedService#getAllFeedsForMember(String)
-     * @see com.teamseven.MusicVillain.Dto.Converter.FeedDtoConverter#convertToDtoForMember(Feed, String)
+     * @see com.teamseven.MusicVillain.Feed.FeedService#serviceAllFeeds(String)
+     * @see com.teamseven.MusicVillain.Dto.Converter.FeedDtoConverter#convertToDtoForMember(String, Feed)
      *
      * @apiNote
      * 로그인한 사용자가 Feed 조회를 요청했을 때 사용된다.
@@ -109,12 +109,12 @@ public class FeedDtoConverter implements DtoConverter<Feed, FeedDto> {
      * 수행하지 않은 피드의 경우 - "interactionProps": { content : "👏", border : "2px solid #651fff" }<br?
      *
      * @param entityList FeedDto List로 변환하고자하는 Feed List
-     * @param memberId 요청하는 회원의 식별자
+     * @param authorizedMemberId 요청하는 회원의 식별자
      * @return 피드 리스트를 DTO 리스트로 변환한 결과
      */
-    public List<FeedDto> convertToDtoListForMember(List<Feed> entityList, String memberId) {
+    public List<FeedDto> convertToDtoListForMember(String authorizedMemberId, List<Feed> entityList) {
         return entityList.stream()
-                .map(feed -> this.convertToDtoForMember(feed, memberId))
+                .map(feed -> this.convertToDtoForMember(authorizedMemberId, feed))
                 .collect(Collectors.toList());
     }
 

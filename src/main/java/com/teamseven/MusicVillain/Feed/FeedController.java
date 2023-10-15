@@ -8,7 +8,6 @@ import com.teamseven.MusicVillain.Security.JWT.AuthorizationResult;
 import com.teamseven.MusicVillain.Security.JWT.FeedJwtAuthorizationManager;
 import com.teamseven.MusicVillain.Dto.ServiceResult;
 import com.teamseven.MusicVillain.Dto.ResponseBody.Status;
-import com.teamseven.MusicVillain.Member.Member;
 import com.teamseven.MusicVillain.Dto.DtoTest;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,8 +20,6 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -52,7 +49,7 @@ public class FeedController {
      * @author Woody K
      * @since JDK 17
      * @see FeedService#getAllFeeds()
-     * @see FeedService#getAllFeedsForMember(String) 
+     * @see FeedService#serviceAllFeeds(String)
      * @return 피드 정보 리스트 반환
      */
     @GetMapping("/feeds")
@@ -63,7 +60,7 @@ public class FeedController {
         if(!headers.containsKey("Authorization"))
         {
             // Authorization이 포함되어 있지 않은 경우 회원이 아닌 사용자에 대한 모든 피드 조회 메서드(getAllFeeds) 호출
-            ServiceResult result = feedService.getAllFeeds();
+            ServiceResult result = feedService.serviceAllFeeds();
             return ResponseObject.OK(result.getData());
         }
         
@@ -75,7 +72,7 @@ public class FeedController {
         
         // JWT 검증 성공 시 회원에 대한 모든 피드 조회 메서드(getAllFeedsForMember) 호출
         String authorizedMemberId = (String) authResult.getData();
-        ServiceResult result = feedService.getAllFeedsForMember(authorizedMemberId);
+        ServiceResult result = feedService.serviceAllFeeds(authorizedMemberId);
         
         return ResponseObject.OK(result.getData());
     }
@@ -86,15 +83,35 @@ public class FeedController {
      *
      * @author Woody K
      * @since JDK 17
-     * @see FeedService#getFeedByFeedId(String)
+     * @see FeedService#serviceFeedByFeedId(String)
      *
      * @param feedId 피드 아이디
      * @return 피드 DTO 반환
      */
     @GetMapping("/feeds/{feedId}")
     @Operation(summary = "피드 조회", description = "특정 피드를 조회합니다.")
-    public ResponseObject getFeedById(@PathVariable("feedId") String feedId){
-        return ResponseObject.OK(feedService.getFeedByFeedId(feedId));
+    public ResponseObject getFeedById(@PathVariable("feedId") String feedId,
+                                      @RequestHeader HttpHeaders headers){
+
+        if(!headers.containsKey("Authorization"))
+        {
+            ServiceResult sr = feedService.serviceFeedByFeedId(feedId);
+            return ResponseObject.OK(sr.getData());
+        }
+
+        ServiceResult jwtVerifyResult =
+                JwtManager.verifyAccessToken(headers.get("Authorization").get(0));
+
+        if (jwtVerifyResult.isFailed())
+            return ResponseObject.UNAUTHORIZED(jwtVerifyResult.getMessage());
+
+        String authorizedMemberId = (String) jwtVerifyResult.getData();
+
+        ServiceResult sr = feedService.serviceFeedByFeedId(authorizedMemberId, feedId);
+
+        return sr.isFailed() ? ResponseObject.BAD_REQUEST(sr.getMessage())
+                : ResponseObject.OK(sr.getData());
+
     }
 
     /**
@@ -103,7 +120,7 @@ public class FeedController {
      *
      * @author Woody K
      * @since JDK 17
-     * @see FeedService#getAllFeedsByFeedType(String)
+     * @see FeedService#serviceAllFeedsByFeedType(String)
      *
      * @param feedType 피드 타입
      * @return 피드 리스트 반환
@@ -111,8 +128,25 @@ public class FeedController {
     @GetMapping("/feeds/feedType")
     @Operation(summary = "타입별 피드 조회", description = "타입 별로 피드를 조회합니다.")
     // 주소 예시: http://localhost:8080/feeds/feedType?value=고음괴물
-    public ResponseObject getAllFeedsByFeedType(@RequestParam("value") String feedType){
-        ServiceResult result = feedService.getAllFeedsByFeedType(feedType);
+    public ResponseObject getAllFeedsByFeedType(@RequestParam("value") String feedType,
+                                                @RequestHeader HttpHeaders headers){
+        if(!headers.containsKey("Authorization"))
+        {
+            ServiceResult result = feedService.serviceAllFeedsByFeedType(feedType);
+            return ResponseObject.OK(result.getData());
+        }
+
+        log.info("authorization header exists");
+        ServiceResult jwtVerifyResult =
+                JwtManager.verifyAccessToken(headers.get("Authorization").get(0));
+
+        if (jwtVerifyResult.isFailed())
+            return ResponseObject.UNAUTHORIZED(jwtVerifyResult.getMessage());
+
+        String authorizedMemberId = (String) jwtVerifyResult.getData();
+        log.info("getAllFeedsByFeedType for authorizedMemberId: {}", authorizedMemberId);
+        ServiceResult result = feedService.serviceAllFeedsByFeedType(authorizedMemberId, feedType);
+
         return ResponseObject.OK(result.getData());
     }
 
@@ -237,7 +271,7 @@ public class FeedController {
      *
      * @author Woody K
      * @since JDK 17
-     * @see FeedService#getRecordByFeedId(String)
+     * @see FeedService#serviceRecordByFeedId(String)
      *
      * @param feedId 피드 아이디
      * @return 녹음본 반환
@@ -257,7 +291,7 @@ public class FeedController {
 //        String resourcePath = "/Users/gunmo/Desktop/Team7-Backend/src/main/resources/static/output." + recordResponseDto.getRecordFileType().split("/")[1];
 //        writeBytesToFile(decodedByteArray, resourcePath);
 
-        return feedService.getRecordByFeedId(feedId);
+        return feedService.serviceRecordByFeedId(feedId);
     }
 
     //for test
@@ -276,7 +310,7 @@ public class FeedController {
      *
      * @author Woody K
      * @since JDK 17
-     * @see FeedService#getAllFeedsByMemberId(String)
+     * @see FeedService#serviceAllFeedsByAuthorizedMemberId(String)
      *
      * @param memberId 멤버 아이디
      * @return 피드 리스트 반환
@@ -284,8 +318,18 @@ public class FeedController {
     @GetMapping("/feeds/member")
     @Operation(summary = "멤버가 생성한 모든 피드 조회", description = "회원이 생성한 모든 피드를 조회합니다.")
     // 주소 예시: http://localhost:8080/feeds/member?id=1
-    public ResponseObject getFeedByMemberId(@RequestParam("id") String memberId){
-        ServiceResult result = feedService.getAllFeedsByMemberId(memberId);
+    public ResponseObject getFeedByMemberId(@RequestParam("id") String memberId,
+                                            @RequestHeader HttpHeaders headers){
+        if(!headers.containsKey("Authorization"))
+            return ResponseObject.UNAUTHORIZED("Authorization Header is missing.");
+
+        AuthorizationResult authorizationResult
+                = memberAuthManager.authorize(headers, memberId);
+
+        if(authorizationResult.isFailed())
+            return ResponseObject.UNAUTHORIZED(authorizationResult.getMessage());
+
+        ServiceResult result = feedService.serviceAllFeedsByAuthorizedMemberId(memberId);
         return ResponseObject.OK(result.getData());
     }
 
@@ -345,7 +389,7 @@ public class FeedController {
      *
      * @author Woody K
      * @since JDK 17
-     * @see FeedService#getInteractionFeedsByMemberId(String)
+     * @see FeedService#serviceInteractionFeedsByAuthorizedMemberId(String)
      *
      * @param memberId 멤버 아이디
      * @param headers 헤더
@@ -362,7 +406,7 @@ public class FeedController {
         if(authResult.isFailed())
             return ResponseObject.UNAUTHORIZED(authResult.getMessage());
 
-        ServiceResult result = feedService.getInteractionFeedsByMemberId(memberId);
+        ServiceResult result = feedService.serviceInteractionFeedsByAuthorizedMemberId(memberId);
         return result.isFailed() ? ResponseObject.BAD_REQUEST(result.getData())
                 : ResponseObject.OK(result.getData());
     }
