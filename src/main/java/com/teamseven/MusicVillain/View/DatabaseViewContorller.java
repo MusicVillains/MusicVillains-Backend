@@ -12,6 +12,8 @@ import com.teamseven.MusicVillain.Notification.NotificationRepository;
 import com.teamseven.MusicVillain.Notification.Notification;
 import com.teamseven.MusicVillain.Record.Record;
 import com.teamseven.MusicVillain.Record.RecordService;
+import com.teamseven.MusicVillain.Withdrawal.Withdrawal;
+import com.teamseven.MusicVillain.Withdrawal.WithdrawalRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,12 +30,13 @@ public class DatabaseViewContorller {
     private final RecordService recordService;
     private final InteractionService interactionService;
     private final NotificationRepository notificationRepository;
+    private final WithdrawalRepository withdrawalRepository;
 
     @Autowired
     public DatabaseViewContorller(MemberService memberService, FeedService feedService,
                                   RecordService recordService, InteractionService interactionService,
                                   FeedRepository feedRepository, NotificationRepository notificationRepository,
-                                  MemberRepository memberRepository) {
+                                  MemberRepository memberRepository, WithdrawalRepository withdrawalRepository) {
         this.memberService = memberService;
         this.feedService = feedService;
         this.recordService = recordService;
@@ -41,7 +44,14 @@ public class DatabaseViewContorller {
         this.feedRepository = feedRepository;
         this.notificationRepository = notificationRepository;
         this.memberRepository = memberRepository;
+        this.withdrawalRepository = withdrawalRepository;
+    }
 
+    @GetMapping("/view/withdrawals")
+    public String withdrawalView(Model model) {
+        List<Withdrawal> withdrawalList = withdrawalRepository.findAll();
+        model.addAttribute("withdrawalList", withdrawalList);
+        return "withdrawal_view";
     }
 
     @GetMapping("/view/members")
