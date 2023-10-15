@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>InsertFeed API Page</title>
+    <link rel="stylesheet" type="text/css" href="../styles.css">
+    <script>
+        const BASE_URL = "https://api.musicvillains.kro.kr";  // Base URL
+        const ENDPOINT_URL = "/feeds";
+
+        function updateRequestUrl() {
+            const requestUrlElement = document.getElementById("requestUrl");
+            requestUrlElement.textContent = `${BASE_URL}${ENDPOINT_URL}`;
+            requestUrlElement.innerHTML = `${BASE_URL}${ENDPOINT_URL}`;
+        }
+
+        function copyToClipboard() {
+            const textToCopy = document.getElementById("responseBody");
+            textToCopy.select();
+            document.execCommand('copy');
+        }
+
+        function sendRequest(event) {
+            event.preventDefault();
+
+            const formData = new FormData();
+            formData.append("ownerId", document.getElementById("ownerId").value);
+            formData.append("musicName", document.getElementById("musicName").value);
+            formData.append("musicianName", document.getElementById("musicianName").value);
+            formData.append("feedType", document.getElementById("feedType").value);
+            formData.append("description", document.getElementById("description").value);
+            formData.append("recordDuration", document.getElementById("recordDuration").value || '0');
+            formData.append("recordFile", document.getElementById("recordFile").files[0]);
+            const requestUrl = `${BASE_URL}${ENDPOINT_URL}`;
+
+            const token = document.getElementById("Authorization").value;
+
+            const responseStatus = document.getElementById("responseStatus");
+            const responseBody = document.getElementById("responseBody");
+            const responseTimeField = document.getElementById("responseTime");
+
+            const startTime = new Date().getTime();
+
+            fetch(requestUrl, {
+                method: "POST",
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: formData
+            })
+            .then(response => {
+                const endTime = new Date().getTime();
+                const responseTime = endTime - startTime;
+
+                responseTimeField.value = responseTime + " ms";
+                responseStatus.value = response.status;
+
+                return response.json();
+            })
+            .then(data => {
+                responseBody.value = JSON.stringify(data, null, 2);
+            })
+            .catch(error => {
+                console.error("Error fetching data:", error);
+                responseBody.value = "Error fetching data.";
+            });
+        }
+    </script>
+</head>
+<body onload="updateRequestUrl()">
+<h2>InsertFeed API Page</h2>
+
+<table>
+    <tr class="headerRow">
+        <td>
+            <h2>Request</h2>
+        </td>
+        <td>
+            <h2>Response</h2>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <form id="apiRequestForm" onsubmit="sendRequest(event)" enctype="multipart/form-data">
+                <div class="flex-container">
+                    <label for="requestMethod">Request Method</label>
+                    <div id="requestMethod" style="flex-grow: 1;" contenteditable="false">POST</div>
+                </div>
+                <div class="flex-container">
+                    <label for="requestUrl">Request URL</label>
+                    <div id="requestUrl" style="flex-grow: 1;" contenteditable="false"></div>
+                </div>
+                <br>
+                <h3>Headers</h3>
+                <table class="paramTable">
+                    <tr>
+                        <td><label for="Authorization"><b><span>*</span>Authorization</b></label></td>
+                        <td>String</td>
+                        <td><input type="text" id="Authorization" placeholder="accessToken" required></td>
+                    </tr>
+                </table>
+                <h3>Body Params</h3>
+                <table class="paramTable">
+                    <tr>
+                        <td><label for="ownerId"><b><span>*</span>Owner ID</b></label></td>
+                        <td>String</td>
+                        <td><input type="text" id="ownerId" placeholder="Owner ID" required></td>
+                    </tr>
+                    <tr>
+                        <td><label for="musicName"><b><span>*</span>Music Name</b></label></td>
+                        <td>String</td>
+                        <td><input type="text" id="musicName" placeholder="Music Name" required></td>
+                    </tr>
+                    <tr>
+                        <td><label for="musicianName"><b><span>*</span>Musician Name</b></label></td>
+                        <td>String</td>
+                        <td><input type="text" id="musicianName" placeholder="Musician Name" required></td>
+                    </tr>
+                    <tr>
+                        <td><label for="feedType"><b><span>*</span>Feed Type</b></label></td>
+                        <td>String</td>
+                        <td><input type="text" id="feedType" placeholder="Feed Type" required></td>
+                    </tr>
+                    <tr>
+                        <td><label for="description"><b>Feed Description</b></label></td>
+                        <td>String</td>
+                        <td><input type="text" id="description" placeholder="Feed Description"></td>
+                    </tr>
+                    <tr>
+                        <td><label for="recordDuration"><b>Record Duration</b></label></td>
+                        <td>Integer</td>
+                        <td><input type="number" id="recordDuration" placeholder="Record Duration"></td>
+                    </tr>
+                    <tr>
+                        <td><label for="recordFile"><b><span>*</span>Record File</b></label></td>
+                        <td>MultipartFile</td>
+                        <td><input type="file" id="recordFile" required></td>
+                    </tr>
+                </table>
+                <br><br>
+                <button type="submit">Send Request</button>
+                <br>
+            </form>
+        </td>
+        <td>
+            <div>
+                <label for="responseStatus">Status</label>
+                <input type="text" id="responseStatus" name="responseStatus" style="border: none;" readonly>
+                <br>
+                <input type="text" id="responseTime" name="responseTime" style="border: none;" readonly>
+                <br>
+                <textarea id="responseBody" name="responseBody" placeholder="JSON Body" rows="10" readonly></textarea>
+                <br>
+                <button type="button" onclick="copyToClipboard()">Copy</button>
+            </div>
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>
