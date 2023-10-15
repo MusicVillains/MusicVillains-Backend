@@ -47,7 +47,7 @@ public class FeedControllerTest {
         // given
         HttpStatusCode expected = HttpStatusCode.valueOf(200);
         // when
-        HttpStatusCode actual = feedController.getFeedById("1").getStatusCode();
+        HttpStatusCode actual = feedController.getFeedById("1", new HttpHeaders()).getStatusCode();
         // then
         assertEquals(expected, actual);
     }
@@ -69,7 +69,7 @@ public class FeedControllerTest {
         // given
         HttpStatusCode expected = HttpStatusCode.valueOf(200);
         // when
-        HttpStatusCode actual = feedController.getAllFeedsByFeedType("고음괴물").getStatusCode();
+        HttpStatusCode actual = feedController.getAllFeedsByFeedType("고음괴물",new HttpHeaders()).getStatusCode();
         // then
         assertEquals(expected, actual);
     }

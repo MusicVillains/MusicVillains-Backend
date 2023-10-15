@@ -207,7 +207,7 @@ public class FeedServiceUnitTest {
                 // given
 
                 // when
-                ServiceResult dataTransferObjectList = mockFeedService.getAllFeeds();
+                ServiceResult dataTransferObjectList = mockFeedService.serviceAllFeeds();
 
                 // then
                 Mockito.verify(mockFeedRepository, Mockito.times(1)).findAllByOrderByCreatedAtDesc();
@@ -232,7 +232,7 @@ public class FeedServiceUnitTest {
                 Mockito.when(mockFeedRepository.findAllByOwnerMemberId(mockMemberId)).thenReturn(mockFeedList);
 
                 // when
-                ServiceResult serviceResult = mockFeedService.getAllFeedsByMemberId(mockMemberId);
+                ServiceResult serviceResult = mockFeedService.serviceAllFeedsByAuthorizedMemberId(mockMemberId);
 
                 // then
                 List<FeedDto> feedDtoList = (List<FeedDto>) serviceResult.getData();
@@ -250,7 +250,7 @@ public class FeedServiceUnitTest {
                 Mockito.when(mockFeedRepository.findAllByOwnerMemberId(mockMemberId)).thenReturn(null);
 
                 // when
-                ServiceResult serviceResult = mockFeedService.getAllFeedsByMemberId(mockMemberId);
+                ServiceResult serviceResult = mockFeedService.serviceAllFeedsByAuthorizedMemberId(mockMemberId);
 
                 // then
                 Mockito.verify(mockFeedRepository, Mockito.times(1)).findAllByOwnerMemberId(mockMemberId);
@@ -265,7 +265,7 @@ public class FeedServiceUnitTest {
                 String mockMemberId = null;
 
                 // when
-                ServiceResult serviceResult = mockFeedService.getAllFeedsByMemberId(mockMemberId);
+                ServiceResult serviceResult = mockFeedService.serviceAllFeedsByAuthorizedMemberId(mockMemberId);
 
                 // then
                 List<FeedDto> feedDtoList = (List<FeedDto>) serviceResult.getData();
@@ -292,7 +292,7 @@ public class FeedServiceUnitTest {
                 Mockito.when(mockFeedRepository.findAllByFeedType(mockFeedType)).thenReturn(mockFeedList);
 
                 // when
-                ServiceResult serviceResult = mockFeedService.getAllFeedsByFeedType(mockFeedType);
+                ServiceResult serviceResult = mockFeedService.serviceAllFeedsByFeedType(mockFeedType);
 
                 // then
                 List<FeedDto> feedDtoList = (List<FeedDto>) serviceResult.getData();
@@ -310,7 +310,7 @@ public class FeedServiceUnitTest {
                 Mockito.when(mockFeedRepository.findAllByFeedType(mockFeedType)).thenReturn(null);
 
                 // when
-                ServiceResult serviceResult = mockFeedService.getAllFeedsByFeedType(mockFeedType);
+                ServiceResult serviceResult = mockFeedService.serviceAllFeedsByFeedType(mockFeedType);
 
                 // then
                 Mockito.verify(mockFeedRepository, Mockito.times(1)).findAllByFeedType(mockFeedType);
@@ -325,7 +325,7 @@ public class FeedServiceUnitTest {
                 String mockFeedType = null;
 
                 // when
-                ServiceResult serviceResult = mockFeedService.getAllFeedsByFeedType(mockFeedType);
+                ServiceResult serviceResult = mockFeedService.serviceAllFeedsByFeedType(mockFeedType);
 
                 // then
                 List<FeedDto> feedDtoList = (List<FeedDto>) serviceResult.getData();
@@ -348,7 +348,7 @@ public class FeedServiceUnitTest {
                 Mockito.when(mockFeedRepository.findByFeedId(mockFeedId)).thenReturn(mockFeed);
 
                 // when
-                ServiceResult serviceResult = mockFeedService.getFeedByFeedId(mockFeedId);
+                ServiceResult serviceResult = mockFeedService.serviceFeedByFeedId(mockFeedId);
 
                 // then
                 FeedDto feedDto = (FeedDto) serviceResult.getData();
@@ -367,7 +367,7 @@ public class FeedServiceUnitTest {
                 Mockito.when(mockFeedRepository.findByFeedId(mockFeedId)).thenReturn(null);
 
                 // when
-                ServiceResult serviceResult = mockFeedService.getFeedByFeedId(mockFeedId);
+                ServiceResult serviceResult = mockFeedService.serviceFeedByFeedId(mockFeedId);
 
                 // then
                 FeedDto feedDto = (FeedDto) serviceResult.getData();
@@ -383,7 +383,7 @@ public class FeedServiceUnitTest {
                 String mockFeedId = null;
 
                 // when
-                ServiceResult serviceResult = mockFeedService.getFeedByFeedId(mockFeedId);
+                ServiceResult serviceResult = mockFeedService.serviceFeedByFeedId(mockFeedId);
 
                 // then
                 FeedDto feedDto = (FeedDto) serviceResult.getData();
@@ -409,7 +409,7 @@ public class FeedServiceUnitTest {
                 Mockito.when(mockFeedRepository.findAllByOwnerMemberId(mockMemberId)).thenReturn(mockFeedList);
 
                 // when
-                ServiceResult serviceResult = mockFeedService.getAllFeedsByMemberId(mockMemberId);
+                ServiceResult serviceResult = mockFeedService.serviceAllFeedsByAuthorizedMemberId(mockMemberId);
 
                 // then
                 List<FeedDto> feedDtoList = (List<FeedDto>) serviceResult.getData();
@@ -427,7 +427,7 @@ public class FeedServiceUnitTest {
                 Mockito.when(mockFeedRepository.findAllByOwnerMemberId(mockMemberId)).thenReturn(null);
 
                 // when
-                ServiceResult serviceResult = mockFeedService.getAllFeedsByMemberId(mockMemberId);
+                ServiceResult serviceResult = mockFeedService.serviceAllFeedsByAuthorizedMemberId(mockMemberId);
 
                 // then
                 Mockito.verify(mockFeedRepository, Mockito.times(1)).findAllByOwnerMemberId(mockMemberId);
@@ -442,7 +442,7 @@ public class FeedServiceUnitTest {
                 String mockMemberId = null;
 
                 // when
-                ServiceResult serviceResult = mockFeedService.getAllFeedsByMemberId(mockMemberId);
+                ServiceResult serviceResult = mockFeedService.serviceAllFeedsByAuthorizedMemberId(mockMemberId);
 
                 // then
                 List<FeedDto> feedDtoList = (List<FeedDto>) serviceResult.getData();
@@ -466,7 +466,7 @@ public class FeedServiceUnitTest {
                 Mockito.when(mockFeedRepository.findByFeedId(mockFeedId)).thenReturn(mockFeed);
 
                 // when
-                ServiceResult serviceResult = mockFeedService.getFeedOwnerMemberIdByFeedId(mockFeedId);
+                ServiceResult serviceResult = mockFeedService.serviceFeedOwnerMemberIdByFeedId(mockFeedId);
 
                 // then
                 String ownerId = (String) serviceResult.getData();
@@ -485,7 +485,7 @@ public class FeedServiceUnitTest {
                 Mockito.when(mockFeedRepository.findByFeedId(mockFeedId)).thenReturn(null);
 
                 // when
-                ServiceResult serviceResult = mockFeedService.getFeedOwnerMemberIdByFeedId(mockFeedId);
+                ServiceResult serviceResult = mockFeedService.serviceFeedOwnerMemberIdByFeedId(mockFeedId);
 
                 // then
                 Mockito.verify(mockFeedRepository, Mockito.times(1)).findByFeedId(mockFeedId);
@@ -500,7 +500,7 @@ public class FeedServiceUnitTest {
                 String mockFeedId = null;
 
                 // when
-                ServiceResult serviceResult = mockFeedService.getFeedOwnerMemberIdByFeedId(mockFeedId);
+                ServiceResult serviceResult = mockFeedService.serviceFeedOwnerMemberIdByFeedId(mockFeedId);
 
                 // then
                 Mockito.verify(mockFeedRepository, Mockito.times(0)).findByFeedId(mockFeedId);
@@ -522,7 +522,7 @@ public class FeedServiceUnitTest {
                 Mockito.when(mockFeedRepository.findByFeedId(mockFeedId)).thenReturn(mockFeed);
 
                 // when
-                RecordResponseBody serviceResult = mockFeedService.getRecordByFeedId(mockFeedId);
+                RecordResponseBody serviceResult = mockFeedService.serviceRecordByFeedId(mockFeedId);
 
                 // then
                 Mockito.verify(mockFeedRepository, Mockito.times(2)).findByFeedId(mockFeedId);
@@ -543,7 +543,7 @@ public class FeedServiceUnitTest {
                 Mockito.when(mockFeedRepository.findByFeedId(mockFeedId)).thenReturn(null);
 
                 // when
-                RecordResponseBody serviceResult = mockFeedService.getRecordByFeedId(mockFeedId);
+                RecordResponseBody serviceResult = mockFeedService.serviceRecordByFeedId(mockFeedId);
 
                 // then
                 Mockito.verify(mockFeedRepository, Mockito.times(2)).findByFeedId(mockFeedId);
@@ -558,7 +558,7 @@ public class FeedServiceUnitTest {
                 String mockFeedId = null;
 
                 // when
-                RecordResponseBody serviceResult = mockFeedService.getRecordByFeedId(mockFeedId);
+                RecordResponseBody serviceResult = mockFeedService.serviceRecordByFeedId(mockFeedId);
 
                 // then
                 Mockito.verify(mockFeedRepository, Mockito.times(0)).findByFeedId(mockFeedId);

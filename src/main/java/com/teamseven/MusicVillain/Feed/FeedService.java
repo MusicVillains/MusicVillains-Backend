@@ -1,6 +1,5 @@
 package com.teamseven.MusicVillain.Feed;
 
-import com.teamseven.MusicVillain.Aspect.Timer;
 import com.teamseven.MusicVillain.Dto.*;
 import com.teamseven.MusicVillain.Dto.Converter.DtoConverter;
 import com.teamseven.MusicVillain.Dto.Converter.DtoConverterFactory;
@@ -28,6 +27,7 @@ import com.teamseven.MusicVillain.Record.Record;
 import org.springframework.web.multipart.MultipartFile;
 
 
+@SuppressWarnings("all")
 @Service
 @Slf4j
 public class FeedService {
@@ -50,8 +50,31 @@ public class FeedService {
         this.interactionService = interactionService;
     }
 
-    private DtoConverter feedDtoDtoConverter =
+    private DtoConverter dtoConverter =
             DtoConverterFactory.getConverter(Feed.class, FeedDto.class);
+
+
+    private List<Feed> getAllFeeds(){
+        return feedRepository.findAllByOrderByCreatedAtDesc();
+    }
+
+    private List<Feed> getAllFeedsByFeedType(String feedType){
+
+        log.info("Request feedType: " + feedType);
+        if(feedType.equals("all") || feedType.equals("전체")){
+            return this.getAllFeeds();
+        }
+        List<Feed> FeedList = feedRepository.findAllByFeedType(feedType);
+        return FeedList;
+    }
+
+    private List<Feed> getAllFeedsByMemberId(String memberId){
+        return feedRepository.findAllByOwnerMemberId(memberId);
+    }
+
+    private Feed getFeedByFeedId(String feedId){
+        return feedRepository.findByFeedId(feedId);
+    }
 
     /**
      * @see com.teamseven.MusicVillain.Dto.FeedDto
@@ -66,28 +89,27 @@ public class FeedService {
      *
      * @return ServiceResult 객체. 성공시 모든 FeedDto 객체의 리스트를 포함.
      */
-    public ServiceResult getAllFeeds(){
-        List<Feed> feeds = feedRepository.findAllByOrderByCreatedAtDesc();
-        List<FeedDto> feedDtoList = feedDtoDtoConverter.convertToDtoList(feeds);
+    public ServiceResult serviceAllFeeds(){
+        List<FeedDto> feedDtoList = dtoConverter.convertToDtoList(this.getAllFeeds());
         return ServiceResult.success(feedDtoList);
     }
 
     /**
-     * @see com.teamseven.MusicVillain.Dto.Converter.FeedDtoConverter#convertToDtoListForMember(List, String)
+     * @see com.teamseven.MusicVillain.Dto.Converter.FeedDtoConverter#convertToDtoListForMember(String, List)
      * @see com.teamseven.MusicVillain.Dto.FeedDto
      * @see com.teamseven.MusicVillain.Dto.InteractionProps
      *
      * @apiNote
      * 로그인 한 멤버에 대한 피드 조회 요청을 처리한다.<br>
      * 사용자가 Interaction을 수행한 피드와 수행하지 않은 피드를 구분하여 FeedDto의 InteractionProps 필드를 설정하여 반환한다.<br>
-     * @param memberId 조회를 요청한 회원 식별자
+     * @param authorizedMemberId 조회를 요청한 회원 식별자
      * @return ServiceResult 객체. 성공시 모든 FeedDto 객체의 리스트를 포함.
      */
-    public ServiceResult getAllFeedsForMember(String memberId){
-        List<Feed> feeds = feedRepository.findAllByOrderByCreatedAtDesc();
+    public ServiceResult serviceAllFeeds(String authorizedMemberId){
 
         List<FeedDto> feedDtoList =
-                ((FeedDtoConverter)feedDtoDtoConverter).convertToDtoListForMember(feeds,memberId);
+                ((FeedDtoConverter)dtoConverter).convertToDtoListForMember(authorizedMemberId, this.getAllFeeds());
+
         return ServiceResult.success(feedDtoList);
     }
     /**
@@ -99,7 +121,7 @@ public class FeedService {
      * @param feedId 레코드 정보를 가져올 피드의 ID
      * @return RecordResponseBody 객체. 레코드의 세부 정보를 포함.
      */
-    public RecordResponseBody getRecordByFeedId(String feedId){
+    public RecordResponseBody serviceRecordByFeedId(String feedId){
         if(feedId == null) return RecordResponseBody.builder()
                 .statusCode(Status.BAD_REQUEST.getStatusCode())
                 .message("FeedId is null")
@@ -277,47 +299,78 @@ public class FeedService {
         feedRepository.save(nullableFeed);
 
         return ServiceResult.success(
-                feedDtoDtoConverter.convertToDto(nullableFeed));
+                dtoConverter.convertToDto(nullableFeed));
     }
 
     /**
-     * 지정된 멤버 ID의 모든 피드를 반환합니다.
+     * @apiNote
+     * 로그인 완료한 회원의 회원 식별자로 해당 회원이 생성한 모든 피드를 반환합니다.
      *
      * @author Woody K
      * @since JDK 17
      *
      * @param memberId 피드를 조회할 멤버의 ID
      * @return ServiceResult 객체. 성공시 해당 멤버의 모든 FeedDto 객체의 리스트를 포함.
+     *
+     * @see com.teamseven.MusicVillain.Dto.Converter.FeedDtoConverter#convertToDtoListForMember(String, List)
      */
-    public ServiceResult getAllFeedsByMemberId(String memberId) {
-        if(memberId == null) return ServiceResult.fail("MemberId is null");
-        List<Feed> feeds = feedRepository.findAllByOwnerMemberId(memberId);
-        if (feeds == null) return ServiceResult.fail("Feeds not found for memberId: " + memberId);
-        List<FeedDto> resultFeedDtoList = feedDtoDtoConverter.convertToDtoList(feeds);
+    public ServiceResult serviceAllFeedsByAuthorizedMemberId(String authorizedMemberid) {
+        if(authorizedMemberid == null) return ServiceResult.fail("MemberId is null");
+
+        List<Feed> feeds = this.getAllFeedsByMemberId(authorizedMemberid);
+
+        if (feeds == null)
+            return ServiceResult.fail("Feeds not found for memberId: " + authorizedMemberid);
+
+        List<FeedDto> resultFeedDtoList =
+                ((FeedDtoConverter) dtoConverter).convertToDtoListForMember(authorizedMemberid,feeds);
+
         return ServiceResult.success(resultFeedDtoList);
     }
 
+
     /**
-     * 지정된 피드 타입의 모든 피드를 반환합니다.
+     * 로그인하지 않은 사용자의 요청에 대해 지정된 피드 타입의 모든 피드를 반환합니다.
      *
-     * @author Woody K
      * @since JDK 17
      *
      * @param feedType 조회할 피드의 타입
      * @return ServiceResult 객체. 성공시 해당 타입의 모든 FeedDto 객체의 리스트를 포함.
      */
-    public ServiceResult getAllFeedsByFeedType(String feedType){
-        if (feedType == null){
+    public ServiceResult serviceAllFeedsByFeedType(String feedType){
+        if (feedType == null)
             return ServiceResult.fail("FeedType is null");
-        }
 
-        if(feedType.equals("all") || feedType.equals("전체")){
-            return this.getAllFeeds();
-        }
+        List<Feed> feeds = this.getAllFeedsByFeedType(feedType);
 
-        List<Feed> feeds = feedRepository.findAllByFeedType(feedType);
-        if (feeds == null) return ServiceResult.fail("Feeds not found for feedType: " + feedType);
-        List<FeedDto> resultFeedDtoList = feedDtoDtoConverter.convertToDtoList(feeds);
+        if (feeds == null)
+            return ServiceResult.fail("Feeds not found for feedType: " + feedType);
+
+        List<FeedDto> resultFeedDtoList = dtoConverter.convertToDtoList(feeds);
+
+        return ServiceResult.success(resultFeedDtoList);
+    }
+
+
+    /**
+     * 로그인한 사용자의 요청에 대해서 지정된 피드 타입의 모든 피드를 반환합니다.
+     *
+     * @since JDK 17
+     * @param authorizedMemberId 조회를 요청한 회원 식별자
+     * @param feedType 조회할 피드의 타입
+     * @return ServiceResult 객체. 성공시 해당 타입의 모든 FeedDto 객체의 리스트를 포함.
+     */
+    public ServiceResult serviceAllFeedsByFeedType(String authorizedMemberId, String feedType){
+        if (feedType == null) return ServiceResult.fail("FeedType is null");
+
+        List<Feed> feeds = this.getAllFeedsByFeedType(feedType);
+
+        if (feeds == null)
+            return ServiceResult.fail("Feeds not found for feedType: " + feedType);
+
+        List<FeedDto> resultFeedDtoList =
+                ((FeedDtoConverter) dtoConverter).convertToDtoListForMember(authorizedMemberId, feeds);
+
         return ServiceResult.success(resultFeedDtoList);
     }
 
@@ -379,20 +432,6 @@ public class FeedService {
     }
 
     /**
-     * 멤버 ID가 유효한지 검사합니다.
-     *
-     * @author Woody K
-     * @since JDK 17
-     *
-     * @param memberId 검사할 멤버의 ID
-     * @return boolean. 유효한 멤버 ID인 경우 true, 그렇지 않은 경우 false.
-     */
-    public boolean checkIsValidMemberId(String memberId){
-        if (memberId == null) return false;
-        return memberRepository.findByMemberId(memberId) != null;
-    }
-
-    /**
      * 지정된 피드 ID에 대한 피드 정보를 반환합니다.
      *
      * @author Woody K
@@ -401,43 +440,68 @@ public class FeedService {
      * @param feedId 정보를 가져올 피드의 ID
      * @return FeedDto 객체. 해당 피드의 정보를 포함.
      */
-    public ServiceResult getFeedByFeedId(String feedId) {
+    public ServiceResult serviceFeedByFeedId(String feedId) {
         // parameter null check
-        if(feedId == null) return ServiceResult.fail("Bad request, feedId is null");
+        if(feedId == null)
+            return ServiceResult.fail("Bad request, feedId is null");
 
         // find feed by feedId
-        Feed nullableFeed = feedRepository.findByFeedId(feedId);
+        Feed nullableFeed = this.getFeedByFeedId(feedId);
 
         // check if feed not found
-        if(nullableFeed == null) return ServiceResult.fail("Feed Not Found");
+        if(nullableFeed == null)
+            return ServiceResult.fail("Feed Not Found");
 
         // convert to FeedDto
-        DataTransferObject feedDto = feedDtoDtoConverter.convertToDto(nullableFeed);
+        DataTransferObject feedDto = dtoConverter.convertToDto(nullableFeed);
+
+        return ServiceResult.success(feedDto);
+    }
+
+    public ServiceResult serviceFeedByFeedId(String authorizedMemberId, String feedId) {
+        // parameter null check
+        if(feedId == null)
+            return ServiceResult.fail("Bad request, feedId is null");
+
+        // find feed by feedId
+        Feed nullableFeed = this.getFeedByFeedId(feedId);
+
+        // check if feed not found
+        if(nullableFeed == null)
+            return ServiceResult.fail("Feed Not Found");
+
+        // convert to FeedDto
+        DataTransferObject feedDto
+                = ((FeedDtoConverter)dtoConverter).convertToDtoForMember(authorizedMemberId, nullableFeed);
 
         return ServiceResult.success(feedDto);
     }
 
     /**
-     * 지정된 멤버 ID가 상호 작용한 모든 피드를 반환합니다.
+     * @apiNote
+     * 로그인한 회원 또는 인가가 완료된 경우에만 사용가능합니다.<br>
+     * 특정 회원이 상호작용한 모든 피드를 반환합니다.<br>
      *
      * @author Woody K
      * @since JDK 17
      *
-     * @param memberId 피드를 조회할 멤버의 ID
+     * @param authorizedMemberId 요청한 회원의 식별자
      * @return ServiceResult 객체. 성공시 해당 멤버가 상호 작용한 모든 FeedDto 객체의 리스트를 포함.
+     *
+     * @see com.teamseven.MusicVillain.Dto.Converter.FeedDtoConverter#convertToDtoListForMember(String, List)
      */
-    public ServiceResult getInteractionFeedsByMemberId(String memberId) {
+    public ServiceResult serviceInteractionFeedsByAuthorizedMemberId(String authorizedMemberId) {
         // parameter null check
-        if(memberId == null) return ServiceResult.fail("Bad request, memberId is null");
+        if(authorizedMemberId == null) return ServiceResult.fail("Bad request, memberId is null");
 
         // get Member from DB
-        Member nullableMember = memberRepository.findByMemberId(memberId);
+        Member nullableMember = memberRepository.findByMemberId(authorizedMemberId);
         // check if member is null
         if(nullableMember == null) return ServiceResult.of(ServiceResult.FAIL, "Member Not Found");
 
         // get Interaction List of this Member from DB
         List<Interaction> interactionList =
-                interactionRepository.findAllByInteractionMemberMemberId(memberId);
+                interactionRepository.findAllByInteractionMemberMemberId(authorizedMemberId);
 
         List<Feed> interactionFeedList = new ArrayList<>();
 
@@ -445,7 +509,7 @@ public class FeedService {
             interactionFeedList.add(interaction.getInteractionFeed());
         }
 
-        List<FeedDto> resultFeedDtoList = feedDtoDtoConverter.convertToDtoList(interactionFeedList);
+        List<FeedDto> resultFeedDtoList = ((FeedDtoConverter) dtoConverter).convertToDtoListForMember(authorizedMemberId, interactionFeedList);
         return ServiceResult.success(resultFeedDtoList);
 
     }
@@ -459,7 +523,7 @@ public class FeedService {
      * @param feedId 소유자의 멤버 ID를 가져올 피드의 ID
      * @return ServiceResult 객체. 성공시 해당 피드의 소유자 멤버 ID를 포함.
      */
-    public ServiceResult getFeedOwnerMemberIdByFeedId(String feedId) {
+    public ServiceResult serviceFeedOwnerMemberIdByFeedId(String feedId) {
         // check if
         if (feedId == null) return ServiceResult.fail("FeedId is null");
 
@@ -468,5 +532,20 @@ public class FeedService {
 
         return ServiceResult.success(nullableFeed.getOwner().getMemberId());
 
+    }
+
+
+    /**
+     * 멤버 ID가 유효한지 검사합니다.
+     *
+     * @author Woody K
+     * @since JDK 17
+     *
+     * @param memberId 검사할 멤버의 ID
+     * @return boolean. 유효한 멤버 ID인 경우 true, 그렇지 않은 경우 false.
+     */
+    public boolean checkIsValidMemberId(String memberId){
+        if (memberId == null) return false;
+        return memberRepository.findByMemberId(memberId) != null;
     }
 }
