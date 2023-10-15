@@ -21,7 +21,7 @@ public class InteractionProps {
             this.content = "\uD83D\uDC4F";
             this.backgroundColor = "transparent";
             this.border = "2px solid #651fff";
-            this.fontSize = null;
+            this.fontSize = "20px";
         }else{
             this.content = "박수";
             this.backgroundColor = "#EAED70";
