@@ -10,9 +10,10 @@
 
         function updateRequestUrl() {
             const memberId = document.getElementById("memberId").value || "{memberId}";
+            const name = document.getElementById("name").value || "{name}";
             const requestUrlElement = document.getElementById("requestUrl");
-            requestUrlElement.textContent = `${BASE_URL}${ENDPOINT_URL}/${memberId}`;
-            requestUrlElement.innerHTML = `${BASE_URL}${ENDPOINT_URL}<span style="color: gray;">/${memberId}?name={name}</span>`;
+            requestUrlElement.textContent = `${BASE_URL}${ENDPOINT_URL}/${memberId}?name=${name}`;
+            requestUrlElement.innerHTML = `${BASE_URL}${ENDPOINT_URL}<span style="color: gray;">/${memberId}?name=${name}</span>`;
         }
 
         function copyToClipboard() {
@@ -103,7 +104,7 @@
           <tr>
             <td><label for="memberId"><b><span>*</span>memberId</b></label></td>
             <td>String</td>
-            <td><input type="text" id="memberId" placeholder="memberId" required></td>
+            <td><input type="text" id="memberId" placeholder="memberId" required oninput="updateRequestUrl()"></td>
           </tr>
         </table>
         <h3>Query Params</h3>
@@ -111,7 +112,7 @@
           <tr>
             <td><label for="name"><b><span>*</span>name</b></label></td>
             <td>String</td>
-            <td><input type="text" id="name" placeholder="name" required></td>
+            <td><input type="text" id="name" placeholder="name" required oninput="updateRequestUrl()"></td>
           </tr>
         </table>
         <br><br>

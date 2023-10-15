@@ -11,7 +11,8 @@
         function updateRequestUrl() {
             const feedId = document.getElementById("feedId").value || "{feedId}";
             const requestUrlElement = document.getElementById("requestUrl");
-            requestUrlElement.textContent = `${BASE_URL}${ENDPOINT_URL}/${feedId}`;
+            requestUrlElement.textContent = `${BASE_URL}${ENDPOINT_URL}?feedId=${feedId}`;
+            requestUrlElement.innerHTML = `${BASE_URL}${ENDPOINT_URL}<span style="color: gray;">?feedId=${feedId}</span>`;
         }
 
         function copyToClipboard() {
@@ -101,7 +102,7 @@
                     <tr>
                         <td><label for="feedId"><b><span>*</span>feedId</b></label></td>
                         <td>String</td>
-                        <td><input type="text" id="feedId" placeholder="feedId" required></td>
+                        <td><input type="text" id="feedId" placeholder="feedId" required oninput="updateRequestUrl()"></td>
                     </tr>
                 </table>
                 <br><br>
