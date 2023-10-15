@@ -1,6 +1,7 @@
 package com.teamseven.MusicVillain.Member;
 
 import com.teamseven.MusicVillain.Dto.DataTransferObject;
+import com.teamseven.MusicVillain.Dto.RequestBody.WithdrawalCreationRequestBody;
 import com.teamseven.MusicVillain.Dto.ResponseBody.ResponseObject;
 import com.teamseven.MusicVillain.Dto.RequestBody.MemberCreationRequestBody;
 import com.teamseven.MusicVillain.Security.JWT.MemberJwtAuthorizationManager;
@@ -9,6 +10,7 @@ import com.teamseven.MusicVillain.Dto.ServiceResult;
 import com.teamseven.MusicVillain.Dto.ResponseBody.Status;
 import com.teamseven.MusicVillain.Dto.MemberDto;
 import com.teamseven.MusicVillain.Security.OAuth.OAuthService;
+import com.teamseven.MusicVillain.Withdrawal.WithdrawalService;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -34,6 +36,7 @@ public class MemberController {
 
     private final MemberService memberService;
     private final MemberJwtAuthorizationManager authManager;
+    private final WithdrawalService withdrawalService;
     private final OAuthService oAuthService;
 
 
@@ -175,6 +178,7 @@ public class MemberController {
     public ResponseObject deleteMemberByMemberId(
             @Parameter(description = "탈퇴할 회원의 멤버 아이디", required = true)
             @PathVariable("memberId") String memberId,
+            @RequestBody WithdrawalCreationRequestBody withdrawalCreationRequestBody,
             @Parameter(description = "JWT Token", required = true)
             @RequestHeader HttpHeaders requestHeader){
 
@@ -197,6 +201,8 @@ public class MemberController {
                 return ResponseObject.onlyData(Status.BAD_REQUEST, "Unlink failed");
             }
         }
+
+        ServiceResult insertWithdrawalResult = withdrawalService.insertWithdrawal(withdrawalCreationRequestBody);
 
         return ResponseObject.of(Status.OK, deleteMemberResult.getData());
 
